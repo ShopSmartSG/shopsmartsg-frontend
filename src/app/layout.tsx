@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { PrimeReactProvider } from "primereact/api";
+import Navbar from '../../shared/components/navbar/navbar';
 
-import Navbar from "../../shared/components/navbar/navbar";
 
 export const metadata: Metadata = {
   title: "ShopSmart",
@@ -22,7 +22,7 @@ export default function RootLayout({
       <body>
         <PrimeReactProvider>
           <Navbar />
-          <div className="pagePadding">{children}</div>
+          <div>{children}</div>
         </PrimeReactProvider>
       </body>
     </html>

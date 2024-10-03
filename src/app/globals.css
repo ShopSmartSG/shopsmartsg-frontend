@@ -2,10 +2,7 @@
 @import "../../node_modules/primeflex/primeflex.css";
 @import "../../node_modules/primeicons/primeicons.css";
 
-.p-button{
-    height: 40px !important;
-    min-width: 100px !important;
-}
+
 
 .pagePadding{
     padding: 20px;
@@ -14,4 +11,9 @@ label{
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
     color: #4B4B4B;
+}
+
+body{
+    margin: 0px;
+   
 }

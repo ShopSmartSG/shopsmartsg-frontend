@@ -3,7 +3,8 @@ import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { confirmDialog, } from "primereact/confirmdialog";
+import '../merchant/merchant.css';
 interface FormData {
   email: string;
   phone: string;
@@ -136,7 +137,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="p-2">
       <div className="grid">
         <div className="col-6">
           <h1 style={{ color: "#007A7C" }}>Merchant Details</h1>
@@ -253,12 +254,13 @@ const Page: React.FC = () => {
                 disabled={!editDetailsEnable}
               />
               <Toast ref={toast} />
-              <ConfirmDialog />
+
             </div>
           </div>
         </div>
       </form>
     </div>
+    
   );
 };
 
