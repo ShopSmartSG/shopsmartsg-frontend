@@ -227,6 +227,16 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                             <li>
                               <Link
+                                href="/merchant/login"
+                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-chart-line mr-2"></i>
+                                <span className="font-medium">Login</span>
+                                <Ripple />
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
                                 href="/merchant/manage/view"
                                 className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
@@ -265,26 +275,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             <Ripple />
                           </Link>
                         </li>
-                        <li>
-                          <Link
-                            href="/"
-                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
-                          >
-                            <i className="pi pi-calendar mr-2"></i>
-                            <span className="font-medium">Calendar</span>
-                            <Ripple />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/"
-                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
-                          >
-                            <i className="pi pi-cog mr-2"></i>
-                            <span className="font-medium">Settings</span>
-                            <Ripple />
-                          </Link>
-                        </li>
+                     
                       </ul>
                     </li>
                   </ul>
