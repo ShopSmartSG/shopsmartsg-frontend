@@ -341,7 +341,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                       image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                       shape="circle"
                     />
-                    <span className="font-bold">Amy Elsner</span>
+                    <span className="font-bold">Yatharth Sathija</span>
                   </Link>
                 </div>
               </div>
