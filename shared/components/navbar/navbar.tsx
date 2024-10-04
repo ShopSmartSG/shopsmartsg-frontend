@@ -40,17 +40,11 @@ export default function Navbar() {
       template: itemRenderer,
     },
     {
-      label: "Merchant Create",
-      icon: "pi pi-users",
-      url: "/merchant/manage/create",
+      label: "Admin",
+      icon: "pi pi-user",
+      url: "/admin",
       template: itemRenderer,
-    },
-    {
-      label: "Merchant View",
-      icon: "pi pi-users",
-      url: "/merchant/manage/view",
-      template: itemRenderer,
-    },
+    }
   ];
 
   const start = (

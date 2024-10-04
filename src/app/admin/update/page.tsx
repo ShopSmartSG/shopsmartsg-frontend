@@ -4,13 +4,13 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-import "../merchant/merchant.css";
+
 
 interface FormData {
   email: string;
   phone: string;
   addressLine1: string;
-  addressLine2?: string; // Optional field
+  addressLine2?: string; 
   pincode: string;
 }
 
@@ -49,7 +49,6 @@ const Page: React.FC = () => {
     setEditDetailsEnable(true);
   };
 
-  
   const confirm1 = () => {
     confirmDialog({
       message: "Are you sure you want to proceed?",
@@ -87,7 +86,6 @@ const Page: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
 
-
     Object.keys(formData).forEach((key) => {
       const error = validateField(key as keyof FormData);
       if (error) newErrors[key as keyof FormData] = error;
@@ -100,7 +98,6 @@ const Page: React.FC = () => {
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { id } = e.target;
     const error = validateField(id as keyof FormData);
-
 
     if (error) {
       setErrors((prevErrors) => ({
@@ -122,8 +119,8 @@ const Page: React.FC = () => {
       detail: "You have accepted",
       life: 3000,
     });
-    // Add any additional logic here, e.g., form submission
-    setEditDetailsEnable(false); // Disable edit after confirmation
+   
+    setEditDetailsEnable(false); 
   };
 
   const reject = () => {
@@ -136,7 +133,7 @@ const Page: React.FC = () => {
   };
 
   const confirmUpdate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
     if (validateForm()) {
       confirmDialog({
         message: "Are you sure you want to proceed?",
@@ -151,11 +148,11 @@ const Page: React.FC = () => {
 
   return (
     <fieldset>
-      <legend>Merchant</legend>
+      <legend>Admin</legend>
       <div className="p-2">
         <div className="grid">
           <div className="col-6">
-            <h1 style={{ color: "#007A7C" }}>Manage Profile</h1>
+            <h1 style={{ color: "#007A7C" }}>Update Merchant Details</h1>
           </div>
           <div
             className="col-6 flex justify-content-end"
@@ -260,7 +257,6 @@ const Page: React.FC = () => {
                 )}
               </div>
               <div className="field col-12">
-               
                 <Button
                   onClick={confirm1}
                   icon="pi pi-check"
