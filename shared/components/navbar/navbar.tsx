@@ -44,6 +44,12 @@ export default function Navbar() {
       icon: "pi pi-user",
       url: "/admin",
       template: itemRenderer,
+    },
+    {
+      label: "Customer",
+      icon: "pi pi-users",
+      url: "/customer/login",
+      template: itemRenderer,
     }
   ];
 
