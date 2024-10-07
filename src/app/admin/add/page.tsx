@@ -10,6 +10,7 @@ import { InputMask } from "primereact/inputmask";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { classNames } from "primereact/utils";
+import axios from "axios";
 
 export default function CreateMerchantForm() {
   const [showDialog, setShowDialog] = useState(false);
@@ -41,15 +42,29 @@ export default function CreateMerchantForm() {
   });
 
 
-  const handleConfirm = () => {
-    setShowDialog(false);
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Merchant created successfully",
-      life: 3000,
-    });
-    formik.resetForm();
+  const handleConfirm = async() => {
+    const data = {
+      "merchantName": formik.values.merchantName,
+      "merchantEmail": formik.values.email,
+      "addressLine1": formik.values.address1,
+      "addressLine2": formik.values.address2,
+      "phoneNumber": formik.values.phone,
+      "blacklisted": false,
+      "pincode":formik.values.pincode
+
+    }
+
+    const response = await axios.post("http://localhost:8080/merchants", data);
+    if (response.status === 201) {
+       setShowDialog(false);
+       toast.current.show({
+         severity: "success",
+         summary: "Success",
+         detail: "Merchant created successfully",
+         life: 3000,
+       });
+       formik.resetForm();
+    }
   };
 
   return (

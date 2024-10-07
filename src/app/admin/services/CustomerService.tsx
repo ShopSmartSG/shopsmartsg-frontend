@@ -1,4 +1,6 @@
+import axios from "axios";
 export const CustomerService = {
+
   getData() {
     return [
       {
@@ -9034,3 +9036,24 @@ export const CustomerService = {
     ).then((res) => res.json());
   },
 };
+
+export const getStaticProps = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/merchants");
+    const data = await response.data;
+    return {
+      props: {
+        merchants: data
+      }
+    }
+  }
+
+  catch (error) {
+    console.error(error);
+    return {
+      props: {
+        merchants: []
+      }
+    }
+  }
+}
