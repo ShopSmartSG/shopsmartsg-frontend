@@ -1,8 +1,14 @@
-'use client'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 import React, { useState, useEffect } from "react";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
-import { Column, ColumnFilterApplyTemplateOptions, ColumnFilterClearTemplateOptions, ColumnFilterElementTemplateOptions } from "primereact/column";
+import {
+  Column,
+  ColumnFilterApplyTemplateOptions,
+  ColumnFilterClearTemplateOptions,
+  ColumnFilterElementTemplateOptions,
+} from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
@@ -10,7 +16,7 @@ import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 
-import { Calendar, CalendarViewChangeEvent } from "primereact/calendar";
+import { Calendar } from "primereact/calendar";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 
 import { Tag } from "primereact/tag";
@@ -19,8 +25,8 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import { CustomerService } from "./services/CustomerService"
-import '../admin/admin.main.css'
+import { CustomerService } from "./services/CustomerService";
+import "../admin/admin.main.css";
 interface Representative {
   name: string;
   image: string;
@@ -125,7 +131,7 @@ export default function AdvancedFilterDemo() {
 
   const getCustomers = (data: Customer[]) => {
     return [...(data || [])].map((d) => {
-      // @ts-ignore
+      // @ts-expect-error - might be better
       d.date = new Date(d.date);
 
       return d;
@@ -153,9 +159,9 @@ export default function AdvancedFilterDemo() {
 
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let _filters = { ...filters };
+    const _filters = { ...filters };
 
-    // @ts-ignore
+    // @ts-expect-error - might be empty string
     _filters["global"].value = value;
 
     setFilters(_filters);
@@ -166,9 +172,6 @@ export default function AdvancedFilterDemo() {
     setFilters(defaultFilters);
     setGlobalFilterValue("");
   };
-
-  
-   
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -178,14 +181,16 @@ export default function AdvancedFilterDemo() {
           label="Clear"
           outlined
           onClick={clearFilter}
-            />
+        />
 
-            <Button onClick={() => router.push('/admin/add')}>Create Merchant</Button>
-            
-            <p>Admin Portal</p>
+        <Button onClick={() => router.push("/admin/add")}>
+          Create Merchant
+        </Button>
+
+        <p>Admin Portal</p>
         <IconField iconPosition="left">
-                <InputIcon className="pi pi-search" />
-                
+          <InputIcon className="pi pi-search" />
+
           <InputText
             value={globalFilterValue}
             onChange={onGlobalFilterChange}
@@ -195,8 +200,6 @@ export default function AdvancedFilterDemo() {
       </div>
     );
   };
-    
-  
 
   const countryBodyTemplate = (rowData: Customer) => {
     return (
@@ -292,7 +295,7 @@ export default function AdvancedFilterDemo() {
     return (
       <Calendar
         value={options.value}
-        onChange={(e: CalendarChangeEvent) =>
+        onChange={(e) =>
           options.filterCallback(e.value, options.index)
         }
         dateFormat="mm/dd/yy"
@@ -349,18 +352,16 @@ export default function AdvancedFilterDemo() {
   const statusItemTemplate = (option: string) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
+  const router = useRouter();
 
- 
-    const router = useRouter();
-
-    const verifiedUpdateTemplate = ((id: string) => {
-        return (
-         <Button onClick={() => router.push("/admin/update")}>Update</Button>
-     )
- })
+  const verifiedUpdateTemplate = (id: string) => {
+    return <Button onClick={() => router.push("/admin/update")}>Update</Button>;
+  };
   const verifiedBodyTemplate = (rowData: Customer) => {
     return (
-     <Button onClick={() => router.push("/admin/mermanage")}>View Details</Button>
+      <Button onClick={() => router.push("/admin/mermanage")}>
+        View Details
+      </Button>
     );
   };
 

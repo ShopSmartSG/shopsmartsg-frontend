@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { LegacyRef, useRef } from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
@@ -101,7 +101,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                   <span>
                     <Button
                       type="button"
-                      ref={closeIconRef}
+                      ref={closeIconRef as unknown as LegacyRef<Button>}
                       onClick={(e) => hide(e)}
                       icon="pi pi-times"
                       rounded
@@ -275,7 +275,6 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             <Ripple />
                           </Link>
                         </li>
-                     
                       </ul>
                     </li>
                   </ul>

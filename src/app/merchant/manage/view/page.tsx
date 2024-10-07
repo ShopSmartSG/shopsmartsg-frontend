@@ -1,13 +1,14 @@
-'use client'
-import { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import { useState } from "react";
 import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { Divider } from "primereact/divider";
-import { Galleria } from "primereact/galleria";
+
 import Image from "next/image";
-import GasStve from '@/../shared/assets/images/205.jpg'
-import PhoneImage from '@/../shared/assets/images/phone_14_01.jpg'
-import './page.css'
+import GasStve from "@/../shared/assets/images/205.jpg";
+import PhoneImage from "@/../shared/assets/images/phone_14_01.jpg";
+import "./page.css";
 const ProductCatalog = () => {
   // Dummy data for categories and products
   const [categories, setCategories] = useState([
