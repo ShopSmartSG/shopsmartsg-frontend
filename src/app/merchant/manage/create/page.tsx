@@ -5,15 +5,14 @@ import { InputNumber } from "primereact/inputnumber";
 
 import { Toast } from "primereact/toast";
 import { FileUpload } from "primereact/fileupload";
-import { ProgressBar } from "primereact/progressbar";
+
 import { Button } from "primereact/button";
 
-import { Tag } from "primereact/tag";
-import { Fieldset } from "primereact/fieldset";
+
 import { ConfirmDialog } from "primereact/confirmdialog";
 
 const Page = () => {
-    const [value3, setValue3] = useState("");
+
     const [productName, setProductName] = useState("");
     const [productDescription, setProductDescription] = useState("");
     const [visible, setVisible] = useState<boolean>(false);
@@ -81,8 +80,8 @@ const Page = () => {
                 mode="currency"
                 currency="SGD"
                 locale="en-SG"
-                value={productPrice}
-                onValueChange={(e) => setProductPrice(e.value)}
+                value={parseInt(productPrice)}
+                onValueChange={(e) => setProductPrice((e.value.toString()))}
               />
             </div>
             <div className="field col-6">
@@ -93,8 +92,8 @@ const Page = () => {
                 mode="currency"
                 currency="SGD"
                 locale="en-SG"
-                value={listingPrice}
-                onValueChange={(e) => setListingPrice(e.value)}
+                value={parseInt(listingPrice)}
+                onValueChange={(e) => setListingPrice((e.value.toString()))}
               />
             </div>
             <div className="field col-6">
@@ -103,10 +102,10 @@ const Page = () => {
                 id="productPrice"
                 className="w-full"
                
-               
+               value={parseInt(quantity)}
                 locale="en-SG"
               
-                onValueChange={(e) => setQuantity(e.value)}
+                onValueChange={(e) => setQuantity((e.value.toString()))}
               />
             </div>
             <div className="col-6">

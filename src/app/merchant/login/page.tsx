@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "primereact/button";
@@ -17,8 +18,8 @@ const EmailOtpForm = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [otpCount, setOtpCount] = useState(0);
-  const [resendDisabled, setResendDisabled] = useState(true); 
-  const [timer, setTimer] = useState(30); // 
+  const [resendDisabled, setResendDisabled] = useState(true);
+  const [timer, setTimer] = useState(30); //
   const disabledCondition: boolean = otpCount >= 3;
   const toast = useRef(null);
 
@@ -30,7 +31,7 @@ const EmailOtpForm = () => {
           if (prevTimer > 0) {
             return prevTimer - 1;
           } else {
-            setResendDisabled(false); 
+            setResendDisabled(false);
             clearInterval(interval);
             return 30;
           }
@@ -38,7 +39,7 @@ const EmailOtpForm = () => {
       }, 1000);
     }
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [resendDisabled]);
 
   const handleEmailSubmit = (e) => {
@@ -51,7 +52,7 @@ const EmailOtpForm = () => {
     }
 
     setShowOtpDialog(true);
-    setResendDisabled(true); 
+    setResendDisabled(true);
   };
 
   const blurHandler = (value: string) => {
@@ -86,19 +87,19 @@ const EmailOtpForm = () => {
     }
   };
 
-  const otpValidator = (value: string) => {
-    const result = validator.isNumeric(value);
-    if (result) {
-      setOtpError(false);
-      setOtp(value);
-    } else {
-      setOtpError(true);
-    }
-  };
+  // const otpValidator = (value: string) => {
+  //   const result = validator.isNumeric(value);
+  //   if (result) {
+  //     setOtpError(false);
+  //     setOtp(value);
+  //   } else {
+  //     setOtpError(true);
+  //   }
+  // };
 
   const handleResendOtp = () => {
-    setResendDisabled(true); 
-    setTimer(30); 
+    setResendDisabled(true);
+    setTimer(30);
     toast.current.show({
       severity: "info",
       summary: "OTP Resent",
@@ -125,7 +126,7 @@ const EmailOtpForm = () => {
                 onBlur={(e) => blurHandler(e.target.value)}
                 invalid={emailError == "" ? false : true}
                 placeholder="Please Enter your Valid Email"
-                style={{width:'476px',display:'block'}}
+                style={{ width: "476px", display: "block" }}
               />
               {emailError && <small className="p-error">{emailError}</small>}
             </div>
@@ -133,7 +134,7 @@ const EmailOtpForm = () => {
               <Button
                 label="Next"
                 type="submit"
-                style={{width:'80px'}}
+                style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
               />
             </div>
@@ -154,7 +155,7 @@ const EmailOtpForm = () => {
           <InputOtp
             id="otp"
             value={otp}
-            onChange={(e) => setOtp(e.value)}
+            onChange={(e) => setOtp(e.value.toString())}
             length={6}
             disabled={disabledCondition}
           />

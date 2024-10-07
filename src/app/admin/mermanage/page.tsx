@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
-import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
+import { Column, ColumnFilterApplyTemplateOptions, ColumnFilterClearTemplateOptions, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
@@ -20,7 +21,7 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import { CustomerService } from  "../services/CustomerService";
+import { CustomerService } from "../services/CustomerService";
 import { Toast } from "primereact/toast";
 
 interface Representative {
@@ -97,24 +98,24 @@ export default function AdvancedFilterDemo() {
     "negotiation",
     "renewal",
   ]);
-    
-    const accept = () => {
-      toast.current.show({
-        severity: "info",
-        summary: "Confirmed",
-        detail: "You have accepted",
-        life: 3000,
-      });
-    };
 
-    const reject = () => {
-      toast.current.show({
-        severity: "warn",
-        summary: "Rejected",
-        detail: "You have rejected",
-        life: 3000,
-      });
-    };
+  const accept = () => {
+    toast.current.show({
+      severity: "info",
+      summary: "Confirmed",
+      detail: "You have accepted",
+      life: 3000,
+    });
+  };
+
+  const reject = () => {
+    toast.current.show({
+      severity: "warn",
+      summary: "Rejected",
+      detail: "You have rejected",
+      life: 3000,
+    });
+  };
 
   const getSeverity = (status: string) => {
     switch (status) {
@@ -145,7 +146,7 @@ export default function AdvancedFilterDemo() {
 
   const getCustomers = (data: Customer[]) => {
     return [...(data || [])].map((d) => {
-      // @ts-ignore
+      // @ts-expect-error - date is a string
       d.date = new Date(d.date);
 
       return d;
@@ -173,9 +174,10 @@ export default function AdvancedFilterDemo() {
 
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let _filters = { ...filters };
+    const  _filters = { ...filters };
 
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     _filters["global"].value = value;
 
     setFilters(_filters);
@@ -186,7 +188,6 @@ export default function AdvancedFilterDemo() {
     setFilters(defaultFilters);
     setGlobalFilterValue("");
   };
-    
 
   const renderHeader = () => {
     return (
@@ -197,9 +198,9 @@ export default function AdvancedFilterDemo() {
           label="Clear"
           outlined
           onClick={clearFilter}
-            />
-            
-            <p className="text-center">Merchant Products</p>
+        />
+
+        <p className="text-center">Merchant Products</p>
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText
@@ -306,7 +307,7 @@ export default function AdvancedFilterDemo() {
     return (
       <Calendar
         value={options.value}
-        onChange={(e: CalendarChangeEvent) =>
+        onChange={(e) =>
           options.filterCallback(e.value, options.index)
         }
         dateFormat="mm/dd/yy"
@@ -373,17 +374,17 @@ export default function AdvancedFilterDemo() {
       ></ProgressBar>
     );
   };
-    
-    const confirm1 = () => {
-      confirmDialog({
-        message: "Are you sure you want to proceed?",
-        header: "Confirmation",
-        icon: "pi pi-exclamation-triangle",
-        defaultFocus: "accept",
-        accept,
-        reject,
-      });
-    };
+
+  const confirm1 = () => {
+    confirmDialog({
+      message: "Are you sure you want to proceed?",
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      defaultFocus: "accept",
+      accept,
+      reject,
+    });
+  };
 
   const activityFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
@@ -408,16 +409,15 @@ export default function AdvancedFilterDemo() {
     return <Button onClick={() => alert(rowData)}>View Details</Button>;
   };
 
-    const deleteCustomer = () => {
-             toast.current.show({
-               severity: "info",
-               summary: "Confirmed",
-               detail: "You have accepted",
-               life: 3000,
-             });
-
-   }
-    const deleteTemplate = (rowData: Customer) => {
+  const deleteCustomer = () => {
+    toast.current.show({
+      severity: "info",
+      summary: "Confirmed",
+      detail: "You have accepted",
+      life: 3000,
+    });
+  };
+  const deleteTemplate = (rowData: Customer) => {
     return (
       <Button
         onClick={confirm1}
@@ -427,7 +427,7 @@ export default function AdvancedFilterDemo() {
         className="mr-2"
       ></Button>
     );
-}
+  };
   const verifiedFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
@@ -525,9 +525,7 @@ export default function AdvancedFilterDemo() {
           filter
           filterElement={statusFilterTemplate}
         />
-        
 
-       
         <Column
           field="Delete"
           header="Delete"
