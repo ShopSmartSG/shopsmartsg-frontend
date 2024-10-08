@@ -66,7 +66,7 @@ const Page = () => {
                 <div className="col-3">
                     <h3>Customer Service</h3>
                     <ul className="p-reset">
-                        <li><Link href="/help" className="p-mt-1">Help Center</Lin></li>
+                        <li><Link href="/help" className="p-mt-1">Help Center</Link></li>
                         <li><Link href="/returns" className="p-mt-1">Returns & Refunds</Link></li>
                         <li><Link href="/shipping" className="p-mt-1">Shipping Information</Link></li>
                         <li><Link href="/faq" className="p-mt-1">FAQs</Link></li>
