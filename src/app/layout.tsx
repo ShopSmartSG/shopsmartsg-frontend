@@ -22,7 +22,7 @@ export default function RootLayout({
       <body>
         <PrimeReactProvider>
           <Navbar />
-          <div className="p-2">{children}</div>
+          <div className="p-2 surface-ground">{children}</div>
         </PrimeReactProvider>
       </body>
     </html>

@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
+import { Toast } from "primereact/toast";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+
 import {
   Column,
   ColumnFilterApplyTemplateOptions,
@@ -26,7 +29,9 @@ import {
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import { CustomerService } from "./services/CustomerService";
+import {getStaticProps} from "./services/CustomerService"
 import "../admin/admin.main.css";
+import axios from "axios";
 interface Representative {
   name: string;
   image: string;
@@ -38,16 +43,8 @@ interface Country {
 }
 
 interface Customer {
-  id: number;
-  name: string;
-  country: Country;
-  company: string;
-  date: string;
-  status: string;
-  verified: boolean;
-  activity: number;
-  representative: Representative;
-  balance: number;
+  merchantName: string;
+  merchantId: string;
 }
 
 const defaultFilters: DataTableFilterMeta = {
@@ -102,6 +99,7 @@ export default function AdvancedFilterDemo() {
     "renewal",
   ]);
 
+  const toast = useRef(null);
   const getSeverity = (status: string) => {
     switch (status) {
       case "unqualified":
@@ -121,14 +119,19 @@ export default function AdvancedFilterDemo() {
     }
   };
 
+  // useEffect(() => {
+  //   CustomerService.getCustomersMedium().then((data: Customer[]) => {
+  //     setCustomers(getCustomers(data));
+  //     setLoading(false);
+  //   });
+  //   initFilters();
+  // }, []);
   useEffect(() => {
-    CustomerService.getCustomersMedium().then((data: Customer[]) => {
-      setCustomers(getCustomers(data));
-      setLoading(false);
+    getStaticProps().then((data) => {
+      setCustomers(data.props.merchants);
     });
     initFilters();
-  }, []);
-
+  },[])
   const getCustomers = (data: Customer[]) => {
     return [...(data || [])].map((d) => {
       // @ts-expect-error - might be better
@@ -138,6 +141,77 @@ export default function AdvancedFilterDemo() {
     });
   };
 
+  
+  const blockUser = async (merchantId:string) => {
+    const response = await axios.put(`http://localhost:8080/merchants/admin/blacklist/${merchantId}`);
+    if (response.status === 200) {
+      toast.current.show({
+        severity: "success",
+        summary: "Blocked",
+        detail: "Merchant has been blocked successfully",
+        life: 3000,
+      });
+      setCustomers(customers.map((c) => c.merchantId === merchantId? {...c, blacklisted: true } : c));
+    }
+  }
+  
+  const unblockUser = async (merchantId: string) => {
+    const response = await axios.put(`http://localhost:8080/merchants/admin/unblacklist/${merchantId}`);
+    if (response.status === 200) {
+      toast.current.show({
+        severity: "info",
+        summary: "Unblocked",
+        detail: "Merchant has been unblocked successfully",
+        life: 3000,
+      });
+      setCustomers(customers.map((c) => c.merchantId === merchantId? {...c, blacklisted:false } : c));
+    }
+  }
+
+  const deleteCustomer = async(rowId: string) => {
+    const response = await axios.delete(`http://localhost:8080/merchants/${rowId}`);
+    if (response.status === 200) {
+      toast.current.show({
+        severity: "success",
+        summary: "Deleted",
+        detail: "Customer deleted successfully",
+        life: 3000,
+      });
+      setCustomers(customers.filter((c) => c.merchantId!== rowId));
+    }
+    
+  }
+  const deleteCustomerPopUp = async(rowId:string) => {
+
+    confirmDialog({
+      message: "Are you sure you want to delete this customer?",
+      header: "Confirm Delete",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => deleteCustomer(rowId),
+      reject: () => {},
+    })
+  }
+
+  const blockUserPopUp =  (merchantId: string) => {
+    confirmDialog({
+    message: "Are you sure you want to block this customer?",
+      header: "Confirm Block",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => blockUser(merchantId),
+      reject: () => {},
+  })
+}
+
+  const unBlockUserPopup = (merchantId: string) => {
+    confirmDialog({
+      message: "Are you sure you want to unblock this customer?",
+      header: "Confirm Unblock",
+      icon: "pi pi-check",
+      accept: () => unblockUser(merchantId),
+      reject: () => {},
+ 
+   })
+ }
   const formatDate = (value: Date) => {
     return value.toLocaleDateString("en-US", {
       day: "2-digit",
@@ -201,19 +275,7 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-  const countryBodyTemplate = (rowData: Customer) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt="flag"
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`flag flag-${rowData.country.code}`}
-          style={{ width: "24px" }}
-        />
-        <span>{rowData.country.name}</span>
-      </div>
-    );
-  };
+
 
   const filterClearTemplate = (options: ColumnFilterClearTemplateOptions) => {
     return (
@@ -240,22 +302,6 @@ export default function AdvancedFilterDemo() {
   const filterFooterTemplate = () => {
     return <div className="px-3 pt-0 pb-3 text-center">Filter by Country</div>;
   };
-
-  const representativeBodyTemplate = (rowData: Customer) => {
-    const representative = rowData.representative;
-
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={representative.name}
-          src={`https://primefaces.org/cdn/primereact/images/avatar/${representative.image}`}
-          width="32"
-        />
-        <span>{representative.name}</span>
-      </div>
-    );
-  };
-
   const representativeFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
@@ -288,7 +334,7 @@ export default function AdvancedFilterDemo() {
   };
 
   const dateBodyTemplate = (rowData: Customer) => {
-    return formatDate(new Date(rowData.date));
+    return formatDate(new Date());
   };
 
   const dateFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
@@ -306,7 +352,7 @@ export default function AdvancedFilterDemo() {
   };
 
   const balanceBodyTemplate = (rowData: Customer) => {
-    return formatCurrency(rowData.balance);
+    return formatCurrency(4500);
   };
 
   const balanceFilterTemplate = (
@@ -326,9 +372,7 @@ export default function AdvancedFilterDemo() {
   };
 
   const statusBodyTemplate = (rowData: Customer) => {
-    return (
-      <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
-    );
+    return <Tag value={"proposal"} severity={getSeverity("proposal")} />;
   };
 
   const statusFilterTemplate = (
@@ -349,6 +393,18 @@ export default function AdvancedFilterDemo() {
     );
   };
 
+  const blockTemplate = (rowData) => {
+    return rowData.blacklisted ? (
+      <Button onClick={() => unBlockUserPopup(rowData.merchantId)}>Unblock</Button>
+    ) : (
+      <Button
+        icon="pi pi-ban"
+        label="Block"
+        severity="danger"
+        onClick={() => blockUserPopUp(rowData.merchantId)}
+      />
+    );
+  };
   const statusItemTemplate = (option: string) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
@@ -384,6 +440,19 @@ export default function AdvancedFilterDemo() {
     );
   };
 
+
+  const verifiedDeleteTemplate = (rowData) => {
+   
+    return (
+      <Button
+        type="button"
+        icon="pi pi-trash"
+        onClick={() => deleteCustomerPopUp(rowData.merchantId)}
+        severity="danger"
+      ></Button>
+    );
+  }
+
   const header = renderHeader();
 
   return (
@@ -408,33 +477,14 @@ export default function AdvancedFilterDemo() {
         onFilter={(e) => setFilters(e.filters)}
       >
         <Column
-          field="name"
+          field="merchantName"
           header="Name"
-          filter
+          filter={true}
+          filterField="merchantName"
           filterPlaceholder="Search by name"
           style={{ minWidth: "12rem" }}
         />
-        <Column
-          header="Country"
-          filterField="country.name"
-          style={{ minWidth: "12rem" }}
-          body={countryBodyTemplate}
-          filter
-          filterPlaceholder="Search by country"
-          filterClear={filterClearTemplate}
-          filterApply={filterApplyTemplate}
-          filterFooter={filterFooterTemplate}
-        />
-        <Column
-          header="Agent"
-          filterField="representative"
-          showFilterMatchModes={false}
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ minWidth: "14rem" }}
-          body={representativeBodyTemplate}
-          filter
-          filterElement={representativeFilterTemplate}
-        />
+
         <Column
           header="Date"
           filterField="date"
@@ -482,7 +532,27 @@ export default function AdvancedFilterDemo() {
           filter
           filterElement={verifiedFilterTemplate}
         />
+        <Column
+          field="merchantId"
+          header="Delete"
+          bodyClassName="text-center"
+          style={{ minWidth: "8rem" }}
+          body={verifiedDeleteTemplate}
+          filter
+          filterElement={verifiedFilterTemplate}
+        />
+        <Column
+          field="Block"
+          header="Block"
+          bodyClassName="text-center"
+          style={{ minWidth: "8rem" }}
+          body={blockTemplate}
+         
+          
+        />
       </DataTable>
+      <Toast ref={toast} />
+      <ConfirmDialog />
     </div>
   );
 }

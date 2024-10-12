@@ -22,6 +22,7 @@ import {
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import { CustomerService } from "../services/CustomerService";
+import {getStaticProps} from "../services/CustomerService"
 import { Toast } from "primereact/toast";
 
 interface Representative {
@@ -428,6 +429,8 @@ export default function AdvancedFilterDemo() {
       ></Button>
     );
   };
+
+  
   const verifiedFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
@@ -536,6 +539,7 @@ export default function AdvancedFilterDemo() {
           filter
           filterElement={verifiedFilterTemplate}
         />
+       
       </DataTable>
       <Toast ref={toast} />
       <ConfirmDialog />
