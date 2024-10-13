@@ -27,12 +27,12 @@ export default function Navbar() {
   );
 
   const items: MenuItem[] = [
-    {
-      label: "Dashboard",
-      icon: "pi pi-home",
-      url: "/customer/dashboard",
-      template: itemRenderer,
-    },
+    // {
+    //   label: "Dashboard",
+    //   icon: "pi pi-home",
+    //   url: "/customer/dashboard",
+    //   template: itemRenderer,
+    // },
     {
       label: "Merchant",
       icon: "pi pi-users",
@@ -44,7 +44,17 @@ export default function Navbar() {
       icon: "pi pi-user",
       url: "/admin",
       template: itemRenderer,
+    },
+    {
+      label: "Orders",
+      icon: "pi pi-gift",
+      url: "/customer/orders",
+      template: itemRenderer,
     }
+  ];
+
+  const endItems: MenuItem[] = [
+   
   ];
 
   const start = (
@@ -55,15 +65,11 @@ export default function Navbar() {
 
   const end = (
     <div className="flex align-items-center gap-2">
-      <InputText
-        placeholder="Search"
-        type="text"
-        className="w-8rem sm:w-auto"
-      />
-      <Avatar
-        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-        shape="circle"
-      />
+      {/* <Link className="flex align-items-center p-menuitem-link" href="/customer/orders">
+      <span className="pi-gift" />
+      <span className="mx-2">Orders</span>
+      </Link> */}
+      {/* <Menubar model={endItems} /> */}
       <Button
         icon="pi pi-bars"
         onClick={() => setSidebarVisible(true)}
@@ -73,12 +79,13 @@ export default function Navbar() {
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
       />
+      
     </div>
   );
 
   return (
-    <div className="card">
-      <Menubar model={items} start={start} end={end} />
-    </div>
-  );
-}
+      <div className="card">
+        <Menubar model={items} start={start} end={end} />
+      </div>
+    );
+  }
