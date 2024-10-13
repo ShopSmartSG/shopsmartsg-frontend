@@ -63,12 +63,12 @@ export default function Navbar() {
     );
 
   const items: MenuItem[] = [
-    {
-      label: "Dashboard",
-      icon: "pi pi-home",
-      url: "/customer/dashboard",
-      template: itemRenderer,
-    },
+    // {
+    //   label: "Dashboard",
+    //   icon: "pi pi-home",
+    //   url: "/customer/dashboard",
+    //   template: itemRenderer,
+    // },
     {
       label: "Merchant",
       icon: "pi pi-users",
@@ -80,7 +80,17 @@ export default function Navbar() {
       icon: "pi pi-user",
       url: "/admin",
       template: itemRenderer,
+    },
+    {
+      label: "Orders",
+      icon: "pi pi-gift",
+      url: "/customer/orders",
+      template: itemRenderer,
     }
+  ];
+
+  const endItems: MenuItem[] = [
+   
   ];
 
   const start = (
@@ -91,6 +101,7 @@ export default function Navbar() {
 
   const end = (
     <div className="flex align-items-center gap-2">
+
       <i
         className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
         style={{ fontSize: "24px" }}
@@ -102,6 +113,7 @@ export default function Navbar() {
         image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
         shape="circle"
       />
+
       <Button
         icon="pi pi-bars"
         onClick={() => setSidebarVisible(true)}
@@ -165,12 +177,13 @@ export default function Navbar() {
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
       />
+      
     </div>
   );
 
   return (
-    <div className="card">
-      <Menubar model={items} start={start} end={end} />
-    </div>
-  );
-}
+      <div className="card">
+        <Menubar model={items} start={start} end={end} />
+      </div>
+    );
+  }
