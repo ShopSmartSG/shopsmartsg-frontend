@@ -12,6 +12,7 @@ import { Divider } from "primereact/divider";
 import { InputText } from "primereact/inputtext";
 import { PrimeIcons } from "primereact/api";
 import Link from "next/link";
+import { AutoComplete } from "primereact/autocomplete";
 
 const categories = [
   { label: 'All', value: null },
@@ -168,8 +169,8 @@ const Page = () => {
 
   return (
     <div>
-      <div className="grid dir-col p-2">
-        <div className="col-12 md-6 p-inputgroup">
+      <div className="grid  p-2">
+        <div className="col-12  p-inputgroup">
           <Dropdown
             value={selectedCategory}
             options={categories}
@@ -177,7 +178,7 @@ const Page = () => {
             placeholder="Select a Category"
             className="mr-2"
           />
-          <InputText
+          <AutoComplete
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search..."
@@ -206,12 +207,28 @@ const Page = () => {
         </div>
       </div>
       <Card>
-        <div className="content">
+        <div>
           <div className="grid text-center">
-            <div className="col-3 cursor-pointer">Groceries</div>
-            <div className="col-3 cursor-pointer">Electronics</div>
-            <div className="col-3 cursor-pointer">Clothing</div>
-            <div className="col-3 cursor-pointer">Books</div>
+            <div className="col-3 cursor-pointer">
+              <Card>
+                Groceries
+              </Card>
+            </div>
+            <div className="col-3 cursor-pointer">
+              <Card>
+                Electronics
+              </Card>
+            </div>
+            <div className="col-3 cursor-pointer">
+              <Card>
+                Clothing
+              </Card>
+            </div>
+            <div className="col-3 cursor-pointer">
+              <Card>
+                Books
+              </Card>
+            </div>
           </div>
         </div>
       </Card>
