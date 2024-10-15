@@ -11,7 +11,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 const Page = () => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyC4CMPKutQEt59q-1OCRsOdnAUxJetn7GQ",
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
   });
   const [value, setValue] = useState(0);
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
