@@ -169,7 +169,7 @@ const onMapLoad = (map: google.maps.Map) => {
                           <small>{location.name}</small>
                           <br />
                           <a
-                            href={`https://www.google.com/maps?q=${location.lat},${location.lng}`}
+                            href={`https://www.google.com/maps?q=@${location.lat},${location.lng}`}
                             target="_blank"
                           >
                             View Directions on Google Maps
