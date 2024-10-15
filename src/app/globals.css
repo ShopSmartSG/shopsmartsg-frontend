@@ -17,3 +17,6 @@ body{
     margin: 0px;
    
 }
+.col-6{
+    width: 48% !important;
+}

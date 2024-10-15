@@ -86,6 +86,11 @@ export default function Navbar() {
       icon: "pi pi-gift",
       url: "/customer/orders",
       template: itemRenderer,
+    }, {
+      label: "Customer Products",
+      icon: "pi pi-barcode",
+      url: "/customer/products",
+      template: itemRenderer,
     }
   ];
 
