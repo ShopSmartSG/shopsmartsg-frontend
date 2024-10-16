@@ -8,7 +8,7 @@ const Order = ({ params }) => {
     status: 'Order Placed',
     time: '10:00 AM',
     date: '2023-10-01',
-    Merchant: 'Ali',
+    customerName: 'Ali',
     products: [
       { id: 'P12345', name: 'Sample Product 1', quantity: '2' },
       { id: 'P12346', name: 'Sample Product 2', quantity: '1' },
@@ -34,7 +34,7 @@ const Order = ({ params }) => {
             <p>Status: {orderDetails.status}</p>
             <p>Time: {orderDetails.time}</p>
             <p>Date: {orderDetails.date}</p>
-            <p>Merchant: {orderDetails.Merchant}</p>
+            <p>Customer: {orderDetails.customerName}</p>
           </div>
         </div>
       </Card>
