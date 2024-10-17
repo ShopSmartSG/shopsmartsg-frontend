@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { Card } from 'primereact/card';
 import { Image } from 'primereact/image';
 import { Steps } from 'primereact/steps';
+import { Message } from "primereact/message";
+import { Tooltip } from "primereact/tooltip";
+
 
 const orders = [
   { id: '123', status: 'Order Placed', time: '10:00 AM', date: '2023-10-01', Merchant: 'Ali' },
@@ -49,16 +52,42 @@ const orderSteps = [
   return (
     <Card title={`Order ID: ${order.id}`} className="mb-3">
       <div className="flex flex-column md:flex-row justify-content-between align-items-center">
-        <div className="flex-grow-1 mr-3 w-full"  style={{ marginTop: '-50px' }}>
-          <Steps model={orderSteps} activeIndex={activeIndex} readOnly={true} className="m-2 pt-4" />
+        <div className="flex-grow-1 mr-3 w-full" style={{ marginTop: "-50px" }}>
+          <Steps
+            model={orderSteps}
+            activeIndex={activeIndex}
+            readOnly={true}
+            className="m-2 pt-4"
+          />
           <p className="mt-3 mb-2">Time: {order.time}</p>
           <p className="mb-2">Date: {order.date}</p>
           <p className="mb-2">Merchant: {order.Merchant}</p>
-          <Link href={`/customer/orders/${order.id}`} className="p-button p-button-text">
+          <Link
+            href={`/customer/orders/${order.id}`}
+            className="p-button p-button-text"
+          >
             View Order Details
           </Link>
+          <Tooltip
+            target=".navigate-tooltip"
+            content="Click to navigate."
+            position="bottom"
+          ></Tooltip>
+          <div className="flex ">
+            <div className="mr-2 mt-2 navigate-tooltip ">
+              <i className="pi pi-arrow-circle-right block mt-2 navigate-tooltip cursor-pointer"></i>
+            </div>
+            <div>
+              <Message severity="info" text="Click To Navigate." />
+            </div>
+          </div>
         </div>
-        <Image src="https://via.placeholder.com/150" alt="Order Image" width="150" className="mt-3 md:mt-0" />
+        <Image
+          src="https://via.placeholder.com/150"
+          alt="Order Image"
+          width="150"
+          className="mt-3 md:mt-0"
+        />
       </div>
     </Card>
   );
