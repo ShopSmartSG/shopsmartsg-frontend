@@ -1,5 +1,6 @@
 
 'use client';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState } from 'react'
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';

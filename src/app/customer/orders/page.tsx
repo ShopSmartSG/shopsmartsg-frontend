@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import Link from 'next/link';
 import { Card } from 'primereact/card';
@@ -11,8 +12,6 @@ const orders = [
   { id: '125', status: 'Order Ready for Pick Up', time: '12:00 PM', date: '2023-10-03', Merchant: 'Ali' },
 ];
 
-
-
 const getActiveIndex = (status) => {
   switch (status) {
     case 'Order Placed': return 0;
@@ -21,7 +20,6 @@ const getActiveIndex = (status) => {
     default: return 0;
   }
 };
-
 
 const OrderCard = ({ order }) => {
   const activeIndex = getActiveIndex(order.status);

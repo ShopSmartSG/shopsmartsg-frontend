@@ -1,8 +1,10 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import React from 'react';
 import { Card } from 'primereact/card';
 import { Image } from 'primereact/image';
-import { Tooltip } from "primereact/tooltip";
+
 import { Message } from "primereact/message";
 
 const Order = ({ params }) => {
