@@ -2,8 +2,18 @@
 import React from 'react';
 import { Card } from 'primereact/card';
 import { Image } from 'primereact/image';
+import { Tooltip } from "primereact/tooltip";
+import { Message } from "primereact/message";
 
 const Order = ({ params }) => {
+
+  const handleDirections = () =>{
+    window.open(
+      `https://www.google.com/maps?q=@${1.2834},${103.8607}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
   const orderDetails = {
     status: 'Order Placed',
     time: '10:00 AM',
@@ -16,9 +26,24 @@ const Order = ({ params }) => {
     ],
   };
 
+  const footer = () => {
+    return (
+      <div className="w-100 text-right">
+        <Message
+          severity="info"
+          text='Click the icon to navigate to the Merchant.'
+        />
+        <i
+          className="pi pi-directions directions mt-3 ml-2 cursor-pointer text-xl"
+          onClick={handleDirections}
+        ></i>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <Card title={`Order ID: ${params.orderId}`}>
+      <Card title={`Order ID: ${params.orderId}`} footer = {footer}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             {orderDetails.products.map((product) => (
