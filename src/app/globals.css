@@ -20,3 +20,7 @@ body{
 .col-6{
     width: 48% !important;
 }
+
+.col-3{
+    width: 24% !important;
+}
