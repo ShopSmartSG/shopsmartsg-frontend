@@ -47,6 +47,8 @@ interface Customer {
   merchantId: string;
 }
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const defaultFilters: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: {
@@ -143,7 +145,7 @@ export default function AdvancedFilterDemo() {
 
   
   const blockUser = async (merchantId:string) => {
-    const response = await axios.put(`http://localhost:8080/merchants/admin/blacklist/${merchantId}`);
+    const response = await axios.put(`${apiUrl}/merchants/blacklist/${merchantId}`);
     if (response.status === 200) {
       toast.current.show({
         severity: "success",
@@ -156,7 +158,7 @@ export default function AdvancedFilterDemo() {
   }
   
   const unblockUser = async (merchantId: string) => {
-    const response = await axios.put(`http://localhost:8080/merchants/admin/unblacklist/${merchantId}`);
+    const response = await axios.put(`${apiUrl}/merchants/unblacklist/${merchantId}`);
     if (response.status === 200) {
       toast.current.show({
         severity: "info",
@@ -169,7 +171,7 @@ export default function AdvancedFilterDemo() {
   }
 
   const deleteCustomer = async(rowId: string) => {
-    const response = await axios.delete(`http://localhost:8080/merchants/${rowId}`);
+    const response = await axios.delete(`${apiUrl}/merchants/${rowId}`);
     if (response.status === 200) {
       toast.current.show({
         severity: "success",
@@ -477,52 +479,22 @@ export default function AdvancedFilterDemo() {
         onFilter={(e) => setFilters(e.filters)}
       >
         <Column
-          field="merchantName"
+          field="name"
           header="Name"
-          filter={true}
-          filterField="merchantName"
+          filterField="name"
           filterPlaceholder="Search by name"
           style={{ minWidth: "12rem" }}
-        />
-
-        <Column
-          header="Date"
-          filterField="date"
-          dataType="date"
-          style={{ minWidth: "10rem" }}
-          body={dateBodyTemplate}
-          filter
-          filterElement={dateFilterTemplate}
-        />
-        <Column
-          header="Balance"
-          filterField="balance"
-          dataType="numeric"
-          style={{ minWidth: "10rem" }}
-          body={balanceBodyTemplate}
-          filter
-          filterElement={balanceFilterTemplate}
-        />
-        <Column
-          field="status"
-          header="Status"
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ minWidth: "12rem" }}
-          body={statusBodyTemplate}
           filter
           filterElement={statusFilterTemplate}
         />
-
         <Column
-          field="View Details"
-          header="View"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={verifiedBodyTemplate}
-          filter
-          filterElement={verifiedFilterTemplate}
+          field="merchantId"
+          header="ID"
+          filter={true}
+          filterField="merchantId"
+          filterPlaceholder="Search by ID"
+          style={{ minWidth: "12rem" }}
         />
-
         <Column
           field="Update"
           header="Update Details"
@@ -546,9 +518,7 @@ export default function AdvancedFilterDemo() {
           header="Block"
           bodyClassName="text-center"
           style={{ minWidth: "8rem" }}
-          body={blockTemplate}
-         
-          
+          body={blockTemplate}   
         />
       </DataTable>
       <Toast ref={toast} />
