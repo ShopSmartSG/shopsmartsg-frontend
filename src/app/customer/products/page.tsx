@@ -1,7 +1,6 @@
-
 'use client';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Image } from 'primereact/image';
@@ -9,7 +8,38 @@ import { Paginator } from "primereact/paginator";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import { Knob } from "primereact/knob";
 import { ProgressSpinner } from "primereact/progressspinner";
+import axios from 'axios';
+import { useSearchParams } from 'next/navigation'
+
 const Page = () => {
+  const searchParams = useSearchParams();
+  const categoryId  = searchParams.get('categoryId');
+  const maxPrice = searchParams.get('maxPrice');
+  const minPrice = searchParams.get('minPrice');
+  const pincode = searchParams.get('pincode');
+  const searchText = searchParams.get('searchText');
+
+  const [products, setProducts] = useState([]);
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_PRODUCTS_URL}/api/products/filter`, {
+          categoryId,
+          maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+          minPrice: minPrice ? parseFloat(minPrice) : undefined,
+          pincode,
+          searchText
+        });
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();  
+  }, [categoryId, maxPrice, minPrice, pincode, searchText]);
+
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -20,10 +50,10 @@ const onMapLoad = (map: google.maps.Map) => {
   mapRef.current = map;
 };
 
-    const header = (
+    const header = (imageUrl: string): JSX.Element => (
       <Image
         alt="Card"
-        src="https://primefaces.org/cdn/primereact/images/usercard.png"
+        src={imageUrl}
       />
     );
   const containerStyle = {
@@ -81,50 +111,17 @@ const onMapLoad = (map: google.maps.Map) => {
     <div className="grid">
       <div className="col-6">
         <div className="grid">
+        {products.map(product => (
           <div className="col-6">
-            <Card header={header} footer={footer}>
+            <Card header={header(product.imageUrl)} footer={footer}>
               {" "}
+              <h2>{product.productName}</h2>
               <p className="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Inventore sed consequuntur error repudiandae numquam deserunt
-                quisquam repellat libero asperiores earum nam nobis, culpa
-                ratione quam perferendis esse, cupiditate neque quas!
+                {product.productDescription}
               </p>
             </Card>
           </div>
-          <div className="col-6">
-            <Card header={header} footer={footer}>
-              {" "}
-              <p className="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Inventore sed consequuntur error repudiandae numquam deserunt
-                quisquam repellat libero asperiores earum nam nobis, culpa
-                ratione quam perferendis esse, cupiditate neque quas!
-              </p>
-            </Card>
-          </div>
-          <div className="col-6">
-            <Card header={header} footer={footer}>
-              {" "}
-              <p className="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Inventore sed consequuntur error repudiandae numquam deserunt
-                quisquam repellat libero asperiores earum nam nobis, culpa
-                ratione quam perferendis esse, cupiditate neque quas!
-              </p>
-            </Card>
-          </div>
-          <div className="col-6">
-            <Card header={header} footer={footer}>
-              {" "}
-              <p className="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Inventore sed consequuntur error repudiandae numquam deserunt
-                quisquam repellat libero asperiores earum nam nobis, culpa
-                ratione quam perferendis esse, cupiditate neque quas!
-              </p>
-            </Card>
-          </div>
+        ))}
         </div>
       </div>
       <div className="col-6">
@@ -209,8 +206,7 @@ const onMapLoad = (map: google.maps.Map) => {
         <Paginator
           first={first}
           rows={rows}
-          totalRecords={120}
-          rowsPerPageOptions={[10, 20, 30]}
+          totalRecords={products.length}
           onPageChange={onPageChange}
         />
       </div>

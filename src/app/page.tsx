@@ -7,26 +7,44 @@ import { Card } from 'primereact/card'
 import { ProductService } from "./ProductService";
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
+import { useRouter } from 'next/navigation';
 import { Divider } from "primereact/divider";
+import axios from "axios";
 
 import { InputText } from "primereact/inputtext";
 import { PrimeIcons } from "primereact/api";
 import Link from "next/link";
 import { AutoComplete } from "primereact/autocomplete";
 
-const categories = [
-  { label: 'All', value: null },
-  { label: 'Electronics', value: 'electronics' },
-  { label: 'Fashion', value: 'fashion' },
-  { label: 'Home', value: 'home' },
-  // Add more categories as needed
-];
+const apiUrlProduct = process.env.NEXT_PUBLIC_API_PRODUCTS_URL;
+
 const Page = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [pincode, setPincode] = useState('');
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
+  const [categories, setCategories] = useState([{ label: 'All', value: null }]);
+  const router = useRouter();
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${apiUrlProduct}/categories`);
+        const data = response.data;
+        const formattedCategories = data.map(category => ({
+          label: category.categoryName,
+          value: category.categoryId
+        }));
+        setCategories([{ label: 'All', value: null }, ...formattedCategories]);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const header = () => {
     return (
@@ -37,16 +55,16 @@ const Page = () => {
   }
 
   const handleSearch = () => {
-    // Implement search logic here
-    console.log({
-      searchTerm,
-      selectedCategory,
-      pincode,
-      minPrice,
-      maxPrice,
-    });
-    // Make backend call with search term and filters
+    const queryParams = new URLSearchParams({
+      categoryId: selectedCategory || '',
+      maxPrice: maxPrice?.toString() || '',
+      minPrice: minPrice?.toString() || '',
+      pincode: pincode || '',
+      searchText: searchTerm || ''
+    }).toString();
+    router.push(`/customer/products?${queryParams}`);
   };
+
   const [products, setProducts] = useState([]);
   const responsiveOptions = [
     {
