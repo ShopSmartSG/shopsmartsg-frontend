@@ -2,7 +2,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from 'primereact/card';
-
 import { Button } from 'primereact/button';
         
 

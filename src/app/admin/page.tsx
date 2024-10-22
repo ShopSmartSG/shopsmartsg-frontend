@@ -48,6 +48,8 @@ interface Customer {
   merchantId: string;
 }
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const defaultFilters: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: {
@@ -479,8 +481,7 @@ export default function AdvancedFilterDemo() {
         <Column
           field="name"
           header="Name"
-          filter={true}
-          filterField="merchantName"
+          filterField="name"
           filterPlaceholder="Search by name"
           style={{ minWidth: "12rem" }}
           className="capitalize"
@@ -513,17 +514,14 @@ export default function AdvancedFilterDemo() {
           filter
           filterElement={statusFilterTemplate}
         />
-
         <Column
-          field="View Details"
-          header="View"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={verifiedBodyTemplate}
-          filter
-          filterElement={verifiedFilterTemplate}
+          field="merchantId"
+          header="ID"
+          filter={true}
+          filterField="merchantId"
+          filterPlaceholder="Search by ID"
+          style={{ minWidth: "12rem" }}
         />
-
         <Column
           field="Update"
           header="Update Details"

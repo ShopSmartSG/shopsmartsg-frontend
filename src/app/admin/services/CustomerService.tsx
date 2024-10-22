@@ -1,4 +1,5 @@
 import axios from "axios";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const CustomerService = {
 
   getData() {
@@ -9039,7 +9040,7 @@ export const CustomerService = {
 
 export const getStaticProps = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/merchants");
+    const response = await axios.get(`${apiUrl}/merchants`);
     const data = await response.data;
     return {
       props: {
