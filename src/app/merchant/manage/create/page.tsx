@@ -1,5 +1,5 @@
 'use client'
-import React, { useState,useRef } from "react";
+import React, { useState,useRef ,useEffect} from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputNumber } from "primereact/inputnumber";
 
@@ -8,17 +8,36 @@ import { FileUpload } from "primereact/fileupload";
 
 import { Button } from "primereact/button";
 
+import { Dropdown } from "primereact/dropdown";
+        
 
 import { ConfirmDialog } from "primereact/confirmdialog";
+import axios from "axios";
 
 const Page = () => {
-
+  const [merchantDetails, setMerchantDetails] = useState({
+    productName: "",
+    category: {
+      categoryName: "",
+      categoryDescription: "",
+    },
+    imageUrl: "",
+    productDescription: "",
+    originalPrice: 0,
+    listingPrice: 0,
+    availableStock: 0,
+    merchantId: "",
+    pincode: "",
+  });
+    const [categories,setCategories] = useState([]);
     const [productName, setProductName] = useState("");
     const [productDescription, setProductDescription] = useState("");
     const [visible, setVisible] = useState<boolean>(false);
-    const [productPrice, setProductPrice] = useState("");
-    const [listingPrice, setListingPrice] = useState("");
-    const [quantity, setQuantity] = useState("");
+    const [productPrice, setProductPrice] = useState(0);
+    const [listingPrice, setListingPrice] = useState(0);
+  const [quantity, setQuantity] = useState(0);
+  const [imageurl, setImageUrl] = useState("");
+  const [category,setCategory] = useState("");
 
     const toast = useRef<Toast>(null);
      const accept = () => {
@@ -38,15 +57,98 @@ const Page = () => {
          life: 3000,
        });
      };
-    const onUpload = () => {
-      toast.current.show({
-        severity: "info",
-        summary: "Success",
-        detail: "File Uploaded",
-      });
+   const onUpload = async (event) => {
+     try {
+       const file = event.files[0];
+       const formData = new FormData();
+       formData.append("file", file);
+       const response = await axios.post(
+         `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/images/upload`,
+         formData,
+         {
+           headers: {
+             "Content-Type": "multipart/form-data",
+           },
+         }
+       );
+
+       setImageUrl(response.data);
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'Image Uploaded Successfully' });
+
+     } catch (error) {
+       toast.current.show({
+         severity: "warn",
+         summary: "Upload Failed",
+         detail: "Image Uploaded Failed, Please Try Again",
+       });
+       console.log(error); // Might Be helpful for FE LOGGING
+
+     }
+   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/categories`
+          
+          );
+        setCategories(response.data);
+      }
+      catch (error) {
+        console.error("Error fetching categories", error);
+      }
+      
+    }
+    fetchCategories();
+    },[])
+
+  useEffect(() => {
+    const getMerchantDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/9c723141-aba9-4653-8cf6-9e253d988fed`
+        );
+        setMerchantDetails(response.data);
+      }
+      catch (error) {
+        console.log("Merchant deetails fetch failed", error); // error
+        toast.current.show({severity:'warn',summary:'Merchant Details Failed',detail:'Merchant Details fetching Failed!! Please try again'})
+      }
+    }
+    getMerchantDetails();
+  }, [])
+  
+
+  const createProduct =  async() => {
+
+    const dataObj = {
+      productName: productName,
+      category: {
+        categoryName: categories.find((value) => value.categoryId === category)
+          .categoryName,
+        categoryDescription: categories.find(
+          (value) => value.categoryId === category
+        ).categoryDescription,
+      },
+      imageUrl: imageurl,
+      productDescription: productDescription,
+      originalPrice: productPrice,
+      listingPrice: listingPrice,
+      availableStock: quantity,
+      merchantId: merchantDetails.merchantId,
+      pincode: merchantDetails.pincode,
     };
    
-
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/products`, dataObj);
+      toast.current.show({ severity: 'success', summary: 'Details updated successsfully', detail: response.status });
+    }
+    catch (error) {
+      toast.current.show({ severity: 'warn', summary: 'Product Creation Failed', detail: 'Please Try Again!!' });
+      console.log('error', error); // error 
+    }
+  }
     
     return (
       <fieldset className="h-screen">
@@ -80,8 +182,8 @@ const Page = () => {
                 mode="currency"
                 currency="SGD"
                 locale="en-SG"
-                value={parseInt(productPrice)}
-                onValueChange={(e) => setProductPrice((e.value.toString()))}
+                value={productPrice}
+                onValueChange={(e) => setProductPrice(e.value)}
               />
             </div>
             <div className="field col-6">
@@ -92,20 +194,41 @@ const Page = () => {
                 mode="currency"
                 currency="SGD"
                 locale="en-SG"
-                value={parseInt(listingPrice)}
-                onValueChange={(e) => setListingPrice((e.value.toString()))}
+                value={listingPrice}
+                onValueChange={(e) => setListingPrice(e.value)}
               />
+            </div>
+            <div className="field col-6">
+              <label htmlFor="category" className="block">
+                Category
+              </label>
+              <Dropdown
+                optionLabel="categoryName"
+                optionValue="categoryId" // Assuming each category has an 'id' field
+                className="w-full"
+                id="category"
+                options={categories}
+                placeholder="Select a Category"
+                value={category} // Bind selected value to 'category' state
+                onChange={(event) => {
+                  setCategory(event.value); // Update category state with selected value
+                  setMerchantDetails((prev) => ({
+                    ...prev,
+                    category:
+                      categories.find((cat) => cat.id === event.value) || {}, // Set full category details
+                  }));
+                }}
+              />
+             
             </div>
             <div className="field col-6">
               <label htmlFor="productPrice">Quantity</label>
               <InputNumber
                 id="productPrice"
                 className="w-full"
-               
-               value={parseInt(quantity)}
+                value={quantity}
                 locale="en-SG"
-              
-                onValueChange={(e) => setQuantity((e.value.toString()))}
+                onValueChange={(e) => setQuantity(e.value)}
               />
             </div>
             <div className="col-6">
@@ -114,12 +237,12 @@ const Page = () => {
                 <Toast ref={toast}></Toast>
                 <FileUpload
                   mode="advanced"
-                  name="demo[]"
-                  url="/api/upload"
+                  name="file"
+                  url={`${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/images/upload`}
                   accept="image/*"
                   maxFileSize={1000000}
                   onUpload={onUpload}
-                  auto
+                  auto={true}
                   chooseLabel="Browse"
                 />
               </div>
@@ -140,7 +263,7 @@ const Page = () => {
               />
               <div className="card">
                 <Button
-                  onClick={() => setVisible(true)}
+                  onClick={() => createProduct()}
                   icon="pi pi-check"
                   label="Create Product"
                 />

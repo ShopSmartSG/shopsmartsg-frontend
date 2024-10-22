@@ -16,7 +16,6 @@ export default function CreateMerchantForm() {
   const [showDialog, setShowDialog] = useState(false);
   const toast = useRef(null);
 
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -41,29 +40,49 @@ export default function CreateMerchantForm() {
     },
   });
 
-
-  const handleConfirm = async() => {
+  const handleConfirm = async () => {
     const data = {
-      "merchantName": formik.values.merchantName,
-      "merchantEmail": formik.values.email,
-      "addressLine1": formik.values.address1,
-      "addressLine2": formik.values.address2,
-      "phoneNumber": formik.values.phone,
-      "blacklisted": false,
-      "pincode":formik.values.pincode
+      name: formik.values.merchantName,
+      emailAddress: formik.values.email,
+      addressLine1: formik.values.address1,
+      addressLine2: formik.values.address2,
+      phoneNumber: formik.values.phone,
+      blacklisted: false,
+      pincode: formik.values.pincode,
+    };
 
-    }
-
-    const response = await axios.post("http://localhost:8080/merchants", data);
-    if (response.status === 201) {
-       setShowDialog(false);
-       toast.current.show({
-         severity: "success",
-         summary: "Success",
-         detail: "Merchant created successfully",
-         life: 3000,
-       });
-       formik.resetForm();
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants`,
+        data
+      );
+      if (response.status === 201) {
+        setShowDialog(false);
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Merchant created successfully",
+          life: 3000,
+        });
+        formik.resetForm();
+      }
+    } catch (error) {
+      setShowDialog(false);
+      if (error.response && error.response.status === 500) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Please check the data you entered and try again.",
+          life: 3000,
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An unexpected error occurred. Please try again later.",
+          life: 3000,
+        });
+      }
     }
   };
 
@@ -74,14 +93,13 @@ export default function CreateMerchantForm() {
       <div className="p-fluid">
         <Toast ref={toast} />
         <form onSubmit={formik.handleSubmit} className="grid formgrid">
-
           <div className="field col-12 md:col-6">
             <label htmlFor="email">Email ID</label>
             <InputText
               id="email"
               value={formik.values.email}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               className={classNames({
                 "p-invalid": formik.touched.email && formik.errors.email,
               })}
@@ -91,14 +109,13 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-
           <div className="field col-12 md:col-6">
             <label htmlFor="phone">Phone Number</label>
             <InputMask
               id="phone"
               value={formik.values.phone}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               mask="999-999-9999"
               className={classNames({
                 "p-invalid": formik.touched.phone && formik.errors.phone,
@@ -109,14 +126,13 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-        
           <div className="field col-12">
             <label htmlFor="address1">Address Line 1</label>
             <InputText
               id="address1"
               value={formik.values.address1}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               className={classNames({
                 "p-invalid": formik.touched.address1 && formik.errors.address1,
               })}
@@ -126,14 +142,13 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-
           <div className="field col-12">
             <label htmlFor="address2">Address Line 2</label>
             <InputText
               id="address2"
               value={formik.values.address2}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               className={classNames({
                 "p-invalid": formik.touched.address2 && formik.errors.address2,
               })}
@@ -143,14 +158,13 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-
           <div className="field col-12 md:col-6">
             <label htmlFor="merchantName">Merchant Name</label>
             <InputText
               id="merchantName"
               value={formik.values.merchantName}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               className={classNames({
                 "p-invalid":
                   formik.touched.merchantName && formik.errors.merchantName,
@@ -161,14 +175,13 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-
           <div className="field col-12 md:col-6">
             <label htmlFor="pincode">Pincode</label>
             <InputMask
               id="pincode"
               value={formik.values.pincode}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               mask="999999"
               className={classNames({
                 "p-invalid": formik.touched.pincode && formik.errors.pincode,
@@ -179,19 +192,17 @@ export default function CreateMerchantForm() {
             )}
           </div>
 
-         
-          <div className="field col-2">
+          <div className="field col-2 mt-3">
             <Button
               type="submit"
               label="Create Merchant"
               className="mt-2"
               onClick={() => setShowDialog(true)}
-              disabled={!(formik.dirty && formik.isValid)} 
+              disabled={!(formik.dirty && formik.isValid)}
             />
           </div>
         </form>
 
-       
         <Dialog
           header="Confirm"
           visible={showDialog}

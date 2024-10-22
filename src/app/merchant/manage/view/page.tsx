@@ -1,209 +1,335 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { Divider } from "primereact/divider";
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-
-
-
-import Image from "next/image";
-import { StaticImageData } from 'next/image';
-import GasStve from "@/../shared/assets/images/205.jpg";
-import PhoneImage from "@/../shared/assets/images/phone_14_01.jpg";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 import "./page.css";
+import axios from "axios";
+import { Toast } from "primereact/toast";
 
+import { Message } from "primereact/message";
+import { InputNumber } from "primereact/inputnumber";
 
 const ProductCatalog = () => {
-  // Dummy data for categories and products
-
+  const [products, setProducts] = useState({});
   const [visible, setVisible] = useState(false);
   const [updateVisible, setUpdateVisible] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: '', price: '', description: '', quantity: 0 });
+  const [formData, setFormData] = useState({
+    id: null,
+    name: "",
+    originalPrice: 0,
+    description: "",
+    quantity: 0,
+    listingPrice: 0,
+    pincode: "",
+  });
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const toast = useRef<Toast>(null);
 
   const handleDeleteClick = (product) => {
     setSelectedProduct(product);
     setVisible(true);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (formData) {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
   const handleUpdateClick = (product) => {
-    setFormData(product);
+    setSelectedProduct(product);
+    setFormData({
+      ...product,
+      originalPrice: product.price,
+    });
     setUpdateVisible(true);
   };
 
-  const handleUpdateSubmit = () => {
-    if (formData) {
-      setCategories((prevCategories) =>
-        prevCategories.map((category) => ({
-          ...category,
-          products: category.products.map((product) =>
-            product.id === formData.id
-              ? { ...product, name: formData.name, price: formData.price, description: formData.description, quantity: formData.quantity }
-              : product
-          ),
-        }))
+  const handleUpdateSubmit = async () => {
+   
+    const updatedProductData = {
+      productId: formData.id,
+      productName: formData.name,
+      categoryId: selectedProduct.categoryId,
+      imageUrl: selectedProduct.image,
+      productDescription: formData.description,
+      originalPrice: formData.originalPrice,
+      listingPrice: formData.listingPrice,
+      availableStock: formData.quantity,
+      pincode: formData.pincode,
+      merchantId: selectedProduct.merchantId,
+    };
+
+
+
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/${updatedProductData.merchantId}/products/${updatedProductData.productId}`,
+        {
+          ...updatedProductData
+        }
       );
+
+      setProducts((prevProducts) => {
+        const updatedProducts = { ...prevProducts };
+        for (const category in updatedProducts) {
+          updatedProducts[category] = updatedProducts[category].map((product) =>
+            product.id === updatedProductData.productId
+              ? { ...product, ...updatedProductData }
+              : product
+          );
+        }
+        return updatedProducts;
+      });
+
       setUpdateVisible(false);
+      toast.current.show({
+        severity: "success",
+        summary: "Product Updated",
+        detail: "Product updated successfully!",
+      });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Update Failed",
+        detail: "Failed to update product. Please try again.",
+      });
     }
   };
 
-  const handleConfirmDelete = () => {
-    // Add your delete logic here
-    setCategories((prevCategories) =>
-      prevCategories.map((category) => ({
-        ...category,
-        products: category.products.filter(
-          (product) => product.id !== selectedProduct.id
-        ),
-      }))
-    );
-    setVisible(false);
-  };
-  const [categories, setCategories] = useState([
-    {
-      name: "Electronics",
-      products: [
-        {
-          id: 1,
-          name: "Smartphone",
-          price: "$499",
-          description: "This is a brief description of Smartphone.",
-          quantity: 10,
-          image: "https://via.placeholder.com/150",
-        },
-        { id: 2, name: "Laptop", price: "$999", description: "Electronic!!", quantity: 15, image: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      name: "Clothing",
-      products: [
-        { id: 3, name: "T-Shirt", price: "$19", description: "This is jeans", quantity: 18, image: "https://via.placeholder.com/150" },
-        { id: 4, name: "Jeans", price: "$49", description: "This is shirt", quantity: 11, image: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      name: "Home Appliances",
-      products: [
-        {
-          id: 5,
-          name: "Refrigerator",
-          price: "$799",
-          description: "This is a brief description of Refrigerator.",
-          quantity: 10,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 6,
-          name: "Microwave",
-          price: "$199",
-          description: "This is a brief description of Microwave.",
-          quantity: 15,
-          image: "https://via.placeholder.com/150",
-        },
-      ],
-    },
-  ]);
+  useEffect(() => {
+    const getMerchantProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/9c723141-aba9-4653-8cf6-9e253d988fed/products`
+        );
+
+        const groupByCategory = response.data.reduce((acc, product) => {
+          const categoryName = product.category.categoryName;
+          if (!acc[categoryName]) acc[categoryName] = [];
+          acc[categoryName].push({
+            id: product.productId,
+            name: product.productName,
+            price: product.originalPrice,
+            listingPrice: product.listingPrice,
+            description: product.productDescription,
+            quantity: product.availableStock,
+            image: product.imageUrl,
+            merchantId: product.merchantId,
+            pincode: product.pincode,
+            categoryId: product.category.categoryId,
+          });
+          return acc;
+        }, {});
+
+        setProducts(groupByCategory);
+      } catch (error) {
+        console.error("Error fetching merchant products:", error);
+      }
+    };
+
+    getMerchantProducts();
+  }, []);
 
   return (
-    <fieldset>
+    <fieldset style={{ height: "100vh" }}>
       <legend>Product Catalog</legend>
-      <div className="p-grid p-dir-col p-2">
-        {categories.map((category) => (
-          <div key={category.name}>
-            <Panel header={category.name}>
-              <div className="grid">
-                {category.products.map((product) => (
-                  <div key={product.id} className="col-4 ">
-                    <Card
-                      title={product.name}
-                      subTitle={product.price}
-                      header={
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          width={100}
-                          height={100}
-                        />
-                      }
-                    >
-                       <p className="p-m-0" style={{ lineHeight: "1.5" }}>
-                        <span className="font-weight-bold">Quantity:</span> {product.quantity}
-                       </p>
-                      <p className="p-m-0" style={{ lineHeight: "1.5" }}>
-                        
-                        {product.description}
-                      </p>
-                      <div className="p-d-flex p-jc-between p-mt-2">
-                        <Button label="Update" className="p-button-primary mr-2" onClick={() => handleUpdateClick(product)} />
-                        <Button icon="pi pi-trash" className="p-button-danger ml-2" onClick={() => handleDeleteClick(product)} />
-                      </div>
-                    </Card>
-                  </div>
-                ))}
+      {Object.keys(products).length > 0 ? (
+        Object.keys(products).map((categoryName) => (
+          <div key={categoryName}>
+            <div className="p-grid p-dir-col p-2">
+              {Object.keys(products).map((categoryName) => (
+                <div key={categoryName}>
+                  <Panel header={categoryName}>
+                    <div className="grid">
+                      {products[categoryName].map((product) => (
+                        <div key={product.id} className="col-4">
+                          <Card
+                            title={product.name}
+                            subTitle={`$${product.price}`}
+                            header={
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                width={100}
+                                height={100}
+                              />
+                            }
+                          >
+                            <p className="p-m-0" style={{ lineHeight: "1.5" }}>
+                              <span className="font-weight-bold">
+                                Quantity:
+                              </span>{" "}
+                              {product.quantity}
+                            </p>
+                            <p className="p-m-0" style={{ lineHeight: "1.5" }}>
+                              {product.description}
+                            </p>
+                            <div className="p-d-flex p-jc-between p-mt-2">
+                              <Button
+                                label="Update"
+                                className="p-button-primary mr-2"
+                                onClick={() => handleUpdateClick(product)}
+                              />
+                              <Button
+                                icon="pi pi-trash"
+                                className="p-button-danger ml-2"
+                                onClick={() => handleDeleteClick(product)}
+                              />
+                            </div>
+                          </Card>
+                        </div>
+                      ))}
+                    </div>
+                  </Panel>
+                  <Divider />
+                </div>
+              ))}
+            </div>
+
+            <Dialog
+              header="Update Product"
+              visible={updateVisible}
+              style={{ width: "450px" }}
+              footer={
+                <div>
+                  <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    onClick={() => setUpdateVisible(false)}
+                    className="p-button-text"
+                  />
+                  <Button
+                    label="Save"
+                    icon="pi pi-check"
+                    onClick={handleUpdateSubmit}
+                    autoFocus
+                  />
+                </div>
+              }
+              onHide={() => setUpdateVisible(false)}
+            >
+              <div className="p-fluid">
+                <div className="p-field p-2">
+                  <label htmlFor="name">Name</label>
+                  <InputText
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        name: event.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="p-field p-2">
+                  <label htmlFor="originalPrice">Original Price</label>
+                  <InputNumber
+                    id="originalPrice"
+                    name="originalPrice"
+                    value={formData.originalPrice}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        originalPrice: event.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="p-field p-2">
+                  <label htmlFor="listingPrice">Listing Price</label>
+                  <InputNumber
+                    id="listingPrice"
+                    name="listingPrice"
+                    value={formData.listingPrice}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        listingPrice: event.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="p-field p-2">
+                  <label htmlFor="description">Description</label>
+                  <InputText
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        description: event.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="p-field p-2">
+                  <label htmlFor="quantity">Quantity</label>
+                  <InputNumber
+                    id="quantity"
+                    name="quantity"
+                    value={formData.quantity}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        quantity: event.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="p-field p-2">
+                  <label htmlFor="pincode">Pincode</label>
+                  <InputText
+                    id="pincode"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        pincode: event.target.value,
+                      })
+                    }
+                  />
+                </div>
               </div>
-            </Panel>
-            <Divider />
-          </div>
-        ))}
-      </div>
+            </Dialog>
 
-      <Dialog
-        header="Confirm Delete"
-        visible={visible}
-        style={{ width: '350px' }}
-        footer={
-          <div>
-            <Button label="No" icon="pi pi-times" onClick={() => setVisible(false)} className="p-button-text" />
-            <Button label="Yes" icon="pi pi-check" onClick={handleConfirmDelete} autoFocus />
+            <Dialog
+              header="Confirm Delete"
+              visible={visible}
+              style={{ width: "350px" }}
+              footer={
+                <div>
+                  <Button
+                    label="No"
+                    icon="pi pi-times"
+                    onClick={() => setVisible(false)}
+                    className="p-button-text"
+                  />
+                  <Button label="Yes" icon="pi pi-check" autoFocus />
+                </div>
+              }
+              onHide={() => setVisible(false)}
+            >
+              <p>Are you sure you want to delete {selectedProduct?.name}?</p>
+            </Dialog>
           </div>
-        }
-        onHide={() => setVisible(false)}
-      >
-        <p>Are you sure you want to delete {selectedProduct?.name}?</p>
-      </Dialog>
-
-      <Dialog
-        header="Update Product"
-        visible={updateVisible}
-        style={{ width: '450px' }}
-        footer={
-          <div>
-            <Button label="Cancel" icon="pi pi-times" onClick={() => setUpdateVisible(false)} className="p-button-text" />
-            <Button label="Save" icon="pi pi-check" onClick={handleUpdateSubmit} autoFocus />
-          </div>
-        }
-        onHide={() => setUpdateVisible(false)}
-      >
-        <div className="p-fluid">
-          <div className="p-field p-2">
-            <label htmlFor="name">Name</label>
-            <InputText id="name" name="name" value={formData.name} onChange={handleInputChange} />
-          </div>
-          <div className="p-field p-2">
-            <label htmlFor="price">Price</label>
-            <InputText id="price" name="price" value={formData.price} onChange={handleInputChange} />
-          </div>
-          <div className="p-field p-2">
-            <label htmlFor="description">Description</label>
-            <InputText id="description" name="description" value={formData.description} onChange={handleInputChange} />
-          </div>
-          <div className="p-field p-2">
-            <label htmlFor="quantity">Quantity</label>
-            <InputText id="quantity" name="quantity" value={formData.quantity.toString()} onChange={handleInputChange} />
+        ))
+      ) : (
+        <div
+          className="flex flex-column flex-wrap"
+          style={{ paddingTop: "42vh" }}
+        >
+          <div className="flex align-items-center justify-content-center">
+            <Message text="No Products Till Now Please Add Products To view." />
           </div>
         </div>
-      </Dialog>
+      )}
+
+      <Toast position="top-right" ref={toast} />
     </fieldset>
   );
 };

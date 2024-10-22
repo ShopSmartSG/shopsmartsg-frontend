@@ -5,7 +5,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-
+import Image from "next/image";
 import {
   Column,
   ColumnFilterApplyTemplateOptions,
@@ -23,13 +23,14 @@ import { Calendar } from "primereact/calendar";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 
 import { Tag } from "primereact/tag";
+
 import { useRouter } from "next/navigation";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import { CustomerService } from "./services/CustomerService";
-import {getStaticProps} from "./services/CustomerService"
+import { getStaticProps } from "./services/CustomerService";
 import "../admin/admin.main.css";
 import axios from "axios";
 interface Representative {
@@ -119,19 +120,12 @@ export default function AdvancedFilterDemo() {
     }
   };
 
-  // useEffect(() => {
-  //   CustomerService.getCustomersMedium().then((data: Customer[]) => {
-  //     setCustomers(getCustomers(data));
-  //     setLoading(false);
-  //   });
-  //   initFilters();
-  // }, []);
   useEffect(() => {
     getStaticProps().then((data) => {
       setCustomers(data.props.merchants);
     });
     initFilters();
-  },[])
+  }, []);
   const getCustomers = (data: Customer[]) => {
     return [...(data || [])].map((d) => {
       // @ts-expect-error - might be better
@@ -141,9 +135,10 @@ export default function AdvancedFilterDemo() {
     });
   };
 
-  
-  const blockUser = async (merchantId:string) => {
-    const response = await axios.put(`http://localhost:8080/merchants/admin/blacklist/${merchantId}`);
+  const blockUser = async (merchantId: string) => {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/blacklist/${merchantId}`
+    );
     if (response.status === 200) {
       toast.current.show({
         severity: "success",
@@ -151,12 +146,18 @@ export default function AdvancedFilterDemo() {
         detail: "Merchant has been blocked successfully",
         life: 3000,
       });
-      setCustomers(customers.map((c) => c.merchantId === merchantId? {...c, blacklisted: true } : c));
+      setCustomers(
+        customers.map((c) =>
+          c.merchantId === merchantId ? { ...c, blacklisted: true } : c
+        )
+      );
     }
-  }
-  
+  };
+
   const unblockUser = async (merchantId: string) => {
-    const response = await axios.put(`http://localhost:8080/merchants/admin/unblacklist/${merchantId}`);
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/unblacklist/${merchantId}`
+    );
     if (response.status === 200) {
       toast.current.show({
         severity: "info",
@@ -164,12 +165,18 @@ export default function AdvancedFilterDemo() {
         detail: "Merchant has been unblocked successfully",
         life: 3000,
       });
-      setCustomers(customers.map((c) => c.merchantId === merchantId? {...c, blacklisted:false } : c));
+      setCustomers(
+        customers.map((c) =>
+          c.merchantId === merchantId ? { ...c, blacklisted: false } : c
+        )
+      );
     }
-  }
+  };
 
-  const deleteCustomer = async(rowId: string) => {
-    const response = await axios.delete(`http://localhost:8080/merchants/${rowId}`);
+  const deleteCustomer = async (merchantId: string) => {
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchantId}`
+    );
     if (response.status === 200) {
       toast.current.show({
         severity: "success",
@@ -177,30 +184,28 @@ export default function AdvancedFilterDemo() {
         detail: "Customer deleted successfully",
         life: 3000,
       });
-      setCustomers(customers.filter((c) => c.merchantId!== rowId));
+      setCustomers(customers.filter((c) => c.merchantId !== merchantId));
     }
-    
-  }
-  const deleteCustomerPopUp = async(rowId:string) => {
-
+  };
+  const deleteCustomerPopUp = async (merchantId: string) => {
     confirmDialog({
       message: "Are you sure you want to delete this customer?",
       header: "Confirm Delete",
       icon: "pi pi-exclamation-triangle",
-      accept: () => deleteCustomer(rowId),
+      accept: () => deleteCustomer(merchantId),
       reject: () => {},
-    })
-  }
+    });
+  };
 
-  const blockUserPopUp =  (merchantId: string) => {
+  const blockUserPopUp = (merchantId: string) => {
     confirmDialog({
-    message: "Are you sure you want to block this customer?",
+      message: "Are you sure you want to block this customer?",
       header: "Confirm Block",
       icon: "pi pi-exclamation-triangle",
       accept: () => blockUser(merchantId),
       reject: () => {},
-  })
-}
+    });
+  };
 
   const unBlockUserPopup = (merchantId: string) => {
     confirmDialog({
@@ -209,9 +214,8 @@ export default function AdvancedFilterDemo() {
       icon: "pi pi-check",
       accept: () => unblockUser(merchantId),
       reject: () => {},
- 
-   })
- }
+    });
+  };
   const formatDate = (value: Date) => {
     return value.toLocaleDateString("en-US", {
       day: "2-digit",
@@ -275,8 +279,6 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-
-
   const filterClearTemplate = (options: ColumnFilterClearTemplateOptions) => {
     return (
       <Button
@@ -323,7 +325,7 @@ export default function AdvancedFilterDemo() {
   const representativesItemTemplate = (option: Representative) => {
     return (
       <div className="flex align-items-center gap-2">
-        <img
+        <Image
           alt={option.name}
           src={`https://primefaces.org/cdn/primereact/images/avatar/${option.image}`}
           width="32"
@@ -341,9 +343,7 @@ export default function AdvancedFilterDemo() {
     return (
       <Calendar
         value={options.value}
-        onChange={(e) =>
-          options.filterCallback(e.value, options.index)
-        }
+        onChange={(e) => options.filterCallback(e.value, options.index)}
         dateFormat="mm/dd/yy"
         placeholder="mm/dd/yyyy"
         mask="99/99/9999"
@@ -395,7 +395,9 @@ export default function AdvancedFilterDemo() {
 
   const blockTemplate = (rowData) => {
     return rowData.blacklisted ? (
-      <Button onClick={() => unBlockUserPopup(rowData.merchantId)}>Unblock</Button>
+      <Button onClick={() => unBlockUserPopup(rowData.merchantId)}>
+        Unblock
+      </Button>
     ) : (
       <Button
         icon="pi pi-ban"
@@ -415,7 +417,7 @@ export default function AdvancedFilterDemo() {
   };
   const verifiedBodyTemplate = (rowData: Customer) => {
     return (
-      <Button onClick={() => router.push("/admin/mermanage")}>
+      <Button onClick={() => router.push({})}>
         View Details
       </Button>
     );
@@ -440,9 +442,7 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-
   const verifiedDeleteTemplate = (rowData) => {
-   
     return (
       <Button
         type="button"
@@ -451,7 +451,7 @@ export default function AdvancedFilterDemo() {
         severity="danger"
       ></Button>
     );
-  }
+  };
 
   const header = renderHeader();
 
@@ -477,12 +477,13 @@ export default function AdvancedFilterDemo() {
         onFilter={(e) => setFilters(e.filters)}
       >
         <Column
-          field="merchantName"
+          field="name"
           header="Name"
           filter={true}
           filterField="merchantName"
           filterPlaceholder="Search by name"
           style={{ minWidth: "12rem" }}
+          className="capitalize"
         />
 
         <Column
@@ -547,8 +548,6 @@ export default function AdvancedFilterDemo() {
           bodyClassName="text-center"
           style={{ minWidth: "8rem" }}
           body={blockTemplate}
-         
-          
         />
       </DataTable>
       <Toast ref={toast} />

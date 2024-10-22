@@ -28,6 +28,14 @@ const Page = () => {
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
 
+  const header = () => {
+    return (
+      <div className="w-100">
+        <h4 className="pt-2 ml-2">Best Of Shopsmart</h4>
+      </div>
+    )
+  }
+
   const handleSearch = () => {
     // Implement search logic here
     console.log({
@@ -85,7 +93,7 @@ const Page = () => {
 
           <div className="col-3">
             <h3>Contact Us</h3>
-            <p><i className="pi pi-map-marker" /> 123 Hung Mui Kui Terrace, Singapore, SG</p>
+            <p><i className="pi pi-map-marker" /> 123 Heng Mui Keng Terrace, Singapore, SG</p>
             <p><i className="pi pi-phone" /> (123) 456-7890</p>
             <p><i className="pi pi-envelope" /> support@shopsmart.com</p>
           </div>
@@ -95,8 +103,7 @@ const Page = () => {
             <h3>Customer Service</h3>
             <ul className="p-reset">
               <li><Link href="/help" className="p-mt-1">Help Center</Link></li>
-              <li><Link href="/returns" className="p-mt-1">Returns & Refunds</Link></li>
-              <li><Link href="/shipping" className="p-mt-1">Shipping Information</Link></li>
+              
               <li><Link href="/faq" className="p-mt-1">FAQs</Link></li>
             </ul>
           </div>
@@ -108,7 +115,7 @@ const Page = () => {
               <li><a href="/shop" className="p-mt-1">Shop</a></li>
               <li><a href="/about" className="p-mt-1">About Us</a></li>
               <li><a href="/contact" className="p-mt-1">Contact</a></li>
-              <li><a href="/blog" className="p-mt-1">Blog</a></li>
+            
             </ul>
           </div>
 
@@ -188,6 +195,7 @@ const Page = () => {
         <div className="col-12 md-6 p-inputgroup">
           <InputText
             value={pincode}
+            maxLength={6}
             onChange={(e) => setPincode(e.target.value)}
             placeholder="Pincode"
             className="mr-2"
@@ -210,30 +218,22 @@ const Page = () => {
         <div>
           <div className="grid text-center">
             <div className="col-3 cursor-pointer">
-              <Card>
-                Groceries
-              </Card>
+              <Card>Groceries</Card>
             </div>
             <div className="col-3 cursor-pointer">
-              <Card>
-                Electronics
-              </Card>
+              <Card>Electronics</Card>
             </div>
             <div className="col-3 cursor-pointer">
-              <Card>
-                Clothing
-              </Card>
+              <Card>Clothing</Card>
             </div>
             <div className="col-3 cursor-pointer">
-              <Card>
-                Books
-              </Card>
+              <Card>Books</Card>
             </div>
           </div>
         </div>
       </Card>
       <br />
-      <Card header={"Best Of ShopSmart"}>
+      <Card header={header}>
         <div className="grid text-center">
           <div className="col-3 cursor-pointer">
             <Card>

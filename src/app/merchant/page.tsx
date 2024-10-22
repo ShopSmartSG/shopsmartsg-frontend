@@ -1,10 +1,11 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import "../merchant/merchant.css";
+import axios from "axios";
 
 interface FormData {
   email: string;
@@ -24,7 +25,6 @@ interface Errors {
 
 const Page: React.FC = () => {
   const toast = useRef<Toast>(null);
-
   const [formData, setFormData] = useState<FormData>({
     email: "",
     phone: "",
@@ -32,7 +32,7 @@ const Page: React.FC = () => {
     addressLine2: "",
     pincode: "",
   });
-
+  const [merchantName, setMerchantName] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [editDetailsEnable, setEditDetailsEnable] = useState<boolean>(false);
 
@@ -62,7 +62,7 @@ const Page: React.FC = () => {
   };
   const validateField = (field: keyof FormData): string | undefined => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^[0-9]{10}$/;
+
 
     switch (field) {
       case "email":
@@ -71,7 +71,7 @@ const Page: React.FC = () => {
         break;
       case "phone":
         if (!formData.phone) return "Phone number is required.";
-        if (!phonePattern.test(formData.phone)) return "Invalid phone number.";
+        
         break;
       case "addressLine1":
         if (!formData.addressLine1) return "Address Line 1 is required.";
@@ -115,15 +115,42 @@ const Page: React.FC = () => {
     }
   };
 
-  const accept = () => {
-    toast.current?.show({
-      severity: "success",
-      summary: "Confirmed",
-      detail: "You have accepted",
-      life: 3000,
-    });
-    // Add any additional logic here, e.g., form submission
-    setEditDetailsEnable(false); // Disable edit after confirmation
+  const accept = async () => {
+   const data = {
+     name: merchantName,
+     merchantId: "de2e56fa-b127-4bf4-bd01-163b23ef2db0",
+     addressLine1: formData.addressLine1,
+     addressLine2: formData.addressLine2,
+     pincode: formData.pincode,
+     emailAddress: formData.email,
+     phoneNumber: formData.phone,
+   };
+    try {
+       const response = await axios.put(
+         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/de2e56fa-b127-4bf4-bd01-163b23ef2db0`,
+         data
+       );
+      if (response.status === 200) {
+        toast.current?.show({
+          severity: "success",
+          summary: "Updated",
+          detail: "Your Details have been updated successfully",
+          life: 3000,
+        });
+        setEditDetailsEnable(false); 
+      }
+      
+    }
+    catch (error) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message,
+        life: 3000,
+      });
+    }
+    
+   
   };
 
   const reject = () => {
@@ -149,6 +176,34 @@ const Page: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      
+      try {
+        // Make the API call
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/de2e56fa-b127-4bf4-bd01-163b23ef2db0`
+        );
+
+        // Set the fetched data to state
+        setFormData({
+          ...response.data,
+          email: response.data.emailAddress,
+          phone: response.data.phoneNumber,
+          
+        });
+        setMerchantName(response.data.name);
+      } catch (error) {
+        // Handle errors
+        console.error(error);
+       
+      } 
+    };
+
+    // Call the fetch function
+    fetchData();
+  }, []); 
+
   return (
     <fieldset>
       <legend>Merchant</legend>
@@ -172,7 +227,7 @@ const Page: React.FC = () => {
         <form onSubmit={confirmUpdate}>
           <div className="flex flex-column gap-2">
             <label htmlFor="id">Merchant ID</label>
-            <p>DUMMY MERCHANT</p>
+            <p>de2e56fa-b127-4bf4-bd01-163b23ef2db0</p>
             <div className="form-grid grid">
               <div className="field col-12">
                 <label htmlFor="email">Email ID</label>
@@ -260,7 +315,6 @@ const Page: React.FC = () => {
                 )}
               </div>
               <div className="field col-12">
-               
                 <Button
                   onClick={confirm1}
                   icon="pi pi-check"
