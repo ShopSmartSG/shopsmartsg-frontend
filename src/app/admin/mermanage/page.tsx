@@ -21,7 +21,6 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import { CustomerService } from "../services/CustomerService";
 import {getStaticProps} from "../services/CustomerService"
 import { Toast } from "primereact/toast";
 
@@ -453,96 +452,97 @@ export default function AdvancedFilterDemo() {
   const header = renderHeader();
 
   return (
-    <div className="card p-2">
-      <DataTable
-        value={customers}
-        paginator
-        showGridlines
-        rows={10}
-        loading={loading}
-        dataKey="id"
-        filters={filters}
-        globalFilterFields={[
-          "name",
-          "country.name",
-          "representative.name",
-          "balance",
-          "status",
-        ]}
-        header={header}
-        emptyMessage="No customers found."
-        onFilter={(e) => setFilters(e.filters)}
-      >
-        <Column
-          field="name"
-          header="Name"
-          filter
-          filterPlaceholder="Search by name"
-          style={{ minWidth: "12rem" }}
-        />
-        <Column
-          header="Country"
-          filterField="country.name"
-          style={{ minWidth: "12rem" }}
-          body={countryBodyTemplate}
-          filter
-          filterPlaceholder="Search by country"
-          filterClear={filterClearTemplate}
-          filterApply={filterApplyTemplate}
-          filterFooter={filterFooterTemplate}
-        />
-        <Column
-          header="Agent"
-          filterField="representative"
-          showFilterMatchModes={false}
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ minWidth: "14rem" }}
-          body={representativeBodyTemplate}
-          filter
-          filterElement={representativeFilterTemplate}
-        />
-        <Column
-          header="Date"
-          filterField="date"
-          dataType="date"
-          style={{ minWidth: "10rem" }}
-          body={dateBodyTemplate}
-          filter
-          filterElement={dateFilterTemplate}
-        />
-        <Column
-          header="Balance"
-          filterField="balance"
-          dataType="numeric"
-          style={{ minWidth: "10rem" }}
-          body={balanceBodyTemplate}
-          filter
-          filterElement={balanceFilterTemplate}
-        />
-        <Column
-          field="status"
-          header="Status"
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ minWidth: "12rem" }}
-          body={statusBodyTemplate}
-          filter
-          filterElement={statusFilterTemplate}
-        />
+    <AdminLayout>
+      <div className="card p-2">
+        <DataTable
+          value={customers}
+          paginator
+          showGridlines
+          rows={10}
+          loading={loading}
+          dataKey="id"
+          filters={filters}
+          globalFilterFields={[
+            "name",
+            "country.name",
+            "representative.name",
+            "balance",
+            "status",
+          ]}
+          header={header}
+          emptyMessage="No customers found."
+          onFilter={(e) => setFilters(e.filters)}
+        >
+          <Column
+            field="name"
+            header="Name"
+            filter
+            filterPlaceholder="Search by name"
+            style={{ minWidth: "12rem" }}
+          />
+          <Column
+            header="Country"
+            filterField="country.name"
+            style={{ minWidth: "12rem" }}
+            body={countryBodyTemplate}
+            filter
+            filterPlaceholder="Search by country"
+            filterClear={filterClearTemplate}
+            filterApply={filterApplyTemplate}
+            filterFooter={filterFooterTemplate}
+          />
+          <Column
+            header="Agent"
+            filterField="representative"
+            showFilterMatchModes={false}
+            filterMenuStyle={{ width: "14rem" }}
+            style={{ minWidth: "14rem" }}
+            body={representativeBodyTemplate}
+            filter
+            filterElement={representativeFilterTemplate}
+          />
+          <Column
+            header="Date"
+            filterField="date"
+            dataType="date"
+            style={{ minWidth: "10rem" }}
+            body={dateBodyTemplate}
+            filter
+            filterElement={dateFilterTemplate}
+          />
+          <Column
+            header="Balance"
+            filterField="balance"
+            dataType="numeric"
+            style={{ minWidth: "10rem" }}
+            body={balanceBodyTemplate}
+            filter
+            filterElement={balanceFilterTemplate}
+          />
+          <Column
+            field="status"
+            header="Status"
+            filterMenuStyle={{ width: "14rem" }}
+            style={{ minWidth: "12rem" }}
+            body={statusBodyTemplate}
+            filter
+            filterElement={statusFilterTemplate}
+          />
 
-        <Column
-          field="Delete"
-          header="Delete"
-          dataType="boolean"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={deleteTemplate}
-          filter
-          filterElement={verifiedFilterTemplate}
-        />
-       
-      </DataTable>
-      <Toast ref={toast} />
-      <ConfirmDialog />
-    </div>
+          <Column
+            field="Delete"
+            header="Delete"
+            dataType="boolean"
+            bodyClassName="text-center"
+            style={{ minWidth: "8rem" }}
+            body={deleteTemplate}
+            filter
+            filterElement={verifiedFilterTemplate}
+          />
+        </DataTable>
+        <Toast ref={toast} />
+        <ConfirmDialog />
+      </div>
+    </AdminLayout>
   );
 }

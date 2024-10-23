@@ -1,10 +1,9 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-
 
 interface FormData {
   email: string;
@@ -147,131 +146,131 @@ const Page: React.FC = () => {
   };
 
   return (
-    <fieldset>
-      <legend>Admin</legend>
-      <div className="p-2">
-        <div className="grid">
-          <div className="col-6">
-            <h1 style={{ color: "#007A7C" }}>Update Merchant Details</h1>
-          </div>
-          <div
-            className="col-6 flex justify-content-end"
-            style={{ paddingTop: "27px" }}
-          >
-            <Button
-              label="Edit Details"
-              severity="info"
-              raised
-              onClick={enableDetails}
-            />
-          </div>
-        </div>
-        <form onSubmit={confirmUpdate}>
-          <div className="flex flex-column gap-2">
-            <label htmlFor="id">Merchant ID</label>
-            <p>DUMMY MERCHANT</p>
-            <div className="form-grid grid">
-              <div className="field col-12">
-                <label htmlFor="email">Email ID</label>
-                <InputText
-                  id="email"
-                  aria-describedby="email-help"
-                  placeholder="Please Enter your Valid Email ID"
-                  className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
-                    errors.email ? "p-invalid" : ""
-                  }`}
-                  value={formData.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={!editDetailsEnable}
-                />
-                {errors.email && (
-                  <small className="p-error">{errors.email}</small>
-                )}
-              </div>
-              <div className="field col-12">
-                <label htmlFor="phone">Phone Number</label>
-                <InputText
-                  id="phone"
-                  aria-describedby="phone-help"
-                  placeholder="Please Enter your Valid Phone Number"
-                  className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
-                    errors.phone ? "p-invalid" : ""
-                  }`}
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={!editDetailsEnable}
-                />
-                {errors.phone && (
-                  <small className="p-error">{errors.phone}</small>
-                )}
-              </div>
-              <div className="field col-6">
-                <label htmlFor="addressLine1">Address Line 1</label>
-                <InputText
-                  id="addressLine1"
-                  aria-describedby="address-help"
-                  placeholder="Address Line 1"
-                  className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
-                    errors.addressLine1 ? "p-invalid" : ""
-                  }`}
-                  value={formData.addressLine1}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={!editDetailsEnable}
-                />
-                {errors.addressLine1 && (
-                  <small className="p-error">{errors.addressLine1}</small>
-                )}
-              </div>
-              <div className="field col-6">
-                <label htmlFor="addressLine2">Address Line 2</label>
-                <InputText
-                  id="addressLine2"
-                  aria-describedby="address-help"
-                  placeholder="Address Line 2"
-                  className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                  value={formData.addressLine2}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={!editDetailsEnable}
-                />
-              </div>
-              <div className="field col-6">
-                <label htmlFor="pincode">Pincode</label>
-                <InputText
-                  id="pincode"
-                  aria-describedby="address-help"
-                  placeholder="Pincode"
-                  className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
-                    errors.pincode ? "p-invalid" : ""
-                  }`}
-                  value={formData.pincode}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={!editDetailsEnable}
-                />
-                {errors.pincode && (
-                  <small className="p-error">{errors.pincode}</small>
-                )}
-              </div>
-              <div className="field col-12">
-                <Button
-                  onClick={confirm1}
-                  icon="pi pi-check"
-                  label="Confirm"
-                  className="mr-2"
-                  disabled={!editDetailsEnable}
-                ></Button>
-                <ConfirmDialog />
-                <Toast ref={toast} />
-              </div>
+      <fieldset>
+        <legend>Admin</legend>
+        <div className="p-2">
+          <div className="grid">
+            <div className="col-6">
+              <h1 style={{ color: "#007A7C" }}>Update Merchant Details</h1>
+            </div>
+            <div
+              className="col-6 flex justify-content-end"
+              style={{ paddingTop: "27px" }}
+            >
+              <Button
+                label="Edit Details"
+                severity="info"
+                raised
+                onClick={enableDetails}
+              />
             </div>
           </div>
-        </form>
-      </div>
-    </fieldset>
+          <form onSubmit={confirmUpdate}>
+            <div className="flex flex-column gap-2">
+              <label htmlFor="id">Merchant ID</label>
+              <p>{ sharedData}</p>
+              <div className="form-grid grid">
+                <div className="field col-12">
+                  <label htmlFor="email">Email ID</label>
+                  <InputText
+                    id="email"
+                    aria-describedby="email-help"
+                    placeholder="Please Enter your Valid Email ID"
+                    className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
+                      errors.email ? "p-invalid" : ""
+                    }`}
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!editDetailsEnable}
+                  />
+                  {errors.email && (
+                    <small className="p-error">{errors.email}</small>
+                  )}
+                </div>
+                <div className="field col-12">
+                  <label htmlFor="phone">Phone Number</label>
+                  <InputText
+                    id="phone"
+                    aria-describedby="phone-help"
+                    placeholder="Please Enter your Valid Phone Number"
+                    className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
+                      errors.phone ? "p-invalid" : ""
+                    }`}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!editDetailsEnable}
+                  />
+                  {errors.phone && (
+                    <small className="p-error">{errors.phone}</small>
+                  )}
+                </div>
+                <div className="field col-6">
+                  <label htmlFor="addressLine1">Address Line 1</label>
+                  <InputText
+                    id="addressLine1"
+                    aria-describedby="address-help"
+                    placeholder="Address Line 1"
+                    className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
+                      errors.addressLine1 ? "p-invalid" : ""
+                    }`}
+                    value={formData.addressLine1}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!editDetailsEnable}
+                  />
+                  {errors.addressLine1 && (
+                    <small className="p-error">{errors.addressLine1}</small>
+                  )}
+                </div>
+                <div className="field col-6">
+                  <label htmlFor="addressLine2">Address Line 2</label>
+                  <InputText
+                    id="addressLine2"
+                    aria-describedby="address-help"
+                    placeholder="Address Line 2"
+                    className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                    value={formData.addressLine2}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!editDetailsEnable}
+                  />
+                </div>
+                <div className="field col-6">
+                  <label htmlFor="pincode">Pincode</label>
+                  <InputText
+                    id="pincode"
+                    aria-describedby="address-help"
+                    placeholder="Pincode"
+                    className={`text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full ${
+                      errors.pincode ? "p-invalid" : ""
+                    }`}
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!editDetailsEnable}
+                  />
+                  {errors.pincode && (
+                    <small className="p-error">{errors.pincode}</small>
+                  )}
+                </div>
+                <div className="field col-12">
+                  <Button
+                    onClick={confirm1}
+                    icon="pi pi-check"
+                    label="Confirm"
+                    className="mr-2"
+                    disabled={!editDetailsEnable}
+                  ></Button>
+                  <ConfirmDialog />
+                  <Toast ref={toast} />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </fieldset>
   );
 };
 
