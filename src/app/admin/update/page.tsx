@@ -168,7 +168,7 @@ const Page: React.FC = () => {
           <form onSubmit={confirmUpdate}>
             <div className="flex flex-column gap-2">
               <label htmlFor="id">Merchant ID</label>
-              <p>{ sharedData}</p>
+             
               <div className="form-grid grid">
                 <div className="field col-12">
                   <label htmlFor="email">Email ID</label>

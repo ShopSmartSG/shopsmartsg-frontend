@@ -69,7 +69,7 @@ const defaultFilters: DataTableFilterMeta = {
 
 export default function AdvancedFilterDemo() {
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState([]);
 
 
   const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
@@ -103,7 +103,7 @@ export default function AdvancedFilterDemo() {
     });
     initFilters();
   }, []);
-  const getCustomers = (data: Customer[]) => {
+  const getCustomers = (data) => {
     return [...(data || [])].map((d) => {
       d.date = new Date(d.date);
 
@@ -290,7 +290,7 @@ export default function AdvancedFilterDemo() {
     return (
       <MultiSelect
         value={options.value}
-        options={representatives}
+
         itemTemplate={representativesItemTemplate}
         onChange={(e: MultiSelectChangeEvent) =>
           options.filterCallback(e.value)
@@ -302,7 +302,7 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-  const representativesItemTemplate = (option: Representative) => {
+  const representativesItemTemplate = (option) => {
     return (
       <div className="flex align-items-center gap-2">
         <Image
@@ -315,7 +315,7 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-  const dateBodyTemplate = (rowData: Customer) => {
+  const dateBodyTemplate = (rowData) => {
     return formatDate(new Date());
   };
 
@@ -331,7 +331,7 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-  const balanceBodyTemplate = (rowData: Customer) => {
+  const balanceBodyTemplate = (rowData) => {
     return formatCurrency(4500);
   };
 
@@ -382,9 +382,9 @@ export default function AdvancedFilterDemo() {
       </div>
     );
   };
-  const verifiedBodyTemplate = (rowData: Customer) => {
+  const verifiedBodyTemplate = (rowData) => {
     return (
-      <Button onClick={() => router.push({})}>
+      <Button>
         View Details
       </Button>
     );
