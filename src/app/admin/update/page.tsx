@@ -1,10 +1,11 @@
 "use client";
-import React, {  useRef, useState } from "react";
+import React, {  useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-
+import { useAdminContext } from "@/context/AdminContext";
+import axios from "axios";
 interface FormData {
   email: string;
   phone: string;
@@ -23,6 +24,7 @@ interface Errors {
 
 const Page: React.FC = () => {
   const toast = useRef<Toast>(null);
+    const { adminData } = useAdminContext();
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -31,7 +33,7 @@ const Page: React.FC = () => {
     addressLine2: "",
     pincode: "",
   });
-
+const [merchantName, setMerchantName] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [editDetailsEnable, setEditDetailsEnable] = useState<boolean>(false);
 
@@ -47,6 +49,9 @@ const Page: React.FC = () => {
   const enableDetails = () => {
     setEditDetailsEnable(true);
   };
+
+ 
+  
 
   const confirm1 = () => {
     confirmDialog({
@@ -111,17 +116,39 @@ const Page: React.FC = () => {
     }
   };
 
-  const accept = () => {
+const accept = async () => {
+  const data = {
+    name: merchantName,
+    merchantId: adminData,
+    addressLine1: formData.addressLine1,
+    addressLine2: formData.addressLine2,
+    pincode: formData.pincode,
+    emailAddress: formData.email,
+    phoneNumber: formData.phone,
+  };
+  try {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${adminData}`,
+      data
+    );
+    if (response.status === 200) {
+      toast.current?.show({
+        severity: "success",
+        summary: "Updated",
+        detail: "Your Details have been updated successfully",
+        life: 3000,
+      });
+      setEditDetailsEnable(false);
+    }
+  } catch (error) {
     toast.current?.show({
-      severity: "success",
-      summary: "Confirmed",
-      detail: "You have accepted",
+      severity: "error",
+      summary: "Error",
+      detail: error.message,
       life: 3000,
     });
-   
-    setEditDetailsEnable(false); 
-  };
-
+  }
+};
   const reject = () => {
     toast.current?.show({
       severity: "warn",
@@ -144,6 +171,30 @@ const Page: React.FC = () => {
       });
     }
   };
+ useEffect(() => {
+   const fetchData = async () => {
+     try {
+       // Make the API call
+       const response = await axios.get(
+         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${adminData}`
+       );
+
+       // Set the fetched data to state
+       setFormData({
+         ...response.data,
+         email: response.data.emailAddress,
+         phone: response.data.phoneNumber,
+       });
+       setMerchantName(response.data.name);
+     } catch (error) {
+       // Handle errors
+       console.error(error);
+     }
+   };
+
+   // Call the fetch function
+   fetchData();
+ }, []); 
 
   return (
       <fieldset>
@@ -168,7 +219,7 @@ const Page: React.FC = () => {
           <form onSubmit={confirmUpdate}>
             <div className="flex flex-column gap-2">
               <label htmlFor="id">Merchant ID</label>
-             
+            {adminData}
               <div className="form-grid grid">
                 <div className="field col-12">
                   <label htmlFor="email">Email ID</label>

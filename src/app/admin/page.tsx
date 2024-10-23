@@ -19,7 +19,7 @@ import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 
-
+import { useAdminContext } from "@/context/AdminContext";
 
 import { Calendar } from "primereact/calendar";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
@@ -76,6 +76,7 @@ export default function AdvancedFilterDemo() {
   const [loading, setLoading] = useState<boolean>(false);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
   
+  const { setAdminData } = useAdminContext();
 
   const toast = useRef(null);
   const getSeverity = (status: string) => {
@@ -374,11 +375,15 @@ export default function AdvancedFilterDemo() {
   };
   const router = useRouter();
 
-  const verifiedUpdateTemplate = (id: string) => {
+  const verifiedUpdateTemplate = (rowData) => {
 
     return (
       <div>
-        <Button onClick={() => router.push("/admin/update")}>Update</Button>
+       
+        <Button onClick={() => {
+          setAdminData(rowData.merchantId);
+          router.push('/admin/update')
+        }}>Update</Button>
       </div>
     );
   };

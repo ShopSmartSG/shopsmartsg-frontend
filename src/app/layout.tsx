@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { PrimeReactProvider } from "primereact/api";
 import Navbar from '../../shared/components/navbar/navbar';
-
+import { AdminProvider } from "@/context/AdminContext";
 
 export const metadata: Metadata = {
   title: "ShopSmart",
@@ -20,10 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <PrimeReactProvider>
-          <Navbar />
-          <div className="p-2 surface-ground">{children}</div>
-        </PrimeReactProvider>
+        <AdminProvider>
+          <PrimeReactProvider>
+            <Navbar />
+            <div className="p-2 surface-ground">{children}</div>
+          </PrimeReactProvider>
+        </AdminProvider>
       </body>
     </html>
   );
