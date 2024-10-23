@@ -477,8 +477,6 @@ export default function AdvancedFilterDemo() {
             bodyClassName="text-center"
             style={{ minWidth: "8rem" }}
             body={verifiedUpdateTemplate}
-
-
           />
           <Column
             field="merchantId"
@@ -486,7 +484,6 @@ export default function AdvancedFilterDemo() {
             bodyClassName="text-center"
             style={{ minWidth: "8rem" }}
             body={verifiedDeleteTemplate}
-          
           />
           <Column
             field="Block"

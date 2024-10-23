@@ -1,5 +1,5 @@
 import axios from "axios";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiUrl = process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL;
 export const CustomerService = {
   getData() {
     return [
