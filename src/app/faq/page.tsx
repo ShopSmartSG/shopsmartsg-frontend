@@ -1,8 +1,8 @@
-import React from 'react'
+/* eslint-disable react/no-unescaped-entities */
+import React from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 
 import { Badge } from "primereact/badge";
-
 
 const page = () => {
   return (
@@ -185,6 +185,6 @@ const page = () => {
       </Accordion>
     </div>
   );
-}
+};
 
-export default page
+export default page;

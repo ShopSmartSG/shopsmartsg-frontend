@@ -21,8 +21,8 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import {getStaticProps} from "../services/CustomerService"
-import { Toast } from "primereact/toast";
+import {CustomerService, getStaticProps} from "../services/CustomerService"
+import { Toast } from "primereact/toast"
 
 interface Representative {
   name: string;
@@ -452,7 +452,7 @@ export default function AdvancedFilterDemo() {
   const header = renderHeader();
 
   return (
-    <AdminLayout>
+
       <div className="card p-2">
         <DataTable
           value={customers}
@@ -543,6 +543,6 @@ export default function AdvancedFilterDemo() {
         <Toast ref={toast} />
         <ConfirmDialog />
       </div>
-    </AdminLayout>
+
   );
 }
