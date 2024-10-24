@@ -249,25 +249,40 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                           </ul>
                         </li>
-                       
                       </ul>
                     </li>
                   </ul>
-                  
                 </div>
                 <div className="mt-auto">
-                  <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
-                  <Link
-                    v-ripple
-                    className="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                    href="/"
-                  >
-                    <Avatar
-                      image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                      shape="circle"
-                    />
-                    <span className="font-bold">Yatharth Sathija</span>
-                  </Link>
+                  <div className="grid">
+                    <div className="col-10">
+                      <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
+                      <Link
+                        v-ripple
+                        className="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                        href="/"
+                      >
+                        <Avatar
+                          image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                          shape="circle"
+                        />
+                        <span className="font-bold">Yatharth Sathija</span>
+                      </Link>
+                    </div>
+                    <div className="col-2" style={{marginTop:'30px'}}>
+                      <Button
+                        type="button"
+                        icon="pi pi-power-off"
+                        rounded
+                        outlined
+                        className="h-2rem w-2rem m-3" 
+                        tooltip="Logout"
+                        tooltipOptions={{
+                          position: "left"
+                        }}
+                      ></Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

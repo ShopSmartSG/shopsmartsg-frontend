@@ -114,7 +114,10 @@ export default function AdvancedFilterDemo() {
 
   const blockUser = async (merchantId: string) => {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/blacklist/${merchantId}`
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/blacklist/${merchantId}`,
+      {
+        withCredentials: false,
+      }
     );
     if (response.status === 200) {
       toast.current.show({
@@ -133,7 +136,10 @@ export default function AdvancedFilterDemo() {
 
   const unblockUser = async (merchantId: string) => {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/unblacklist/${merchantId}`
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/unblacklist/${merchantId}`,
+      {
+        withCredentials: false,
+      }
     );
     if (response.status === 200) {
       toast.current.show({
@@ -152,7 +158,10 @@ export default function AdvancedFilterDemo() {
 
   const deleteCustomer = async (merchantId: string) => {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchantId}`
+      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchantId}`,
+      {
+        withCredentials: false,
+      }
     );
     if (response.status === 200) {
       toast.current.show({
