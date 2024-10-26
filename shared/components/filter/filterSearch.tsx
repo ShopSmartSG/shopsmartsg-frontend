@@ -31,9 +31,7 @@ const FilterSearch = () => {
           }));
           setCategories([
               { label: "All", value: null },
-              { label: "Drink", value: 123445 }, {
-                label: "Food", value: 123446
-              },
+             
             ...formattedCategories,
           ]);
         } catch (error) {

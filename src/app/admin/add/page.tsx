@@ -53,7 +53,7 @@ export default function CreateMerchantForm() {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createMerchant`,
         data
       );
       if (response.status === 201) {

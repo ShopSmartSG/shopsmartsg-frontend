@@ -13,6 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 
 import { ConfirmDialog } from "primereact/confirmdialog";
 import axios from "axios";
+import { InputText } from "primereact/inputtext";
 
 const Page = () => {
   const [merchantDetails, setMerchantDetails] = useState({
@@ -37,7 +38,9 @@ const Page = () => {
     const [listingPrice, setListingPrice] = useState(0);
   const [quantity, setQuantity] = useState(0);
   const [imageurl, setImageUrl] = useState("");
-  const [category,setCategory] = useState("");
+  const [category, setCategory] = useState('');
+  const [newCategory, setNewCategory] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
 
     const toast = useRef<Toast>(null);
      const accept = () => {
@@ -93,7 +96,10 @@ const Page = () => {
             `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/categories`
           
           );
-        setCategories(response.data);
+        setCategories([
+          ...response.data,
+          { categoryName: "others", categoryId: "others" },
+        ]);
       }
       catch (error) {
         console.error("Error fetching categories", error);
@@ -107,7 +113,7 @@ const Page = () => {
     const getMerchantDetails = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/9c723141-aba9-4653-8cf6-9e253d988fed`
+          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/d93afec4-b583-4d7a-8558-85f1199e22f9`
         );
         setMerchantDetails(response.data);
       }
@@ -147,6 +153,27 @@ const Page = () => {
     catch (error) {
       toast.current.show({ severity: 'warn', summary: 'Product Creation Failed', detail: 'Please Try Again!!' });
       console.log('error', error); // error 
+    }
+  }
+
+  const categoryHandler = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/categories`, {
+          categoryName: newCategory,
+          categoryDescription: newCategoryDescription,
+        }
+        
+      );
+      if (response.status == 200) {
+        toast.current.show({ severity:'success', summary:'Category created successfully', detail: response.status });
+        setCategories([...categories, response.data]);
+        setNewCategory('');
+        setNewCategoryDescription('');
+      }
+    }
+    catch (error) {
+      toast.current.show({ severity: 'warn', summary: 'Category Creation Failed', detail: 'Please Try Again!!' });
     }
   }
     
@@ -219,8 +246,24 @@ const Page = () => {
                   }));
                 }}
               />
-             
             </div>
+            {category == "others" ? (
+              <div className="inline">
+                <div className="field col-6">
+                  <label htmlFor="categoryName">Category Name</label>
+                  <InputText className="w-100" onChange={(e) => setNewCategory(e.target.value)}/>
+                </div>
+                <div className="field col-6">
+                  <label htmlFor="categoryDescription">
+                    Category Description
+                  </label>
+                  <InputTextarea className="w-100" onChange={(e) => setNewCategoryDescription(e.target.value)} />
+                  <Button label="Add Category" onClick={categoryHandler}/>
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="field col-6">
               <label htmlFor="productPrice">Quantity</label>
               <InputNumber
@@ -231,7 +274,7 @@ const Page = () => {
                 onValueChange={(e) => setQuantity(e.value)}
               />
             </div>
-            <div className="col-6">
+            <div className="col-6 ">
               <div className="field">
                 <label htmlFor="">Upload Product Image</label>
                 <Toast ref={toast}></Toast>
