@@ -10,6 +10,10 @@ import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
 import "./login.css";
+import axios from "axios";
+import { signIn } from "next-auth/react";
+import email from 'next-auth/providers/email';
+import { useRouter } from "next/navigation";
 
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
@@ -42,6 +46,8 @@ const EmailOtpForm = () => {
     return () => clearInterval(interval);
   }, [resendDisabled]);
 
+  const router = useRouter();
+
   const handleEmailSubmit = (e) => {
     e.preventDefault();
     setEmailError("");
@@ -63,27 +69,27 @@ const EmailOtpForm = () => {
     }
   };
 
-  const handleOtpSubmit = () => {
-    if (parseInt(otp) == 123456) {
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Login Succcessful",
-        life: 3000,
-      });
+  const handleOtpSubmit = async() => {
+    try {
+      const response = await signIn('credentials', {
+        redirect: false,
+        email:email,
+        emailAddress:email,
+        otp:otp
+        
+      })
+      if (response.ok) {
+        toast.current.show({ severity: "success", summary: "Success", detail: "Login Successful", life: 3000 });
+        setShowOtpDialog(false);
+        setTimeout(() => {
+          router.push('/merchant/manage/view')
+        }, 3000);
+        
+      }
+    }
+    catch (error) {
+      toast.current.show({ status: "error", message: "Error submitting OTP. Please try again later." });
       setShowOtpDialog(false);
-      setOtp("");
-      setOtpCount(0);
-    } else {
-      setOtpError(true);
-      setOtp("");
-      setOtpCount(otpCount + 1);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid OTP",
-        life: 3000,
-      });
     }
   };
 
@@ -107,14 +113,42 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
+  const handleEmail = async() => {
+    setShowOtpDialog(true);
+    setResendDisabled(true);
 
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/merchant`,
+        {
+          email,
+        },
+        {
+          withCredentials: true, // Include credentials with the request
+        }
+      );
+
+    }
+
+    catch (error) {
+      console.error("Error sending email: ", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to send email. Please try again later.",
+        life: 3000,
+      });
+    }
+
+
+  }
   return (
     <div
       className="flex-row justify-content-center flex-wrap "
       style={{ height: "100vh" }}
     >
       <Card>
-        <p className="p-card-title text-center">Sign In Page</p>
+        <p className="p-card-title text-center">Merchant Sign In Page</p>
         <div className="flex align-items-center justify-content-center">
           <form onSubmit={handleEmailSubmit} className="p-fluid">
             <div className="field">
@@ -136,6 +170,7 @@ const EmailOtpForm = () => {
                 type="submit"
                 style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
+                onClick={handleEmail}
               />
             </div>
           </form>

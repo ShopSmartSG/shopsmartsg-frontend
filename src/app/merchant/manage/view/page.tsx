@@ -30,9 +30,12 @@ const ProductCatalog = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const toast = useRef<Toast>(null);
 
-  const handleDeleteClick = (product) => {
+  const handleDeleteClick =  (product) => {
+    
+    
     setSelectedProduct(product);
     setVisible(true);
+  
   };
 
   const handleUpdateClick = (product) => {
@@ -130,6 +133,32 @@ const ProductCatalog = () => {
 
     getMerchantProducts();
   }, []);
+
+  const handleDeleteSumit = async () => {
+     try {
+       const response = await axios.delete(
+         `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/${selectedProduct.merchantId}/products/${selectedProduct.id}`
+       );
+       if (response.status === 200) {
+         toast.current.show({
+           severity: "success",
+           summary: "Product Deleted",
+           detail: "Product deleted successfully",
+           life: 3000,
+         });
+         setVisible(false);
+         setSelectedProduct(null);
+        
+       }
+     } catch (error) {
+       toast.current.show({
+         severity: "error",
+         summary: "Product Deletion Failed",
+         detail: "Please Try Again!!",
+       });
+       console.log("error", error); // error
+     }
+  }
 
   return (
     <fieldset style={{ height: "100vh" }}>
@@ -309,9 +338,10 @@ const ProductCatalog = () => {
                     onClick={() => setVisible(false)}
                     className="p-button-text"
                   />
-                  <Button label="Yes" icon="pi pi-check" autoFocus />
+                  <Button label="Yes" icon="pi pi-check" autoFocus onClick={handleDeleteSumit}/>
                 </div>
               }
+              
               onHide={() => setVisible(false)}
             >
               <p>Are you sure you want to delete {selectedProduct?.name}?</p>

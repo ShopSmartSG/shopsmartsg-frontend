@@ -1,14 +1,14 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
-import email from "next-auth/providers/email";
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         CredentialsProvider({
           name: "OTP Login",
           credentials: {
             email: { label: "email", type: "email" },
-            password: { label: "password", type: "text" },
+            emailAddress: { label: "emailAddress", type: "email" },
+            otp: { label: "otp", type: "password" },
           },
           async authorize(credentials) {
             try {
@@ -17,11 +17,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             //     email: credentials.email,
             //     otp: credentials.password,
             //   }, { withCredentials: true }); // Ensure cookies are included
-            const response = await axios.post("http://localhost:8084/profile/login/verifyOtp/merchant",{
-              email: credentials.email,
-              otp: credentials.password
-            })
-    
+              const response = await axios.post(`${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/merchant`,{
+                email: credentials.email,
+                emailAddress:credentials.email,
+                otp: credentials.otp
+              },
+              {
+                  withCredentials: true, // Include credentials with the request
+                })
+                console.log(response.headers,"RESPONSE HEADERS")
               if (response.status === 200) {
                 // Return user data from Spring Boot response to establish session
                 return response.data || null;
@@ -34,10 +38,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }),
       ],
       session: {
-        strategy: 'jwt', // Use Spring Boot’s session instead of JWT
+        strategy: undefined, // Use Spring Boot’s session instead of JWT
       },
      
       pages: {
-        signIn: "/customer/login",
+        signIn: "/merchant/login",
       }
 })

@@ -6,7 +6,7 @@ import { Tag } from "primereact/tag";
 import { Card } from 'primereact/card'
 import { ProductService } from "./ProductService";
 
-import { useRouter } from 'next/navigation';
+
 import { Divider } from "primereact/divider";
 import axios from "axios";
 
@@ -14,6 +14,9 @@ import { InputText } from "primereact/inputtext";
 import { PrimeIcons } from "primereact/api";
 import Link from "next/link";
 import FilterSearch from "../../shared/components/filter/filterSearch";
+import { useRouter } from "next/navigation";
+import { Image } from "primereact/image";
+        
 
 const apiUrlProduct = process.env.NEXT_PUBLIC_API_PRODUCTS_URL;
 
@@ -22,7 +25,7 @@ const Page = () => {
   
 
 
-
+const router = useRouter();
 
   const header = () => {
     return (
@@ -160,23 +163,79 @@ const Page = () => {
     );
   }, []);
 
+  const footer = (value:string) => {
+    return (
+      <div className="text-center">
+        {value}
+      </div>
+    );
+  }
+
   return (
     <div>
-     <FilterSearch  />
+      <FilterSearch />
       <Card>
         <div>
           <div className="grid text-center">
-            <div className="col-3 cursor-pointer">
-              <Card>Groceries</Card>
+            <div
+              className="col-3 cursor-pointer"
+              onClick={() =>
+                router.push(
+                  "/customer/products?categoryId=302ef7d8-de49-4126-a211-163d94f48634"
+                )
+              }
+            >
+              <Card footer={footer("Groceries")}>
+                <Image
+                  src="https://img.freepik.com/free-psd/hand-drawn-shopping-cart-isolated_23-2151551324.jpg"
+                  height="122px"
+                />
+              </Card>
             </div>
-            <div className="col-3 cursor-pointer">
-              <Card>Electronics</Card>
+            <div
+              className="col-3 cursor-pointer"
+              onClick={() =>
+                router.push(
+                  "/customer/products?categoryId=b625dcbf-ee91-4861-a5cb-b3bf9f863389"
+                )
+              }
+            >
+              <Card footer={footer("Electronics")}>
+                <Image
+                  src="https://img.freepik.com/free-vector/gaming-item-sticker-icons-hand-drawn-coloring-vector_528110-163.jpg"
+                  height="122px"
+                />
+              </Card>
             </div>
-            <div className="col-3 cursor-pointer">
-              <Card>Clothing</Card>
+            <div
+              className="col-3 cursor-pointer"
+              onClick={() =>
+                router.push(
+                  "/customer/products?categoryId=f2670d9e-10e0-4317-9d6d-afec4e8ee8c8"
+                )
+              }
+            >
+              <Card footer={footer("Clothing")}>
+                <Image
+                  src="https://img.freepik.com/free-vector/set-different-cloth-white-background_1308-97958.jpg"
+                  height="122px"
+                />
+              </Card>
             </div>
-            <div className="col-3 cursor-pointer">
-              <Card>Books</Card>
+            <div
+              className="col-3 cursor-pointer"
+              onClick={() =>
+                router.push(
+                  "/customer/products?categoryId=426243e1-5e6e-42ef-bb12-85072e941802"
+                )
+              }
+            >
+              <Card footer={footer("Books")}>
+                <Image
+                  src="https://img.freepik.com/free-vector/isolated-bundle-books_1308-46573.jpg"
+                  height="122px"
+                />
+              </Card>
             </div>
           </div>
         </div>
@@ -184,7 +243,10 @@ const Page = () => {
       <br />
       <Card header={header}>
         <div className="grid text-center">
-          <div className="col-3 cursor-pointer">
+          <div
+            className="col-3 cursor-pointer"
+            onClick={() => router.push("/")}
+          >
             <Card>
               <p>Amul Taja Milk</p>
               <small>
