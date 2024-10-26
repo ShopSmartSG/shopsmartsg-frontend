@@ -13,6 +13,7 @@
     "axios": "^1.7.7",
     "formik": "^2.4.6",
     "next": "14.2.13",
+    "next-auth": "^5.0.0-beta.25",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.3",
