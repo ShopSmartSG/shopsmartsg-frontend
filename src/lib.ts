@@ -9,8 +9,11 @@ export async function logout() {
 
 export async function getSession() {
     const session = cookies().get("userId")?.value;
-    if (!session) return null;
-    return await session;
+    if (!session) return null; 
+    const sessvalue = await session;
+
+    
+    return await sessvalue;
 }
 
 export async function updateSession(request: NextRequest) {

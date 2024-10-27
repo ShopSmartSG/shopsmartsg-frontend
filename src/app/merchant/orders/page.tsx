@@ -13,7 +13,9 @@ const Orders = () => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersMerchant/fcf8f7da-760f-406d-8d0a-acf06d456ccb`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersMerchant/fcf8f7da-760f-406d-8d0a-acf06d456ccb
+
+`
         );
         setOrders(response.data);
       } catch (error) {
@@ -23,7 +25,7 @@ const Orders = () => {
     fetchMerchantOrderRequests();
   }, []);
 
-  const updateOrdesStatus = async (orderId, status) => {
+  const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/updateOrderStatus/${orderId}/${status}`,
@@ -43,10 +45,11 @@ const Orders = () => {
   };
 
   const ongoingOrders = orders.filter(
-    (order) =>
-      order.status === "CREATED" || order.status === "Order Ready for Pick Up"
+    (order) => order.status === "CREATED" || order.status === "READY"
   );
-  const pastOrders = orders.filter((order) => order.status === "COMPLETED");
+  const pastOrders = orders.filter(
+    (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
+  );
 
   const renderButtons = (orderId, status) => {
     switch (status) {
@@ -56,23 +59,37 @@ const Orders = () => {
             <Button
               label="Cancel Order"
               className="p-button-danger m-3"
-              onClick={() => updateOrdesStatus(orderId, "CANCELLED")}
+              onClick={() => updateOrderStatus(orderId, "CANCELLED")}
             />
             <Button
               label="Order Ready"
               className="p-button-success m-3"
-              onClick={() => updateOrdesStatus(orderId, "READY")}
+              onClick={() => updateOrderStatus(orderId, "READY")}
             />
           </div>
         );
-      case "Order Ready for Pick Up":
+      case "READY":
         return (
           <Button
             label="Order Picked Up"
             className="p-button-info"
-            onClick={() => updateOrdesStatus(orderId, "COMPLETED")}
+            onClick={() => updateOrderStatus(orderId, "COMPLETED")}
           />
         );
+      case "COMPLETED":
+        return (
+          <Button
+            label="Order Completed"
+            className="p-button-secondary"
+            disabled
+          />
+        )
+      case "CANCELLED":
+        return (
+          <Button
+            label="Order Cancelled"
+            className="p-button-secondary"
+            disabled/>)
       default:
         return null;
     }
@@ -83,7 +100,7 @@ const Orders = () => {
       <h2>Ongoing Orders</h2>
       <div className="p-grid">
         {ongoingOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md-4">
+          <div key={order.orderId} className="col-12 md:col-4">
             <Card title={`Order ID: ${order.orderId}`}>
               <div
                 style={{
@@ -113,7 +130,7 @@ const Orders = () => {
       <h2>Past Orders</h2>
       <div className="p-grid">
         {pastOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md-4">
+          <div key={order.orderId} className="col-12 md:col-4">
             <Card title={`Order ID: ${order.orderId}`}>
               <div
                 style={{

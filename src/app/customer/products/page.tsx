@@ -81,8 +81,8 @@ const Page = () => {
           (product: Product) => product.merchantId
         );
         const uniqueMerchantIds: string[] = Array.from(new Set(merchantIds));
-        setMerchants(uniqueMerchantIds);
-        setProducts(response.data);
+        setMerchants(Array.from(new Set(uniqueMerchantIds)));
+        setProducts(Array.from(new Set(response.data)));
 
         // Initialize quantities for all products
         const initialQuantities: ProductQuantity = {};
@@ -204,7 +204,7 @@ const response = await axios.put(
           merchants.map(async (merchant) => {
             try {
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchant}`
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchant}`
               );
               const data = response.data;
               return {

@@ -4,6 +4,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { useSession } from "@/context/SessionContext";
 import "../merchant/merchant.css";
 
 import { useRouter } from "next/navigation";
@@ -25,6 +26,8 @@ interface Errors {
   pincode?: string;
 }
 
+
+
 const Page: React.FC = () => {
   const toast = useRef<Toast>(null);
   const [formData, setFormData] = useState<FormData>({
@@ -34,6 +37,7 @@ const Page: React.FC = () => {
     addressLine2: "",
     pincode: "",
   });
+  const { session } = useSession();
   const [merchantName, setMerchantName] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [editDetailsEnable, setEditDetailsEnable] = useState<boolean>(false);
@@ -208,10 +212,10 @@ const Page: React.FC = () => {
     fetchData();
   }, []); 
 
-  if (status === 'unauthenticated') {
+  if (session == '' || session == null || session == undefined) {
     router.push('/merchant/login');
   }
-  else if (status == 'authenticated') {
+  else  {
      return (
        <fieldset>
          <legend>Merchant</legend>
