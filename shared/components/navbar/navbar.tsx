@@ -53,7 +53,9 @@ export default function Navbar({ userid }) {
   const placeOrder = async (customerId: string) => {
     try {
        const response = await axios.put(
-         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}`
+         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}`, {
+           data:'k'
+         }
        );
        if (response.status == 200) {
          setTimeout(() => {
@@ -224,7 +226,7 @@ export default function Navbar({ userid }) {
         style={{ fontSize: "24px" }}
         onClick={() => setCartVisibility(true)}
       >
-        <Badge value={data.length} />
+        <Badge value={cartItems.length} />
       </i>
       <Avatar
         image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"

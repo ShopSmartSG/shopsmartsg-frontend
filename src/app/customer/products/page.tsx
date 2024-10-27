@@ -54,6 +54,14 @@ const Page = () => {
   }
 
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
+  const [first, setFirst] = useState(0);
+  const [rows] = useState(4);
+  const getCurrentPageProducts = () => {
+    return products.slice(first, first + rows);
+  };
+  const onPageChange = (event: { first: number; rows: number }) => {
+    setFirst(event.first);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -288,6 +296,15 @@ const response = await axios.put(
               </div>
             ))}
           </div>
+          <div className="card">
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={products.length}
+              onPageChange={onPageChange}
+              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+            />
+          </div>
         </div>
         <div className="col-6">
           <Card style={{ height: "124.5vh" }}>
@@ -374,9 +391,6 @@ const response = await axios.put(
               </div>
             )}
           </Card>
-        </div>
-        <div className="card col-12">
-          <Paginator first={0} rows={10} totalRecords={products.length} />
         </div>
       </div>
     </div>

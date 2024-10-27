@@ -1,0 +1,11 @@
+.p-dialog{
+    height: 34vh;
+    width: 50vw;
+}
+.p-inline-message {
+    margin-top: 10px;
+}
+
+.emailContainer{
+    width: 56px !important;
+}

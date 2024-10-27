@@ -1,11 +1,12 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { Image } from 'primereact/image';
 
 import { Message } from "primereact/message";
+import axios from 'axios';
 
 const Order = ({ params }) => {
 
@@ -42,6 +43,13 @@ const Order = ({ params }) => {
       </div>
     );
   }
+
+
+  useEffect(() => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrderById/`)
+    }
+  })
 
   return (
     <div>
