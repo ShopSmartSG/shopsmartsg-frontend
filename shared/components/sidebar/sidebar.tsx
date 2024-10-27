@@ -1,21 +1,49 @@
 "use client";
-import React, { LegacyRef, useRef } from "react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
+import { getSession } from "@/lib";
 import Link from "next/link";
+import axios from "axios";
 
 interface HeadlessDemoProps {
   visible: boolean;
   onHide: () => void;
 }
 
-export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
+export default function HeadlessDemo({ visible, onHide,userId }) {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
+
+  const session = getSession();
+
+  const [uname,setUname] = useState('')
+
+  useEffect(() => {
+    const username = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${userId}`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status == 200) {
+         console.log(response.data,"Response Data")
+        }
+      }
+      catch (error) {
+        console.log(error);
+      }
+      
+    }
+    
+    username();
+  },[])
 
 
   return (
@@ -266,7 +294,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                           shape="circle"
                         />
-                        <span className="font-bold">Yatharth Sathija</span>
+                        <span className="font-bold">{uname } </span>
                       </Link>
                     </div>
                     <div className="col-2" style={{marginTop:'30px'}}>

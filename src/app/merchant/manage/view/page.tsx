@@ -10,6 +10,7 @@ import { InputText } from "primereact/inputtext";
 import "./page.css";
 import axios from "axios";
 import { Toast } from "primereact/toast";
+import { getCookie } from "cookies-next";
 
 import { Message } from "primereact/message";
 import { InputNumber } from "primereact/inputnumber";
@@ -46,6 +47,13 @@ const ProductCatalog = () => {
     });
     setUpdateVisible(true);
   };
+  const [merchantId, setMerchantId] = useState("");
+ 
+
+  const myCookies = getCookie('userId', {
+    
+  })
+
 
   const handleUpdateSubmit = async () => {
    
@@ -62,7 +70,7 @@ const ProductCatalog = () => {
       merchantId: selectedProduct.merchantId,
     };
 
-
+   
 
     try {
       await axios.put(
@@ -162,6 +170,7 @@ const ProductCatalog = () => {
 
   return (
     <fieldset style={{ height: "100vh" }}>
+      <p>{myCookies} merch</p>
       <legend>Product Catalog</legend>
       {Object.keys(products).length > 0 ? (
         Object.keys(products).map((categoryName) => (
@@ -338,10 +347,14 @@ const ProductCatalog = () => {
                     onClick={() => setVisible(false)}
                     className="p-button-text"
                   />
-                  <Button label="Yes" icon="pi pi-check" autoFocus onClick={handleDeleteSumit}/>
+                  <Button
+                    label="Yes"
+                    icon="pi pi-check"
+                    autoFocus
+                    onClick={handleDeleteSumit}
+                  />
                 </div>
               }
-              
               onHide={() => setVisible(false)}
             >
               <p>Are you sure you want to delete {selectedProduct?.name}?</p>

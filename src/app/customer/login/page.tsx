@@ -10,6 +10,7 @@ import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
 import "./login.css";
+import axios from "axios";
 
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
@@ -42,15 +43,23 @@ const EmailOtpForm = () => {
     return () => clearInterval(interval);
   }, [resendDisabled]);
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    setEmailError("");
-
-    if (!validator.isEmail(email)) {
-      setEmailError("Please enter a valid email address.");
-      return;
+  const handleEmailSubmit = async() => {
+    
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/customer`, {
+          email:email
+        }
+      );
     }
-
+    catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to send OTP",
+        life: 3000,
+      })
+    }
     setShowOtpDialog(true);
     setResendDisabled(true);
   };
@@ -136,6 +145,7 @@ const EmailOtpForm = () => {
                 type="submit"
                 style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
+                onClick={()=>handleEmailSubmit}
               />
             </div>
           </form>

@@ -128,7 +128,7 @@ const accept = async () => {
   };
   try {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${adminData}`,
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/updateMerchant/${adminData}`,
       data
     );
     if (response.status === 200) {

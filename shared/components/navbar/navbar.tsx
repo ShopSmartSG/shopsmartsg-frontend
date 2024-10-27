@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
 
 import { MenuItem } from "primereact/menuitem";
@@ -13,10 +13,13 @@ import data from "../../assets/dummyData/cart";
 
 import { Dialog } from "primereact/dialog";
 import { Image } from "primereact/image";
+import axios from "axios";
 
-export default function Navbar() {
+export default function Navbar({ userid }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [cartVisibility,setCartVisibility] = useState(false);
+  const [cartVisibility, setCartVisibility] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [merchantId, setMerchantId] = useState("");
 
   const itemRenderer = (item) => (
     <Link className="flex align-items-center p-menuitem-link" href={item.url}>
@@ -42,25 +45,91 @@ export default function Navbar() {
     </div>
   );
 
-  const totalPrice = () => {
-    return data.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  }
+   const fetchProductDetails = async (productId, merchantId) => {
+     try {
+       const response = await axios.get(
+         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getProduct/${merchantId}/products/${productId}`
+       );
 
-    const footerContent = (
-      <div className="p-2">
-        <Button
-          label="Checkout"
-          icon="pi pi-check"
-          className="p-button-success"
-          autoFocus
-        />
-        <Button
-          label="Clear Cart"
-          icon="pi pi-trash"
-          className="p-button-danger"
-        />
-      </div>
-    );
+       return {
+         listingPrice: response.data.listingPrice,
+         productName: response.data.productName,
+         imageUrl: response.data.imageUrl,
+       };
+     } catch (error) {
+       console.error(`Error fetching details for product ${productId}:`, error);
+       return {
+         listingPrice: null,
+         productName: "Not available",
+         imageUrl: null,
+       };
+     }
+   };
+
+   const fetchAllProductDetails = async (items, merchantId) => {
+     try {
+       const updatedItems = await Promise.all(
+         items.map(async (item) => {
+           const productDetails = await fetchProductDetails(
+             item.productId,
+             merchantId
+           );
+           return {
+             ...item,
+             ...productDetails,
+           };
+         })
+       );
+       return updatedItems;
+     } catch (error) {
+       throw new Error("Error fetching product details");
+     }
+   };
+
+   useEffect(() => {
+     const fetchData = async () => {
+       try {
+
+
+         const response = await axios.get(
+           `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCartItems/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
+         );
+
+         setMerchantId(response.data.merchantId);
+
+         const itemsWithDetails = await fetchAllProductDetails(
+           response.data.cartItems,
+           response.data.merchantId
+         );
+
+         setCartItems(itemsWithDetails);
+       } catch (error) {
+         
+         console.error("Error:", error);
+       } 
+     };
+
+     fetchData();
+   }, []);
+
+
+  const footerContent = (
+    <div className="p-2">
+      <Button
+        label="Checkout"
+        icon="pi pi-check"
+        className="p-button-success"
+        autoFocus
+      />
+      <Button
+        label="Clear Cart"
+        icon="pi pi-trash"
+        className="p-button-danger"
+        onClick={() => clearCart("4c699c23-81bf-4a25-9dee-7fb7c37f7f60")}
+        
+      />
+    </div>
+  );
 
   const items: MenuItem[] = [
     // {
@@ -86,17 +155,16 @@ export default function Navbar() {
       icon: "pi pi-gift",
       url: "/customer/orders",
       template: itemRenderer,
-    }, {
+    },
+    {
       label: "Customer Products",
       icon: "pi pi-barcode",
       url: "/customer/products",
       template: itemRenderer,
-    }
+    },
   ];
 
-  const endItems: MenuItem[] = [
-   
-  ];
+  const endItems: MenuItem[] = [];
 
   const start = (
     <Link href="/" className="navbar-title">
@@ -104,9 +172,28 @@ export default function Navbar() {
     </Link>
   );
 
+  const deleteCartItem = async (item) => {
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/deleteFromCart/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`, {
+          productId: item.productId,
+          quantity:item.quantity
+        }
+      );
+    }
+    catch (err) {
+      console.error("Error deleting cart item:", err);
+    }
+  }
+const clearCart = async (customerId: string) => {
+  try {
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/emptyCartItems/${customerId}`
+    );
+  } catch (error) {}
+};
   const end = (
     <div className="flex align-items-center gap-2">
-
       <i
         className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
         style={{ fontSize: "24px" }}
@@ -135,7 +222,7 @@ export default function Navbar() {
         footer={footerContent}
         maximized={true}
       >
-        {data.map((item, index) => (
+        {cartItems.map((item, index) => (
           <div
             key={index}
             className="grid align-items-center gap-3 mb-3"
@@ -143,29 +230,31 @@ export default function Navbar() {
           >
             <div className="col-4">
               <Image
-                src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                src={`${item.imageUrl}`}
                 alt="Product Image"
                 height="200"
                 width="180"
-                
               />
             </div>
 
             <div className="col-7 product-details p-1">
               <div className="grid">
-                
                 <div className="col-4 text-left font-bold">
                   <p>Product Name</p>
                   <p>Quantity</p>
-                  <p>Origin</p>
+
                   <p>Price</p>
                 </div>
                 <div className="col-7 text-right">
-                  <p>{item.name}</p>
+                  <p>{item.productName}</p>
                   <p>{item.quantity}</p>
-                  <p>{item.country}</p>
+
                   <p>${item.price}</p>
-                  <i className="pi pi-trash" style={{color:'red'}}></i>
+                  <i
+                    className="pi pi-trash"
+                    style={{ color: "red" }}
+                    onClick={() => deleteCartItem(item)}
+                  ></i>
                 </div>
               </div>
             </div>
@@ -173,22 +262,22 @@ export default function Navbar() {
         ))}
         <div className="text-right">
           <h3 className="mr-6">
-            Total Price:<small>${totalPrice()}</small>
+            Total Price:<small>$</small>
           </h3>
         </div>
       </Dialog>
 
       <HeadlessDemo
         visible={sidebarVisible}
+        userId={userid}
         onHide={() => setSidebarVisible(false)}
       />
-      
     </div>
   );
 
   return (
-      <div className="card">
-        <Menubar model={items} start={start} end={end} />
-      </div>
-    );
-  }
+    <div className="card">
+      <Menubar model={items} start={start} end={end} />
+    </div>
+  );
+}
