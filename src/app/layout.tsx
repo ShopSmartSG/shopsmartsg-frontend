@@ -5,9 +5,8 @@ import "./globals.css";
 import { PrimeReactProvider } from "primereact/api";
 import Navbar from '../../shared/components/navbar/navbar';
 import { AdminProvider } from "@/context/AdminContext";
-import { type Session } from "next-auth"
 import { getSession } from "@/lib";
-import { SessionProvider } from "next-auth/react"
+import { SessionProvider as CustomSessionProvider } from "@/context/SessionContext";
 export const metadata: Metadata = {
   title: "ShopSmart",
   description: 'ShopSmart is a advanced application which helps to screen through the all the stores and give you the best price for what you want',
@@ -26,11 +25,11 @@ export default async function RootLayout({
       <body>
         <AdminProvider>
           <PrimeReactProvider>
-            <SessionProvider>
-              <Navbar userid={session} />
-              {<p>session {session}</p>}
+            <CustomSessionProvider session={session}>
+              <Navbar />
+              
               <div className="p-2 surface-ground">{children}</div>
-            </SessionProvider>
+            </CustomSessionProvider>
           </PrimeReactProvider>
         </AdminProvider>
       </body>

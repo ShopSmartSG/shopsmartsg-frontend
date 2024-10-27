@@ -241,7 +241,7 @@ const router = useRouter();
         </div>
       </Card>
       <br />
-      <Card header={header}>
+      {/* <Card header={header}>
         <div className="grid text-center">
           <div
             className="col-3 cursor-pointer"
@@ -279,11 +279,11 @@ const router = useRouter();
             </Card>
           </div>
         </div>
-      </Card>
+      </Card> */}
       <br />
       <br />
       <div className="grid">
-        <div className="col-6">
+        {/* <div className="col-6">
           <Card>
             <div className="grid text-center">
               <div className="col-6 cursor-pointer">
@@ -342,7 +342,7 @@ const router = useRouter();
               </div>
             </div>
           </Card>
-        </div>
+        </div> */}
         <br />
         <br />
         <div className="grid">

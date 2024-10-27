@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import "../merchant/merchant.css";
-import { useSession } from "next-auth/react";
+
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -51,7 +51,7 @@ const Page: React.FC = () => {
   const enableDetails = () => {
     setEditDetailsEnable(true);
   };
-  const { data: session, status } = useSession();
+
 
   
   const confirm1 = () => {

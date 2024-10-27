@@ -1,32 +1,21 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { useEffect } from 'react';
-import { Card } from 'primereact/card';
-import { Image } from 'primereact/image';
-
+import React, { useEffect, useState } from "react";
+import { Card } from "primereact/card";
+import { Image } from "primereact/image";
 import { Message } from "primereact/message";
-import axios from 'axios';
+import axios from "axios";
 
 const Order = ({ params }) => {
+  const [orderDetails, setOrderDetails] = useState(null);
 
-  const handleDirections = () =>{
+  const handleDirections = () => {
     window.open(
       `https://www.google.com/maps?q=@${1.2834},${103.8607}`,
       "_blank",
       "noopener,noreferrer"
     );
-  }
-  const orderDetails = {
-    status: 'Order Placed',
-    time: '10:00 AM',
-    date: '2023-10-01',
-    Merchant: 'Ali',
-    products: [
-      { id: 'P12345', name: 'Sample Product 1', quantity: '2' },
-      { id: 'P12346', name: 'Sample Product 2', quantity: '1' },
-      // Add more products as needed
-    ],
   };
 
   const footer = () => {
@@ -34,7 +23,7 @@ const Order = ({ params }) => {
       <div className="w-100 text-right">
         <Message
           severity="info"
-          text='Click the icon to navigate to the Merchant.'
+          text="Click the icon to navigate to the Merchant."
         />
         <i
           className="pi pi-directions directions mt-3 ml-2 cursor-pointer text-xl"
@@ -42,34 +31,59 @@ const Order = ({ params }) => {
         ></i>
       </div>
     );
-  }
-
+  };
 
   useEffect(() => {
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrderById/`)
-    }
-  })
+    const getOrderDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrderById/${params.orderId}`
+        );
+        if (response.status === 200) {
+          setOrderDetails(response.data);
+        }
+      } catch (error) {
+        console.log(error, "Error");
+      }
+    };
+    getOrderDetails();
+  }, [params.orderId]);
+
+  if (!orderDetails) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div>
-      <Card title={`Order ID: ${params.orderId}`} footer = {footer}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Card title={`Order ID: ${orderDetails.orderId}`} footer={footer}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <div>
-            {orderDetails.products.map((product) => (
-              <div key={product.id} style={{ marginBottom: '10px' }}>
-                <p>Product ID: {product.id}</p>
-                <Image src="https://via.placeholder.com/150" alt="Product Image" style={{ marginRight: '10px' }} />
-                <p>{product.name}</p>
+            {orderDetails.orderItems.map((product) => (
+              <div key={product.productId} style={{ marginBottom: "10px" }}>
+                <p>Product ID: {product.productId}</p>
+                <Image
+                  src="https://via.placeholder.com/150"
+                  alt="Product Image"
+                  style={{ marginRight: "10px" }}
+                />
                 <p>Quantity: {product.quantity}</p>
+                <p>Price: ${product.price}</p>
               </div>
             ))}
           </div>
           <div>
             <p>Status: {orderDetails.status}</p>
-            <p>Time: {orderDetails.time}</p>
-            <p>Date: {orderDetails.date}</p>
-            <p>Merchant: {orderDetails.Merchant}</p>
+            <p>Total Price: ${orderDetails.totalPrice}</p>
+            <p>
+              Date: {new Date(orderDetails.createdDate).toLocaleDateString()}
+            </p>
+            <p>Merchant: {orderDetails.merchantId}</p>
           </div>
         </div>
       </Card>

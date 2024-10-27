@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
-import { getSession } from "@/lib";
+import { useSession } from "@/context/SessionContext";
 import Link from "next/link";
 import axios from "axios";
 
@@ -14,37 +14,33 @@ interface HeadlessDemoProps {
   onHide: () => void;
 }
 
-export default function HeadlessDemo({ visible, onHide,userId }) {
+export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
-
-  const session = getSession();
-
-  const [uname,setUname] = useState('')
+  const { session } = useSession();
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const username = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${userId}`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${session}`,
           {
             withCredentials: true,
           }
         );
         if (response.status == 200) {
-         console.log(response.data,"Response Data")
+          console.log(response.data, "Response Data");
+          setName(response.data.name);
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
-      
-    }
-    
-    username();
-  },[])
+    };
 
+    username();
+  }, []);
 
   return (
     <div>
@@ -294,19 +290,19 @@ export default function HeadlessDemo({ visible, onHide,userId }) {
                           image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                           shape="circle"
                         />
-                        <span className="font-bold">{uname } </span>
+                        <span className="font-bold">{name} </span>
                       </Link>
                     </div>
-                    <div className="col-2" style={{marginTop:'30px'}}>
+                    <div className="col-2" style={{ marginTop: "30px" }}>
                       <Button
                         type="button"
                         icon="pi pi-power-off"
                         rounded
                         outlined
-                        className="h-2rem w-2rem m-3" 
+                        className="h-2rem w-2rem m-3"
                         tooltip="Logout"
                         tooltipOptions={{
-                          position: "left"
+                          position: "left",
                         }}
                       ></Button>
                     </div>

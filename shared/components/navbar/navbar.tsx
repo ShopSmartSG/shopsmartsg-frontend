@@ -16,7 +16,7 @@ import { Image } from "primereact/image";
 import axios from "axios";
 import { Toast } from "primereact/toast";
 
-export default function Navbar({ userid }) {
+export default function Navbar() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [cartVisibility, setCartVisibility] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -296,7 +296,7 @@ export default function Navbar({ userid }) {
 
       <HeadlessDemo
         visible={sidebarVisible}
-        userId={userid}
+        
         onHide={() => setSidebarVisible(false)}
       />
     </div>

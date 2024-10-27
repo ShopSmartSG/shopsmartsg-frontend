@@ -71,7 +71,7 @@ const EmailOtpForm = () => {
   const handleOtpSubmit = async () => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/customer`,
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/merchant`,
         {
           email: email,
           emailAddress: email,
@@ -127,7 +127,7 @@ const EmailOtpForm = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/customer`,
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/merchant`,
         {
           email,
         },
@@ -151,7 +151,7 @@ const EmailOtpForm = () => {
       style={{ height: "100vh" }}
     >
       <Card>
-        <p className="p-card-title text-center">Customer Sign In Page</p>
+        <p className="p-card-title text-center">Merchant Sign In Page</p>
         <div className="flex align-items-center justify-content-center">
           <form onSubmit={handleEmailSubmit} className="p-fluid">
             <div className="field">

@@ -9,38 +9,16 @@ import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
 import axios from "axios";
 
-const orders = [
-  {
-    id: "123",
-    status: "Order Placed",
-    time: "10:00 AM",
-    date: "2023-10-01",
-    Merchant: "Ali",
-  },
-  {
-    id: "124",
-    status: "Order Picked Up",
-    time: "11:00 AM",
-    date: "2023-10-02",
-    Merchant: "Ali",
-  },
-  {
-    id: "125",
-    status: "Order Ready for Pick Up",
-    time: "12:00 PM",
-    date: "2023-10-03",
-    Merchant: "Ali",
-  },
-];
-
 const getActiveIndex = (status) => {
   switch (status) {
-    case "Order Placed":
+    case "CREATED":
       return 0;
     case "Order Ready for Pick Up":
       return 1;
-    case "Order Picked Up":
+    case "COMPLETED":
       return 2;
+    case "CANCELLED":
+      return 3;
     default:
       return 0;
   }
@@ -88,26 +66,15 @@ const OrderCard = ({ order }) => {
       icon: "pi pi-check",
       template: (item) => itemRenderer(item, 2),
     },
+    {
+      label: "Order Cancelled",
+      icon: "pi pi-times",
+      template: (item) => itemRenderer(item, 3),
+    },
   ];
 
-  // Retrive all orders
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersCustomer/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
-        );
-        if (response.status == 200) {
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchOrders();
-  });
-
   return (
-    <Card title={`Order ID: ${order.id}`} className="mb-3">
+    <Card title={`Order ID: ${order.orderId}`} className="mb-3">
       <div className="flex flex-column md:flex-row justify-content-between align-items-center">
         <div className="flex-grow-1 mr-3 w-full" style={{ marginTop: "-50px" }}>
           <Steps
@@ -116,11 +83,13 @@ const OrderCard = ({ order }) => {
             readOnly={true}
             className="m-2 pt-4"
           />
-          <p className="mt-3 mb-2">Time: {order.time}</p>
-          <p className="mb-2">Date: {order.date}</p>
-          <p className="mb-2">Merchant: {order.Merchant}</p>
+          <p className="mt-3 mb-2">Total Price: ${order.totalPrice}</p>
+          <p className="mb-2">
+            Date: {new Date(order.createdDate).toLocaleDateString()}
+          </p>
+          <p className="mb-2">Merchant: {order.merchantId}</p>
           <Link
-            href={`/customer/orders/${order.id}`}
+            href={`/customer/orders/${order.orderId}`}
             className="p-button p-button-text"
           >
             View Order Details
@@ -139,23 +108,36 @@ const OrderCard = ({ order }) => {
             </div>
           </div>
         </div>
-        <Image
-          src="https://via.placeholder.com/150"
-          alt="Order Image"
-          width="150"
-          className="mt-3 md:mt-0"
-        />
+        
       </div>
     </Card>
   );
 };
 
 const Orders = () => {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersCustomer/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
+        );
+        if (response.status === 200) {
+          setOrders(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
   const ongoingOrders = orders.filter(
-    (order) => order.status !== "Order Picked Up"
+    (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED"
   );
   const pastOrders = orders.filter(
-    (order) => order.status === "Order Picked Up"
+    (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
   );
 
   return (
@@ -163,7 +145,7 @@ const Orders = () => {
       <h2 className="mb-3">Ongoing Orders</h2>
       <div className="grid">
         {ongoingOrders.map((order) => (
-          <div key={order.id} className="col-12 md:col-6 lg:col-4">
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
             <OrderCard order={order} />
           </div>
         ))}
@@ -172,7 +154,7 @@ const Orders = () => {
       <h2 className="mb-3 mt-5">Past Orders</h2>
       <div className="grid">
         {pastOrders.map((order) => (
-          <div key={order.id} className="col-12 md:col-6 lg:col-4">
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
             <OrderCard order={order} />
           </div>
         ))}
