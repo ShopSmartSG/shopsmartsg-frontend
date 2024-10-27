@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
-
+import { useRef } from "react";
 import { MenuItem } from "primereact/menuitem";
 import { Badge } from "primereact/badge";
 import { Avatar } from "primereact/avatar";
@@ -10,16 +10,18 @@ import Link from "next/link";
 import HeadlessDemo from "../sidebar/sidebar";
 import { Button } from "primereact/button";
 import data from "../../assets/dummyData/cart";
-
+import { useRouter } from "next/navigation";
 import { Dialog } from "primereact/dialog";
 import { Image } from "primereact/image";
 import axios from "axios";
+import { Toast } from "primereact/toast";
 
 export default function Navbar({ userid }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [cartVisibility, setCartVisibility] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [merchantId, setMerchantId] = useState("");
+  const router = useRouter();
 
   const itemRenderer = (item) => (
     <Link className="flex align-items-center p-menuitem-link" href={item.url}>
@@ -45,73 +47,96 @@ export default function Navbar({ userid }) {
     </div>
   );
 
-   const fetchProductDetails = async (productId, merchantId) => {
-     try {
-       const response = await axios.get(
-         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getProduct/${merchantId}/products/${productId}`
+  const toast = useRef(null);
+
+  // Order Placement
+  const placeOrder = async (customerId: string) => {
+    try {
+       const response = await axios.put(
+         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}`
        );
+       if (response.status == 200) {
+         setTimeout(() => {
+           toast.current.show({
+             severity: "success",
+             summary: "Order Placed",
+             detail: "Your order has been placed successfully",
+             life: 3000,
+           });
 
-       return {
-         listingPrice: response.data.listingPrice,
-         productName: response.data.productName,
-         imageUrl: response.data.imageUrl,
-       };
-     } catch (error) {
-       console.error(`Error fetching details for product ${productId}:`, error);
-       return {
-         listingPrice: null,
-         productName: "Not available",
-         imageUrl: null,
-       };
-     }
-   };
+           setCartItems([]);
+         }, 3000);
+         router.push("/customer/orders");
+       }
+    } catch (error) {
+     console.log(error);
+    }
+  };
 
-   const fetchAllProductDetails = async (items, merchantId) => {
-     try {
-       const updatedItems = await Promise.all(
-         items.map(async (item) => {
-           const productDetails = await fetchProductDetails(
-             item.productId,
-             merchantId
-           );
-           return {
-             ...item,
-             ...productDetails,
-           };
-         })
-       );
-       return updatedItems;
-     } catch (error) {
-       throw new Error("Error fetching product details");
-     }
-   };
+  // Fetch Individuval Product Details
+  const fetchProductDetails = async (productId, merchantId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getProduct/${merchantId}/products/${productId}`
+      );
 
-   useEffect(() => {
-     const fetchData = async () => {
-       try {
+      return {
+        listingPrice: response.data.listingPrice,
+        productName: response.data.productName,
+        imageUrl: response.data.imageUrl,
+      };
+    } catch (error) {
+      console.error(`Error fetching details for product ${productId}:`, error);
+      return {
+        listingPrice: null,
+        productName: "Not available",
+        imageUrl: null,
+      };
+    }
+  };
 
+  const fetchAllProductDetails = async (items, merchantId) => {
+    try {
+      const updatedItems = await Promise.all(
+        items.map(async (item) => {
+          const productDetails = await fetchProductDetails(
+            item.productId,
+            merchantId
+          );
+          return {
+            ...item,
+            ...productDetails,
+          };
+        })
+      );
+      return updatedItems;
+    } catch (error) {
+      throw new Error("Error fetching product details");
+    }
+  };
+  // Get Cart Items
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCartItems/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
+        );
 
-         const response = await axios.get(
-           `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCartItems/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
-         );
+        setMerchantId(response.data.merchantId);
 
-         setMerchantId(response.data.merchantId);
+        const itemsWithDetails = await fetchAllProductDetails(
+          response.data.cartItems,
+          response.data.merchantId
+        );
 
-         const itemsWithDetails = await fetchAllProductDetails(
-           response.data.cartItems,
-           response.data.merchantId
-         );
+        setCartItems(itemsWithDetails);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
 
-         setCartItems(itemsWithDetails);
-       } catch (error) {
-         
-         console.error("Error:", error);
-       } 
-     };
-
-     fetchData();
-   }, []);
-
+    fetchData();
+  }, []);
 
   const footerContent = (
     <div className="p-2">
@@ -120,13 +145,13 @@ export default function Navbar({ userid }) {
         icon="pi pi-check"
         className="p-button-success"
         autoFocus
+        onClick={()=> placeOrder("4c699c23-81bf-4a25-9dee-7fb7c37f7f60")}
       />
       <Button
         label="Clear Cart"
         icon="pi pi-trash"
         className="p-button-danger"
         onClick={() => clearCart("4c699c23-81bf-4a25-9dee-7fb7c37f7f60")}
-        
       />
     </div>
   );
@@ -175,23 +200,23 @@ export default function Navbar({ userid }) {
   const deleteCartItem = async (item) => {
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/deleteFromCart/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`, {
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/deleteFromCart/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`,
+        {
           productId: item.productId,
-          quantity:item.quantity
+          quantity: item.quantity,
         }
       );
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Error deleting cart item:", err);
     }
-  }
-const clearCart = async (customerId: string) => {
-  try {
-    const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/emptyCartItems/${customerId}`
-    );
-  } catch (error) {}
-};
+  };
+  const clearCart = async (customerId: string) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/emptyCartItems/${customerId}`
+      );
+    } catch (error) {}
+  };
   const end = (
     <div className="flex align-items-center gap-2">
       <i
@@ -278,6 +303,7 @@ const clearCart = async (customerId: string) => {
   return (
     <div className="card">
       <Menubar model={items} start={start} end={end} />
+      <Toast ref={toast} />
     </div>
   );
 }

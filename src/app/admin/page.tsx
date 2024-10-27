@@ -26,7 +26,6 @@ import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 
 import { Tag } from "primereact/tag";
 
-
 import { useRouter } from "next/navigation";
 import {
   TriStateCheckbox,
@@ -37,8 +36,6 @@ import { getStaticProps } from "./services/CustomerService";
 import "../admin/admin.main.css";
 import axios from "axios";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-
 
 const defaultFilters: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -68,14 +65,12 @@ const defaultFilters: DataTableFilterMeta = {
 };
 
 export default function AdvancedFilterDemo() {
-
   const [customers, setCustomers] = useState([]);
-
 
   const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(false);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
-  
+
   const { setAdminData } = useAdminContext();
 
   const toast = useRef(null);
@@ -114,7 +109,7 @@ export default function AdvancedFilterDemo() {
 
   const blockUser = async (merchantId: string) => {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/blacklist/${merchantId}`,
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/blacklistMerchant/${merchantId}`,
       {
         withCredentials: false,
       }
@@ -136,7 +131,7 @@ export default function AdvancedFilterDemo() {
 
   const unblockUser = async (merchantId: string) => {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/unblacklist/${merchantId}`,
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/unblacklistMerchant/${merchantId}`,
       {
         withCredentials: false,
       }
@@ -158,7 +153,7 @@ export default function AdvancedFilterDemo() {
 
   const deleteCustomer = async (merchantId: string) => {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchantId}`,
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/deleteMerchant/${merchantId}`,
       {
         withCredentials: false,
       }
@@ -238,34 +233,31 @@ export default function AdvancedFilterDemo() {
   };
 
   const renderHeader = () => {
-    
     return (
+      <div className="flex justify-content-between">
+        <Button
+          type="button"
+          icon="pi pi-filter-slash"
+          label="Clear"
+          outlined
+          onClick={clearFilter}
+        />
 
-        <div className="flex justify-content-between">
-          <Button
-            type="button"
-            icon="pi pi-filter-slash"
-            label="Clear"
-            outlined
-            onClick={clearFilter}
+        <Button onClick={() => router.push("/admin/add")}>
+          Create Merchant
+        </Button>
+
+        <p>Admin Portal</p>
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search" />
+
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder="Keyword Search"
           />
-
-          <Button onClick={() => router.push("/admin/add")}>
-            Create Merchant
-          </Button>
-
-          <p>Admin Portal</p>
-          <IconField iconPosition="left">
-            <InputIcon className="pi pi-search" />
-
-            <InputText
-              value={globalFilterValue}
-              onChange={onGlobalFilterChange}
-              placeholder="Keyword Search"
-            />
-          </IconField>
-        </div>
-
+        </IconField>
+      </div>
     );
   };
 
@@ -300,7 +292,6 @@ export default function AdvancedFilterDemo() {
     return (
       <MultiSelect
         value={options.value}
-
         itemTemplate={representativesItemTemplate}
         onChange={(e: MultiSelectChangeEvent) =>
           options.filterCallback(e.value)
@@ -361,10 +352,6 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-  
-
- 
-
   const blockTemplate = (rowData) => {
     return rowData.blacklisted ? (
       <Button onClick={() => unBlockUserPopup(rowData.merchantId)}>
@@ -385,23 +372,21 @@ export default function AdvancedFilterDemo() {
   const router = useRouter();
 
   const verifiedUpdateTemplate = (rowData) => {
-
     return (
       <div>
-       
-        <Button onClick={() => {
-          setAdminData(rowData.merchantId);
-          router.push('/admin/update')
-        }}>Update</Button>
+        <Button
+          onClick={() => {
+            setAdminData(rowData.merchantId);
+            router.push("/admin/update");
+          }}
+        >
+          Update
+        </Button>
       </div>
     );
   };
   const verifiedBodyTemplate = (rowData) => {
-    return (
-      <Button>
-        View Details
-      </Button>
-    );
+    return <Button>View Details</Button>;
   };
 
   const verifiedFilterTemplate = (
@@ -437,79 +422,77 @@ export default function AdvancedFilterDemo() {
   const header = renderHeader();
 
   return (
+    <div className="card">
+      <DataTable
+        value={customers}
+        paginator
+        showGridlines
+        rows={6}
+        loading={loading}
+        dataKey="id"
+        filters={filters}
+        globalFilterFields={[
+          "name",
+          "country.name",
+          "representative.name",
+          "balance",
+          "status",
+        ]}
+        header={header}
+        emptyMessage="No customers found."
+        onFilter={(e) => setFilters(e.filters)}
+      >
+        <Column
+          field="name"
+          header="Name"
+          filterField="name"
+          filterPlaceholder="Search by name"
+          style={{ minWidth: "12rem" }}
+          className="capitalize"
+        />
 
-      <div className="card">
-        <DataTable
-          value={customers}
-          paginator
-          showGridlines
-          rows={10}
-          loading={loading}
-          dataKey="id"
-          filters={filters}
-          globalFilterFields={[
-            "name",
-            "country.name",
-            "representative.name",
-            "balance",
-            "status",
-          ]}
-          header={header}
-          emptyMessage="No customers found."
-          onFilter={(e) => setFilters(e.filters)}
-        >
-          <Column
-            field="name"
-            header="Name"
-            filterField="name"
-            filterPlaceholder="Search by name"
-            style={{ minWidth: "12rem" }}
-            className="capitalize"
-          />
+        <Column
+          header="Balance"
+          filterField="balance"
+          dataType="numeric"
+          style={{ minWidth: "10rem" }}
+          body={balanceBodyTemplate}
+          filter
+          filterElement={balanceFilterTemplate}
+        />
 
-          <Column
-            header="Balance"
-            filterField="balance"
-            dataType="numeric"
-            style={{ minWidth: "10rem" }}
-            body={balanceBodyTemplate}
-            filter
-            filterElement={balanceFilterTemplate}
-          />
-
-          <Column
-            field="merchantId"
-            header="ID"
-            filter={true}
-            filterField="merchantId"
-            filterPlaceholder="Search by ID"
-            style={{ minWidth: "12rem" }}
-          />
-          <Column
-            field="merchantId"
-            header="Update Details"
-            bodyClassName="text-center"
-            style={{ minWidth: "8rem" }}
-            body={verifiedUpdateTemplate}
-          />
-          <Column
-            field="merchantId"
-            header="Delete"
-            bodyClassName="text-center"
-            style={{ minWidth: "8rem" }}
-            body={verifiedDeleteTemplate}
-          />
-          <Column
-            field="Block"
-            header="Block"
-            bodyClassName="text-center"
-            style={{ minWidth: "8rem" }}
-            body={blockTemplate}
-          />
-        </DataTable>
-        <Toast ref={toast} />
-        <ConfirmDialog />
-      </div>
-
+        <Column
+          field="merchantId"
+          header="ID"
+          filter={true}
+          filterField="merchantId"
+          filterPlaceholder="Search by ID"
+          style={{ minWidth: "12rem" }}
+        />
+        <Column
+          field="merchantId"
+          header="Update Details"
+          bodyClassName="text-center"
+          style={{ minWidth: "8rem" }}
+          body={verifiedUpdateTemplate}
+        />
+        <Column
+          field="merchantId"
+          header="Delete"
+          bodyClassName="text-center"
+          style={{ minWidth: "8rem" }}
+          body={verifiedDeleteTemplate}
+        />
+        <Column
+          field="Block"
+          header="Block"
+          bodyClassName="text-center"
+          style={{ minWidth: "8rem" }}
+          body={blockTemplate}
+        />
+      </DataTable>
+      <Toast ref={toast} />
+      <ConfirmDialog />
+    </div>
   );
 }

@@ -1,26 +1,48 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
-import Link from 'next/link';
-import { Card } from 'primereact/card';
-import { Image } from 'primereact/image';
-import { Steps } from 'primereact/steps';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { Card } from "primereact/card";
+import { Image } from "primereact/image";
+import { Steps } from "primereact/steps";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
-
+import axios from "axios";
 
 const orders = [
-  { id: '123', status: 'Order Placed', time: '10:00 AM', date: '2023-10-01', Merchant: 'Ali' },
-  { id: '124', status: 'Order Picked Up', time: '11:00 AM', date: '2023-10-02', Merchant: 'Ali' },
-  { id: '125', status: 'Order Ready for Pick Up', time: '12:00 PM', date: '2023-10-03', Merchant: 'Ali' },
+  {
+    id: "123",
+    status: "Order Placed",
+    time: "10:00 AM",
+    date: "2023-10-01",
+    Merchant: "Ali",
+  },
+  {
+    id: "124",
+    status: "Order Picked Up",
+    time: "11:00 AM",
+    date: "2023-10-02",
+    Merchant: "Ali",
+  },
+  {
+    id: "125",
+    status: "Order Ready for Pick Up",
+    time: "12:00 PM",
+    date: "2023-10-03",
+    Merchant: "Ali",
+  },
 ];
 
 const getActiveIndex = (status) => {
   switch (status) {
-    case 'Order Placed': return 0;
-    case 'Order Ready for Pick Up': return 1;
-    case 'Order Picked Up': return 2;
-    default: return 0;
+    case "Order Placed":
+      return 0;
+    case "Order Ready for Pick Up":
+      return 1;
+    case "Order Picked Up":
+      return 2;
+    default:
+      return 0;
   }
 };
 
@@ -28,26 +50,61 @@ const OrderCard = ({ order }) => {
   const activeIndex = getActiveIndex(order.status);
   const itemRenderer = (item, itemIndex) => {
     const isActiveItem = activeIndex === itemIndex;
-    const backgroundColor = isActiveItem ? 'var(--primary-color)' : 'var(--surface-b)';
-    const textColor = isActiveItem ? 'var(--surface-b)' : 'var(--text-color-secondary)';
+    const backgroundColor = isActiveItem
+      ? "var(--primary-color)"
+      : "var(--surface-b)";
+    const textColor = isActiveItem
+      ? "var(--surface-b)"
+      : "var(--text-color-secondary)";
 
     return (
-        <div className="flex flex-column align-items-center" style={{ marginTop: '20px' }}>
-          <span
-            className="inline-flex align-items-center justify-content-center border-circle border-primary border-1 h-3rem w-3rem z-1 cursor-pointer"
-            style={{ backgroundColor: backgroundColor, color: textColor }}
-          >
-            <i className={`${item.icon} text-xl`} />
-          </span>
-          <span className="mt-2 text-center">{item.label}</span>
-        </div>
-      );
-};
-const orderSteps = [
-    { label: 'Order Placed', icon: 'pi pi-shopping-cart', template: (item) => itemRenderer(item, 0) },
-    { label: 'Order Ready for Pick Up', icon: 'pi pi-box', template: (item) => itemRenderer(item, 1) },
-    { label: 'Order Picked Up', icon: 'pi pi-check', template: (item) => itemRenderer(item, 2) }
+      <div
+        className="flex flex-column align-items-center"
+        style={{ marginTop: "20px" }}
+      >
+        <span
+          className="inline-flex align-items-center justify-content-center border-circle border-primary border-1 h-3rem w-3rem z-1 cursor-pointer"
+          style={{ backgroundColor: backgroundColor, color: textColor }}
+        >
+          <i className={`${item.icon} text-xl`} />
+        </span>
+        <span className="mt-2 text-center">{item.label}</span>
+      </div>
+    );
+  };
+  const orderSteps = [
+    {
+      label: "Order Placed",
+      icon: "pi pi-shopping-cart",
+      template: (item) => itemRenderer(item, 0),
+    },
+    {
+      label: "Order Ready for Pick Up",
+      icon: "pi pi-box",
+      template: (item) => itemRenderer(item, 1),
+    },
+    {
+      label: "Order Picked Up",
+      icon: "pi pi-check",
+      template: (item) => itemRenderer(item, 2),
+    },
   ];
+
+  // Retrive all orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersCustomer/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
+        );
+        if (response.status == 200) {
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchOrders();
+  });
 
   return (
     <Card title={`Order ID: ${order.id}`} className="mb-3">
@@ -94,8 +151,12 @@ const orderSteps = [
 };
 
 const Orders = () => {
-  const ongoingOrders = orders.filter(order => order.status !== 'Order Picked Up');
-  const pastOrders = orders.filter(order => order.status === 'Order Picked Up');
+  const ongoingOrders = orders.filter(
+    (order) => order.status !== "Order Picked Up"
+  );
+  const pastOrders = orders.filter(
+    (order) => order.status === "Order Picked Up"
+  );
 
   return (
     <div className="p-4">
