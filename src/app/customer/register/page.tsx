@@ -10,7 +10,8 @@ import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
 import "./login.css";
-
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -60,6 +61,8 @@ const EmailOtpForm = () => {
     setResendDisabled(true);
   };
 
+  const router = useRouter();
+
   const blurHandler = (value: string) => {
     if (validator.isEmail(value)) {
       setEmailError("");
@@ -68,31 +71,64 @@ const EmailOtpForm = () => {
     }
   };
 
-  const handleOtpSubmit = () => {
-    if (parseInt(otp) == 123456) {
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Login Succcessful",
-        life: 3000,
-      });
-      setShowOtpDialog(false);
-      setOtp("");
-      setOtpCount(0);
-    } else {
-      setOtpError(true);
-      setOtp("");
-      setOtpCount(otpCount + 1);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid OTP",
-        life: 3000,
-      });
-    }
-  };
 
-  
+  const generateOtp = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/generateOtp/customer`, {
+          email:email
+      }, {
+          withCredentials: true
+        }
+      );
+      if (response.status == 200) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "OTP has been sent to your registered email address.",
+          life: 3000,
+        });
+        setOtpCount(otpCount + 1);
+        setTimer(30);
+      }
+    }
+    catch (error) {
+      toast.current.show({})
+  }
+  }
+
+   const handleOtpSubmit = async () => {
+     try {
+       const response = await axios.post(
+         `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/verifyOtp/customer`,
+         {
+           email: email,
+           emailAddress: email,
+           otp: otp,
+         },
+         { withCredentials: true }
+       );
+
+       if (response.status) {
+         toast.current.show({
+           severity: "success",
+           summary: "Success",
+           detail: "Login Successful",
+           life: 3000,
+         });
+         setShowOtpDialog(false);
+         setTimeout(() => {
+           router.push("/merchant/manage/view");
+         }, 3000);
+       }
+     } catch (error) {
+       toast.current.show({
+         status: "error",
+         message: "Error submitting OTP. Please try again later.",
+       });
+       setShowOtpDialog(false);
+     }
+   };
 
   const handleResendOtp = () => {
     setResendDisabled(true);
@@ -104,7 +140,42 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
+  const handleEmail = async () => {
+    setShowOtpDialog(true);
+    setResendDisabled(true);
 
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/generateOtp/customer`,
+        {
+          email,
+        },
+        {
+          withCredentials: true, // Include credentials with the request
+        }
+      );
+      if (response.status == 200) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "OTP has been sent to your registered email address.",
+          life: 3000,
+        });
+        setOtpCount(otpCount + 1);
+        setTimer(30);
+      }
+    } catch (error) {
+      console.error("Error sending email: ", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to send email. Please try again later.",
+        life: 3000,
+      });
+    }
+  };
+
+  
   return (
     <div
       className="flex-row justify-content-center flex-wrap "
@@ -129,31 +200,54 @@ const EmailOtpForm = () => {
             </div>
             <div className="field">
               <label htmlFor="">Name</label>
-              <InputText id="name" placeholder="Enter Your Name" value={ name}  onChange={(e) => setname(e.target.value)}/>
+              <InputText
+                id="name"
+                placeholder="Enter Your Name"
+                value={name}
+                onChange={(e) => setname(e.target.value)}
+              />
             </div>
             <div className="field">
               <label htmlFor="">PinCode</label>
-              <InputText id="pincode" placeholder="Enter Your PinCode" value={pinCode} onChange={(e) => setPinCode(e.target.value)} />
+              <InputText
+                id="pincode"
+                placeholder="Enter Your PinCode"
+                value={pinCode}
+                onChange={(e) => setPinCode(e.target.value)}
+              />
             </div>
             <div className="field">
               <label htmlFor="">Address Line 1</label>
-              <InputText id="addressLine1" placeholder="Enter Your Address Line 1" onChange={(e) => setAddressLine1(e.target.value)}/>
+              <InputText
+                id="addressLine1"
+                placeholder="Enter Your Address Line 1"
+                onChange={(e) => setAddressLine1(e.target.value)}
+              />
             </div>
             <div className="field">
               <label htmlFor="">Address Line 2</label>
-              <InputText id="addressLine2" placeholder="Enter Your Address Line 2" onChange={(e) => setAddressLine2(e.target.value)} />
+              <InputText
+                id="addressLine2"
+                placeholder="Enter Your Address Line 2"
+                onChange={(e) => setAddressLine2(e.target.value)}
+              />
             </div>
             <div className="field">
               <label htmlFor="">Phone Number</label>
-              <InputText id="phoneNumber" placeholder="Enter Your Phone Number" onChange={(e) => setPhoneNumber(e.target.value)} />
+              <InputText
+                id="phoneNumber"
+                placeholder="Enter Your Phone Number"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
             </div>
-            
+
             <div className="p-card-footer min-w-4">
               <Button
                 label="Next"
                 type="submit"
                 style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
+                onClick={() => generateOtp}
               />
             </div>
           </form>
@@ -188,7 +282,7 @@ const EmailOtpForm = () => {
           <div>
             <Button
               label="Submit"
-              onClick={handleOtpSubmit}
+              onClick={handleEmail}
               disabled={disabledCondition}
             />
           </div>

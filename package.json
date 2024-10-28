@@ -11,8 +11,13 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
     "axios": "^1.7.7",
+    "cookies-next": "^4.3.0",
     "formik": "^2.4.6",
+    "js-cookie": "^3.0.5",
+    "js-cookies": "^1.0.4",
     "next": "14.2.13",
+    "next-auth": "^5.0.0-beta.25",
+    "nookies": "^2.5.2",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.3",

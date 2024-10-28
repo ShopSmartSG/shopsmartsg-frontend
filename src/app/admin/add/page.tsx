@@ -47,14 +47,17 @@ export default function CreateMerchantForm() {
       addressLine1: formik.values.address1,
       addressLine2: formik.values.address2,
       phoneNumber: formik.values.phone,
-      blacklisted: false,
+      
       pincode: formik.values.pincode,
     };
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createMerchant`,
-        data
+        data,
+        {
+          withCredentials: true, // Include credentials with the request
+        }
       );
       if (response.status === 201) {
         setShowDialog(false);

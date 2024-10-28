@@ -1,11 +1,13 @@
 "use client";
-import React, { LegacyRef, useRef } from "react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
+import { useSession } from "@/context/SessionContext";
 import Link from "next/link";
+import axios from "axios";
 
 interface HeadlessDemoProps {
   visible: boolean;
@@ -16,7 +18,29 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
+  const { session } = useSession();
+  const [name, setName] = useState("");
 
+  useEffect(() => {
+    const username = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${session}`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status == 200) {
+          console.log(response.data, "Response Data");
+          setName(response.data.name);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    username();
+  }, []);
 
   return (
     <div>
@@ -160,8 +184,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             leaveToClassName="hidden"
                             leaveActiveClassName="slideup"
                           >
-                            <Link
-                              href="/merchant"
+                            <a
+                             
                               ref={btnRef2}
                               className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             >
@@ -169,7 +193,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               <span className="font-medium">Merchant</span>
                               <i className="pi pi-chevron-down ml-auto mr-1"></i>
                               <Ripple />
-                            </Link>
+                            </a>
                           </StyleClass>
                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                             <li>
@@ -246,6 +270,18 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                                 </span>
                                 <Ripple />
                               </Link>
+                              <li>
+                                <Link
+                                  href="/merchant/orders"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                >
+                                  <i className="pi pi-chart-line mr-2"></i>
+                                  <span className="font-medium">
+                                    Merchant Orders
+                                  </span>
+                                  <Ripple />
+                                </Link>
+                              </li>
                             </li>
                           </ul>
                         </li>
@@ -266,19 +302,19 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                           shape="circle"
                         />
-                        <span className="font-bold">Yatharth Sathija</span>
+                        <span className="font-bold">{name} </span>
                       </Link>
                     </div>
-                    <div className="col-2" style={{marginTop:'30px'}}>
+                    <div className="col-2" style={{ marginTop: "30px" }}>
                       <Button
                         type="button"
                         icon="pi pi-power-off"
                         rounded
                         outlined
-                        className="h-2rem w-2rem m-3" 
+                        className="h-2rem w-2rem m-3"
                         tooltip="Logout"
                         tooltipOptions={{
-                          position: "left"
+                          position: "left",
                         }}
                       ></Button>
                     </div>

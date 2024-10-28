@@ -1,9 +1,10 @@
-'use client'
+"use client";
 import React, { useRef, useState, useEffect } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { Paginator } from "primereact/paginator";
+import { Toast } from "primereact/toast";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -17,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import FilterSearch from "../../../../shared/components/filter/filterSearch";
 
 const Page = () => {
+  const toast = useRef<Toast>(null);
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("categoryId");
   const maxPrice = searchParams.get("maxPrice");
@@ -24,7 +26,7 @@ const Page = () => {
   const pincode = searchParams.get("pincode");
   const searchText = searchParams.get("searchText");
   const [merchants, setMerchants] = useState<string[]>([]);
-  
+
   interface Product {
     productId: string;
     productName: string;
@@ -35,7 +37,15 @@ const Page = () => {
     listingPrice: string;
   }
 
+  interface ProductQuantity {
+    [key: string]: number;
+  }
+
   const [products, setProducts] = useState<Product[]>([]);
+  const [productQuantities, setProductQuantities] = useState<ProductQuantity>(
+    {}
+  );
+
   interface Coordinate {
     id: string;
     name: string;
@@ -43,13 +53,21 @@ const Page = () => {
     lng: number;
   }
 
-  const [coordinates, setCoordinates] = useState<Coordinate[]>([]); 
+  const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
+  const [first, setFirst] = useState(0);
+  const [rows] = useState(4);
+  const getCurrentPageProducts = () => {
+    return products.slice(first, first + rows);
+  };
+  const onPageChange = (event: { first: number; rows: number }) => {
+    setFirst(event.first);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/products/filter`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/searchProducts`,
           {
             categoryId,
             maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
@@ -59,11 +77,19 @@ const Page = () => {
           }
         );
 
-        const merchantIds = response.data.map((product) => product.merchantId);
+        const merchantIds = response.data.map(
+          (product: Product) => product.merchantId
+        );
         const uniqueMerchantIds: string[] = Array.from(new Set(merchantIds));
-        console.log("uniqueMerchantIds:", uniqueMerchantIds);
-        setMerchants(uniqueMerchantIds);
-        setProducts(response.data);
+        setMerchants(Array.from(new Set(uniqueMerchantIds)));
+        setProducts(Array.from(new Set(response.data)));
+
+        // Initialize quantities for all products
+        const initialQuantities: ProductQuantity = {};
+        response.data.forEach((product: Product) => {
+          initialQuantities[product.productId] = 0;
+        });
+        setProductQuantities(initialQuantities);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -72,11 +98,82 @@ const Page = () => {
     fetchProducts();
   }, [categoryId, maxPrice, minPrice, pincode, searchText]);
 
+  const handleQuantityChange = (productId: string, newValue: number) => {
+    setProductQuantities((prev) => ({
+      ...prev,
+      [productId]: newValue,
+    }));
+  };
+
+  const addToCart = async (product: Product) => {
+    const quantity = productQuantities[product.productId];
+
+    if (quantity <= 0) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Warning",
+        detail: "Please select a quantity greater than 0",
+        life: 3000,
+      });
+      return;
+    }
+    console.log(product)
+
+    try {
+const response = await axios.put(
+  `${process.env.NEXT_PUBLIC_CentralService_API_URL}/addToCart/4c699c23-81bf-4a25-9dee-7fb7c37f7f60/merchant/${product.merchantId}`,
+  {
+    productId: product.productId,
+    quantity,
+    price: product.listingPrice,
+  }
+);
+      if (response.status == 200) {
+        toast.current?.show({
+          severity: "success",
+          summary: "Success",
+          detail: `Added ${quantity} ${product.productName} to cart`,
+          life: 3000,
+        });
+        // Reset quantity after successful addition
+        handleQuantityChange(product.productId, 0);
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+    // try {
+    //   // Assuming you have an API endpoint for adding to cart
+    //   await axios.post(`${process.env.NEXT_PUBLIC_CART_API_URL}/cart/add`, {
+    //     productId: product.productId,
+    //     quantity: quantity,
+    //   });
+
+    //   toast.current?.show({
+    //     severity: "success",
+    //     summary: "Success",
+    //     detail: `Added ${quantity} ${product.productName} to cart`,
+    //     life: 3000,
+    //   });
+
+    //   // Reset quantity after successful addition
+    //   handleQuantityChange(product.productId, 0);
+    // } catch (error) {
+    //   console.error("Error adding to cart:", error);
+    //   toast.current?.show({
+    //     severity: "error",
+    //     summary: "Error",
+    //     detail: "Failed to add item to cart",
+    //     life: 3000,
+    //   });
+    // }
+  };
+
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   });
-  const [value, setValue] = useState(0);
+
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -88,7 +185,7 @@ const Page = () => {
   const panToLocation = (lat: number, lng: number) => {
     if (mapRef.current) {
       mapRef.current.panTo({ lat, lng });
-      mapRef.current.setZoom(15); 
+      mapRef.current.setZoom(15);
     }
   };
 
@@ -101,84 +198,112 @@ const Page = () => {
   };
 
   useEffect(() => {
-   const getMerchantCoordinates = async () => {
-     if (merchants.length > 0) {
-       const coords = await Promise.all(
-         merchants.map(async (merchant) => {
-           try {
-             const response = await axios.get(
-               `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${merchant}`
-             );
-             const data = response.data;
-             return {
-               id: data.merchantId,
-               name: data.name,
-               lat: data.latitude,
-               lng: data.longitude,
-             };
-           } catch (error) {
-             console.error("Error fetching merchant coordinates:", error);
-             return null; // Handle error gracefully by returning null.
-           }
-         })
-       );
+    const getMerchantCoordinates = async () => {
+      if (merchants.length > 0) {
+        const coords = await Promise.all(
+          merchants.map(async (merchant) => {
+            try {
+              const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchant}`
+              );
+              const data = response.data;
+              return {
+                id: data.merchantId,
+                name: data.name,
+                lat: data.latitude,
+                lng: data.longitude,
+              };
+            } catch (error) {
+              console.error("Error fetching merchant coordinates:", error);
+              return null;
+            }
+          })
+        );
 
-       // Filter out any null values from failed requests.
-       const validCoords = coords.filter((coord) => coord !== null);
-
-       // Append new coordinates to the existing ones.
-       setCoordinates((prevCoords) => [...prevCoords, ...validCoords]);
-     }
-   };
-
+        const validCoords = coords.filter((coord) => coord !== null);
+        setCoordinates((prevCoords) => [...prevCoords, ...validCoords]);
+      }
+    };
 
     getMerchantCoordinates();
   }, [merchants]);
 
   const header = (imageUrl: string): JSX.Element => (
     <Image alt="Card" src={imageUrl} />
-
   );
 
-  const footer = (
+  const footer = (product: Product): JSX.Element => (
     <div className="flex">
       <div className="mt-7">
-        <Button label="Add To Cart" icon="pi pi-check" />
+        <Button
+          label="Add To Cart"
+          icon="pi pi-shopping-cart"
+          onClick={() => addToCart(product)}
+        />
       </div>
       <div className="ml-2">
-        <Knob value={value} size={60} className="ml-4" />
+        <Knob
+          value={productQuantities[product.productId]}
+          size={60}
+          className="ml-4"
+          onChange={(e) => handleQuantityChange(product.productId, e.value)}
+        />
         <div className="flex gap-2">
           <Button
             icon="pi pi-plus"
-            onClick={() => setValue(value + 1)}
-            disabled={value === 100}
+            onClick={() =>
+              handleQuantityChange(
+                product.productId,
+                Math.min(productQuantities[product.productId] + 1, 100)
+              )
+            }
+            disabled={productQuantities[product.productId] === 100}
           />
           <Button
             icon="pi pi-minus"
-            onClick={() => setValue(value - 1)}
-            disabled={value === 0}
+            onClick={() =>
+              handleQuantityChange(
+                product.productId,
+                Math.max(productQuantities[product.productId] - 1, 0)
+              )
+            }
+            disabled={productQuantities[product.productId] === 0}
           />
         </div>
       </div>
     </div>
   );
+
   return (
     <div>
-      <FilterSearch/>
+      <Toast ref={toast} />
+      <FilterSearch />
       <div className="grid">
         <div className="col-6">
           <div className="grid">
             {products.map((product, id) => (
               <div className="col-6" key={id}>
-                <Card header={header(product.imageUrl)} footer={footer}>
+                <Card
+                  header={header(product.imageUrl)}
+                  footer={footer(product)}
+                >
                   <h2>{product.productName}</h2>
                   <p className="m-0">{product.productDescription}</p>
-                  <p className="mt-4\">
+                  <p className="mt-4">
                     <b>SGD {product.listingPrice}</b>
                   </p>
                 </Card>
               </div>
             ))}
+          </div>
+          <div className="card">
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={products.length}
+              onPageChange={onPageChange}
+              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+            />
           </div>
         </div>
         <div className="col-6">
@@ -266,9 +391,6 @@ const Page = () => {
               </div>
             )}
           </Card>
-        </div>
-        <div className="card col-12">
-          <Paginator first={0} rows={10} totalRecords={products.length} />
         </div>
       </div>
     </div>

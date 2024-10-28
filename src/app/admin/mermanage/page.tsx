@@ -458,7 +458,7 @@ export default function AdvancedFilterDemo() {
           value={customers}
           paginator
           showGridlines
-          rows={10}
+          rows={6}
           loading={loading}
           dataKey="id"
           filters={filters}

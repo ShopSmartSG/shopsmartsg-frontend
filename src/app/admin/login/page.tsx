@@ -12,6 +12,8 @@ import { InputOtp } from "primereact/inputotp";
 import "./login.css";
 import axios from "axios";
 
+import { useRouter } from "next/navigation";
+
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -43,23 +45,17 @@ const EmailOtpForm = () => {
     return () => clearInterval(interval);
   }, [resendDisabled]);
 
-  const handleEmailSubmit = async() => {
-    
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/customer`, {
-          email:email
-        }
-      );
+  const router = useRouter();
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    setEmailError("");
+
+    if (!validator.isEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
     }
-    catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to send OTP",
-        life: 3000,
-      })
-    }
+
     setShowOtpDialog(true);
     setResendDisabled(true);
   };
@@ -72,40 +68,40 @@ const EmailOtpForm = () => {
     }
   };
 
-  const handleOtpSubmit = () => {
-    if (parseInt(otp) == 123456) {
+  const handleOtpSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/admin`,
+        {
+          email: email,
+          emailAddress: email,
+          otp: otp,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Login Successful",
+          life: 3000,
+        });
+        setShowOtpDialog(false);
+        setTimeout(() => {
+          router.push("/admin");
+        }, 3000);
+      }
+    } catch (error) {
       toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Login Succcessful",
-        life: 3000,
+        status: "error",
+        message: "Error submitting OTP. Please try again later.",
       });
       setShowOtpDialog(false);
-      setOtp("");
-      setOtpCount(0);
-    } else {
-      setOtpError(true);
-      setOtp("");
-      setOtpCount(otpCount + 1);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid OTP",
-        life: 3000,
-      });
     }
   };
 
-  // const otpValidator = (value: string) => {
-  //   const result = validator.isNumeric(value);
-  //   if (result) {
-  //     setOtpError(false);
-  //     setOtp(value);
-  //   } else {
-  //     setOtpError(true);
-  //   }
-  // };
-
+  
   const handleResendOtp = () => {
     setResendDisabled(true);
     setTimer(30);
@@ -116,14 +112,37 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
+  const handleEmail = async () => {
+    setShowOtpDialog(true);
+    setResendDisabled(true);
 
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/admin`,
+        {
+          email,
+        },
+        {
+          withCredentials: true, // Include credentials with the request
+        }
+      );
+    } catch (error) {
+      console.error("Error sending email: ", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to send email. Please try again later.",
+        life: 3000,
+      });
+    }
+  };
   return (
     <div
       className="flex-row justify-content-center flex-wrap "
       style={{ height: "100vh" }}
     >
       <Card>
-        <p className="p-card-title text-center">Sign In Page</p>
+        <p className="p-card-title text-center">Admin Sign In Page</p>
         <div className="flex align-items-center justify-content-center">
           <form onSubmit={handleEmailSubmit} className="p-fluid">
             <div className="field">
@@ -145,7 +164,7 @@ const EmailOtpForm = () => {
                 type="submit"
                 style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
-                onClick={()=>handleEmailSubmit}
+                onClick={handleEmail}
               />
             </div>
           </form>
@@ -200,7 +219,6 @@ const EmailOtpForm = () => {
         )}
       </Dialog>
       <Toast ref={toast} />
-      
     </div>
   );
 };
