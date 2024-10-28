@@ -13,7 +13,7 @@ const getActiveIndex = (status) => {
   switch (status) {
     case "CREATED":
       return 0;
-    case "Order Ready for Pick Up":
+    case "READY":
       return 1;
     case "COMPLETED":
       return 2;
@@ -26,6 +26,7 @@ const getActiveIndex = (status) => {
 
 const OrderCard = ({ order }) => {
   const activeIndex = getActiveIndex(order.status);
+  console.log(activeIndex,'activeIndex');
   const itemRenderer = (item, itemIndex) => {
     const isActiveItem = activeIndex === itemIndex;
     const backgroundColor = isActiveItem
@@ -57,7 +58,7 @@ const OrderCard = ({ order }) => {
       template: (item) => itemRenderer(item, 0),
     },
     {
-      label: "Order Ready for Pick Up",
+      label: "Ready",
       icon: "pi pi-box",
       template: (item) => itemRenderer(item, 1),
     },
@@ -134,7 +135,7 @@ const Orders = () => {
   }, []);
 
   const ongoingOrders = orders.filter(
-    (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED"
+    (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED" || order.status === 'READY'
   );
   const pastOrders = orders.filter(
     (order) => order.status === "COMPLETED" || order.status === "CANCELLED"

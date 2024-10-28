@@ -135,7 +135,9 @@ const Page: React.FC = () => {
    };
     try {
        const response = await axios.put(
-         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/de2e56fa-b127-4bf4-bd01-163b23ef2db0`,
+         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb
+
+`,
          data
        );
       if (response.status === 200) {
@@ -190,7 +192,7 @@ const Page: React.FC = () => {
       try {
         // Make the API call
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/de2e56fa-b127-4bf4-bd01-163b23ef2db0`
+          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb`
         );
 
         // Set the fetched data to state

@@ -184,7 +184,7 @@ const ProductCatalog = () => {
                         <div key={product.id} className="col-4">
                           <Card
                             title={product.name}
-                            subTitle={`$${product.price}`}
+                            subTitle={`$${product.listingPrice}`}
                             header={
                               <img
                                 src={product.image}
