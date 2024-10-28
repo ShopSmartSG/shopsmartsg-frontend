@@ -52,26 +52,27 @@ export default function Navbar() {
   // Order Placement
   const placeOrder = async (customerId: string) => {
     try {
-       const response = await axios.put(
-         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}`, {
-           data:'k'
-         }
-       );
-       if (response.status == 200) {
-         setTimeout(() => {
-           toast.current.show({
-             severity: "success",
-             summary: "Order Placed",
-             detail: "Your order has been placed successfully",
-             life: 3000,
-           });
-
-           setCartItems([]);
-         }, 3000);
-         router.push("/customer/orders");
-       }
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}`,
+        {
+          data: "k",
+        }
+      );
+      if (response.status == 200) {
+        setTimeout(() => {
+          toast.current.show({
+            severity: "success",
+            summary: "Order Placed",
+            detail: "Your order has been placed successfully",
+            life: 3000,
+          });
+          setCartVisibility(false);
+          setCartItems([]);
+        }, 3000);
+        router.push("/customer/orders");
+      }
     } catch (error) {
-     console.log(error);
+      console.log(error);
     }
   };
 
@@ -147,7 +148,7 @@ export default function Navbar() {
         icon="pi pi-check"
         className="p-button-success"
         autoFocus
-        onClick={()=> placeOrder("4c699c23-81bf-4a25-9dee-7fb7c37f7f60")}
+        onClick={() => placeOrder("4c699c23-81bf-4a25-9dee-7fb7c37f7f60")}
       />
       <Button
         label="Clear Cart"
@@ -288,15 +289,12 @@ export default function Navbar() {
           </div>
         ))}
         <div className="text-right">
-          <h3 className="mr-6">
-            Total Price:<small>$</small>
-          </h3>
+          <h3 className="mr-6"></h3>
         </div>
       </Dialog>
 
       <HeadlessDemo
         visible={sidebarVisible}
-        
         onHide={() => setSidebarVisible(false)}
       />
     </div>

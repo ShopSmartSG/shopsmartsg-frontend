@@ -5,6 +5,8 @@ import { createContext, useContext, useState, ReactNode } from "react";
 interface AdminContextType {
   adminData: string;
   setAdminData: (data: string) => void;
+  userType: string;
+  setUserTyped: (type: string) => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -12,8 +14,10 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [adminData, setAdminData] = useState<string>(null);
 
+  const [userType, setUserTyped] = useState<string>("");
+
   return (
-    <AdminContext.Provider value={{ adminData, setAdminData }}>
+    <AdminContext.Provider value={{ adminData, setAdminData ,userType,setUserTyped}}>
       {children}
     </AdminContext.Provider>
   );

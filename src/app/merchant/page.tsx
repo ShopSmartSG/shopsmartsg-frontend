@@ -213,6 +213,12 @@ const Page: React.FC = () => {
     // Call the fetch function
     fetchData();
   }, []); 
+  const [usetType, SetUserType] = useState('');
+
+  useEffect(() => {
+    const userType = localStorage.getItem("USER_TYPE");
+    SetUserType(userType);
+  }, []);
 
   if (session == '' || session == null || session == undefined) {
     router.push('/merchant/login');
@@ -244,7 +250,7 @@ const Page: React.FC = () => {
                <p>de2e56fa-b127-4bf4-bd01-163b23ef2db0</p>
                <div className="form-grid grid">
                  <div className="field col-12">
-                   <label htmlFor="email">Email ID</label>
+                   <label htmlFor="email">Email ID { usetType}</label>
                    <InputText
                      id="email"
                      aria-describedby="email-help"

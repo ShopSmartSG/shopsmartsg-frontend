@@ -9,11 +9,16 @@ export async function logout() {
 
 export async function getSession() {
     const session = cookies().get("userId")?.value;
-    if (!session) return null; 
+    if (!session) return null;
     const sessvalue = await session;
 
-    
-    return await sessvalue;
+    // Set localStorage values
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('userId', sessvalue);
+        localStorage.setItem('USER_TYPE', 'merchant');
+    }
+
+    return sessvalue;
 }
 
 export async function updateSession(request: NextRequest) {
@@ -21,8 +26,7 @@ export async function updateSession(request: NextRequest) {
     if (!session) return;
 
     // Refresh the session so it doesn't expire
-
-
+    cookies().set("session", session, { maxAge: 3600 }); // Example: extend session by 1 hour
 
     return session;
 }

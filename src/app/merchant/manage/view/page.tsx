@@ -7,6 +7,7 @@ import { Divider } from "primereact/divider";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
+import { useRouter } from "next/navigation";
 import "./page.css";
 import axios from "axios";
 import { Toast } from "primereact/toast";
@@ -14,6 +15,7 @@ import { getCookie } from "cookies-next";
 
 import { Message } from "primereact/message";
 import { InputNumber } from "primereact/inputnumber";
+import { useAdminContext } from "@/context/AdminContext";
 
 const ProductCatalog = () => {
   const [products, setProducts] = useState({});
@@ -30,6 +32,7 @@ const ProductCatalog = () => {
   });
   const [selectedProduct, setSelectedProduct] = useState(null);
   const toast = useRef<Toast>(null);
+  const { adminData, userType } = useAdminContext();
 
   const handleDeleteClick =  (product) => {
     
@@ -38,7 +41,7 @@ const ProductCatalog = () => {
     setVisible(true);
   
   };
-
+  const router = useRouter();
   const handleUpdateClick = (product) => {
     setSelectedProduct(product);
     setFormData({
@@ -112,7 +115,7 @@ const ProductCatalog = () => {
     const getMerchantProducts = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/d93afec4-b583-4d7a-8558-85f1199e22f9/products`
+          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb/products`
         );
 
         const groupByCategory = response.data.reduce((acc, product) => {
@@ -168,213 +171,227 @@ const ProductCatalog = () => {
      }
   }
 
-  return (
-    <fieldset style={{ height: "100vh" }}>
-      <p>{myCookies} merch</p>
-      <legend>Product Catalog</legend>
-      {Object.keys(products).length > 0 ? (
-        Object.keys(products).map((categoryName) => (
-          <div key={categoryName}>
-            <div className="p-grid p-dir-col p-2">
-              {Object.keys(products).map((categoryName) => (
-                <div key={categoryName}>
-                  <Panel header={categoryName}>
-                    <div className="grid">
-                      {products[categoryName].map((product) => (
-                        <div key={product.id} className="col-4">
-                          <Card
-                            title={product.name}
-                            subTitle={`$${product.listingPrice}`}
-                            header={
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                width={100}
-                                height={100}
-                              />
-                            }
-                          >
-                            <p className="p-m-0" style={{ lineHeight: "1.5" }}>
-                              <span className="font-weight-bold">
-                                Quantity:
-                              </span>{" "}
-                              {product.quantity}
-                            </p>
-                            <p className="p-m-0" style={{ lineHeight: "1.5" }}>
-                              {product.description}
-                            </p>
-                            <div className="p-d-flex p-jc-between p-mt-2">
-                              <Button
-                                label="Update"
-                                className="p-button-primary mr-2"
-                                onClick={() => handleUpdateClick(product)}
-                              />
-                              <Button
-                                icon="pi pi-trash"
-                                className="p-button-danger ml-2"
-                                onClick={() => handleDeleteClick(product)}
-                              />
-                            </div>
-                          </Card>
-                        </div>
-                      ))}
-                    </div>
-                  </Panel>
-                  <Divider />
-                </div>
-              ))}
-            </div>
+  if (userType === "MERCHANT" && (adminData != null || adminData != "")) {
+       return (
+         <fieldset style={{ height: "100vh" }}>
+           <p>{myCookies} merch</p>
+           <legend>Product Catalog</legend>
+           {Object.keys(products).length > 0 ? (
+             Object.keys(products).map((categoryName) => (
+               <div key={categoryName}>
+                 <div className="p-grid p-dir-col p-2">
+                   {Object.keys(products).map((categoryName) => (
+                     <div key={categoryName}>
+                       <Panel header={categoryName}>
+                         <div className="grid">
+                           {products[categoryName].map((product) => (
+                             <div key={product.id} className="col-4">
+                               <Card
+                                 title={product.name}
+                                 subTitle={`$${product.listingPrice}`}
+                                 header={
+                                   <img
+                                     src={product.image}
+                                     alt={product.name}
+                                     width={100}
+                                     height={100}
+                                   />
+                                 }
+                               >
+                                 <p
+                                   className="p-m-0"
+                                   style={{ lineHeight: "1.5" }}
+                                 >
+                                   <span className="font-weight-bold">
+                                     Quantity:
+                                   </span>{" "}
+                                   {product.quantity}
+                                 </p>
+                                 <p
+                                   className="p-m-0"
+                                   style={{ lineHeight: "1.5" }}
+                                 >
+                                   {product.description}
+                                 </p>
+                                 <div className="p-d-flex p-jc-between p-mt-2">
+                                   <Button
+                                     label="Update"
+                                     className="p-button-primary mr-2"
+                                     onClick={() => handleUpdateClick(product)}
+                                   />
+                                   <Button
+                                     icon="pi pi-trash"
+                                     className="p-button-danger ml-2"
+                                     onClick={() => handleDeleteClick(product)}
+                                   />
+                                 </div>
+                               </Card>
+                             </div>
+                           ))}
+                         </div>
+                       </Panel>
+                       <Divider />
+                     </div>
+                   ))}
+                 </div>
 
-            <Dialog
-              header="Update Product"
-              visible={updateVisible}
-              style={{ width: "450px" }}
-              footer={
-                <div>
-                  <Button
-                    label="Cancel"
-                    icon="pi pi-times"
-                    onClick={() => setUpdateVisible(false)}
-                    className="p-button-text"
-                  />
-                  <Button
-                    label="Save"
-                    icon="pi pi-check"
-                    onClick={handleUpdateSubmit}
-                    autoFocus
-                  />
-                </div>
-              }
-              onHide={() => setUpdateVisible(false)}
-            >
-              <div className="p-fluid">
-                <div className="p-field p-2">
-                  <label htmlFor="name">Name</label>
-                  <InputText
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        name: event.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="p-field p-2">
-                  <label htmlFor="originalPrice">Original Price</label>
-                  <InputNumber
-                    id="originalPrice"
-                    name="originalPrice"
-                    value={formData.originalPrice}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        originalPrice: event.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="p-field p-2">
-                  <label htmlFor="listingPrice">Listing Price</label>
-                  <InputNumber
-                    id="listingPrice"
-                    name="listingPrice"
-                    value={formData.listingPrice}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        listingPrice: event.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="p-field p-2">
-                  <label htmlFor="description">Description</label>
-                  <InputText
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        description: event.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="p-field p-2">
-                  <label htmlFor="quantity">Quantity</label>
-                  <InputNumber
-                    id="quantity"
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        quantity: event.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="p-field p-2">
-                  <label htmlFor="pincode">Pincode</label>
-                  <InputText
-                    id="pincode"
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        pincode: event.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            </Dialog>
+                 <Dialog
+                   header="Update Product"
+                   visible={updateVisible}
+                   style={{ width: "450px" }}
+                   footer={
+                     <div>
+                       <Button
+                         label="Cancel"
+                         icon="pi pi-times"
+                         onClick={() => setUpdateVisible(false)}
+                         className="p-button-text"
+                       />
+                       <Button
+                         label="Save"
+                         icon="pi pi-check"
+                         onClick={handleUpdateSubmit}
+                         autoFocus
+                       />
+                     </div>
+                   }
+                   onHide={() => setUpdateVisible(false)}
+                 >
+                   <div className="p-fluid">
+                     <div className="p-field p-2">
+                       <label htmlFor="name">Name</label>
+                       <InputText
+                         id="name"
+                         name="name"
+                         value={formData.name}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             name: event.target.value,
+                           })
+                         }
+                       />
+                     </div>
+                     <div className="p-field p-2">
+                       <label htmlFor="originalPrice">Original Price</label>
+                       <InputNumber
+                         id="originalPrice"
+                         name="originalPrice"
+                         value={formData.originalPrice}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             originalPrice: event.value,
+                           })
+                         }
+                       />
+                     </div>
+                     <div className="p-field p-2">
+                       <label htmlFor="listingPrice">Listing Price</label>
+                       <InputNumber
+                         id="listingPrice"
+                         name="listingPrice"
+                         value={formData.listingPrice}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             listingPrice: event.value,
+                           })
+                         }
+                       />
+                     </div>
+                     <div className="p-field p-2">
+                       <label htmlFor="description">Description</label>
+                       <InputText
+                         id="description"
+                         name="description"
+                         value={formData.description}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             description: event.target.value,
+                           })
+                         }
+                       />
+                     </div>
+                     <div className="p-field p-2">
+                       <label htmlFor="quantity">Quantity</label>
+                       <InputNumber
+                         id="quantity"
+                         name="quantity"
+                         value={formData.quantity}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             quantity: event.value,
+                           })
+                         }
+                       />
+                     </div>
+                     <div className="p-field p-2">
+                       <label htmlFor="pincode">Pincode</label>
+                       <InputText
+                         id="pincode"
+                         name="pincode"
+                         value={formData.pincode}
+                         onChange={(event) =>
+                           setFormData({
+                             ...formData,
+                             pincode: event.target.value,
+                           })
+                         }
+                       />
+                     </div>
+                   </div>
+                 </Dialog>
 
-            <Dialog
-              header="Confirm Delete"
-              visible={visible}
-              style={{ width: "350px" }}
-              footer={
-                <div>
-                  <Button
-                    label="No"
-                    icon="pi pi-times"
-                    onClick={() => setVisible(false)}
-                    className="p-button-text"
-                  />
-                  <Button
-                    label="Yes"
-                    icon="pi pi-check"
-                    autoFocus
-                    onClick={handleDeleteSumit}
-                  />
-                </div>
-              }
-              onHide={() => setVisible(false)}
-            >
-              <p>Are you sure you want to delete {selectedProduct?.name}?</p>
-            </Dialog>
-          </div>
-        ))
-      ) : (
-        <div
-          className="flex flex-column flex-wrap"
-          style={{ paddingTop: "42vh" }}
-        >
-          <div className="flex align-items-center justify-content-center">
-            <Message text="No Products Till Now Please Add Products To view." />
-          </div>
-        </div>
-      )}
+                 <Dialog
+                   header="Confirm Delete"
+                   visible={visible}
+                   style={{ width: "350px" }}
+                   footer={
+                     <div>
+                       <Button
+                         label="No"
+                         icon="pi pi-times"
+                         onClick={() => setVisible(false)}
+                         className="p-button-text"
+                       />
+                       <Button
+                         label="Yes"
+                         icon="pi pi-check"
+                         autoFocus
+                         onClick={handleDeleteSumit}
+                       />
+                     </div>
+                   }
+                   onHide={() => setVisible(false)}
+                 >
+                   <p>
+                     Are you sure you want to delete {selectedProduct?.name}?
+                   </p>
+                 </Dialog>
+               </div>
+             ))
+           ) : (
+             <div
+               className="flex flex-column flex-wrap"
+               style={{ paddingTop: "42vh" }}
+             >
+               <div className="flex align-items-center justify-content-center">
+                 <Message text="No Products Till Now Please Add Products To view." />
+               </div>
+             </div>
+           )}
 
-      <Toast position="top-right" ref={toast} />
-    </fieldset>
-  );
+           <Toast position="top-right" ref={toast} />
+         </fieldset>
+       );
+  }
+  else {
+    router.push('/merchant/login');
+  }
+ 
 };
 
 export default ProductCatalog;

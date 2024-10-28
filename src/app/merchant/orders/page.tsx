@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import axios from "axios";
+import { useAdminContext } from "@/context/AdminContext";
+import { useRouter } from "next/navigation";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +28,8 @@ const Orders = () => {
     };
     fetchMerchantOrderRequests();
   }, []);
-
+  const { adminData, userType } = useAdminContext();
+  const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
@@ -97,69 +100,76 @@ const Orders = () => {
     }
   };
 
-  return (
-    <div>
-      <h2>Ongoing Orders</h2>
-      <div className="p-grid">
-        {ongoingOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-4">
-            <Card title={`Order ID: ${order.orderId}`}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <p>Status: {order.status}</p>
-                  <p>Total Price: ${order.totalPrice}</p>
-                  <p>
-                    Date: {new Date(order.createdDate).toLocaleDateString()}
-                  </p>
-                  <p>Customer: {order.customerId}</p>
-                  <Link href={`/merchant/orders/${order.orderId}`}>
-                    View Order Details
-                  </Link>
+ if  (userType === 'MERCHANT' && (adminData != null || adminData != '')) {
+    return (
+      <div>
+        <h2>Ongoing Orders</h2>
+        <div className="p-grid">
+          {ongoingOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-4">
+              <Card title={`Order ID: ${order.orderId}`}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <p>Status: {order.status}</p>
+                    <p>Total Price: ${order.totalPrice}</p>
+                    <p>
+                      Date: {new Date(order.createdDate).toLocaleDateString()}
+                    </p>
+                    <p>Customer: {order.customerId}</p>
+                    <Link href={`/merchant/orders/${order.orderId}`}>
+                      View Order Details
+                    </Link>
+                  </div>
+                  {renderButtons(order.orderId, order.status)}
                 </div>
-                {renderButtons(order.orderId, order.status)}
-              </div>
-            </Card>
-          </div>
-        ))}
-      </div>
+              </Card>
+            </div>
+          ))}
+        </div>
 
-      <h2>Past Orders</h2>
-      <div className="p-grid">
-        {pastOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-4">
-            <Card title={`Order ID: ${order.orderId}`}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <p>Status: {order.status}</p>
-                  <p>Total Price: ${order.totalPrice}</p>
-                  <p>
-                    Date: {new Date(order.createdDate).toLocaleDateString()}
-                  </p>
-                  <p>Customer: {order.customerId}</p>
-                  <Link href={`/merchant/orders/${order.orderId}`}>
-                    View Order Details
-                  </Link>
+        <h2>Past Orders</h2>
+        <div className="p-grid">
+          {pastOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-4">
+              <Card title={`Order ID: ${order.orderId}`}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <p>Status: {order.status}</p>
+                    <p>Total Price: ${order.totalPrice}</p>
+                    <p>
+                      Date: {new Date(order.createdDate).toLocaleDateString()}
+                    </p>
+                    <p>Customer: {order.customerId}</p>
+                    <Link href={`/merchant/orders/${order.orderId}`}>
+                      View Order Details
+                    </Link>
+                  </div>
+                  {renderButtons(order.orderId, order.status)}
                 </div>
-                {renderButtons(order.orderId, order.status)}
-              </div>
-            </Card>
-          </div>
-        ))}
+              </Card>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+ }
+ else {
+   router.push('/merchant/login')
+  }
+
+  
 };
 
 export default Orders;
