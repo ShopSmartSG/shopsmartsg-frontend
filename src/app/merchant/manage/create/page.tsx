@@ -129,7 +129,9 @@ const Page = () => {
     };
     getMerchantDetails();
   }, []);
-   const { adminData, userType } = useAdminContext();
+
+  const userType = localStorage.getItem('userType');
+  const userId = localStorage.getItem('userId');
 
   const createProduct = async () => {
     const dataObj = {
@@ -199,7 +201,7 @@ const Page = () => {
   };
 
 
-  if (userType === 'MERCHANT' && (adminData != null || adminData != '')) {
+  if (userType === 'MERCHANT' && (userId != null || userId != '')) {
      return (
        <fieldset className="h-screen">
          <legend>Create Product</legend>

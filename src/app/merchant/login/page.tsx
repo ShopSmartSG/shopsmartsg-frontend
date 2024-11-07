@@ -25,11 +25,12 @@ const EmailOtpForm = () => {
   const [resendDisabled, setResendDisabled] = useState(true);
   const [timer, setTimer] = useState(30); //
   const disabledCondition: boolean = otpCount >= 3;
-  const [userId, setUserId] = useState("");
+
   const [userTyped, setUserType] = useState("");
   const toast = useRef(null);
   const { setAdminData, setUserTyped } = useAdminContext();
-  const { adminData, userType } = useAdminContext();
+
+
   useEffect(() => {
     let interval;
     if (resendDisabled) {
@@ -63,7 +64,8 @@ const EmailOtpForm = () => {
     setShowOtpDialog(true);
     setResendDisabled(true);
   };
-
+  const userType = localStorage.getItem('userType');
+  const userId = localStorage.getItem('userId');
   const blurHandler = (value: string) => {
     if (validator.isEmail(value)) {
       setEmailError("");
@@ -85,12 +87,12 @@ const EmailOtpForm = () => {
       );
 
       if (response.status) {
-        const cookie = await response.data 
-        console.log(cookie, "COOKIE")
-        setUserId(cookie.userId)
-        setUserType("MERCHANT");
+        const { userId } = await response.data 
+        localStorage.setItem('userType', 'MERCHANT');
+        localStorage.setItem('userId', userId);
         setAdminData(userId);
-        setUserTyped("MERCHANT");
+        setUserTyped("merchant");
+       
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -104,7 +106,7 @@ const EmailOtpForm = () => {
       toast.current.show({
         status: "error",
         message: "Error submitting OTP. Please try again later.",
-      });
+      }); 
       setShowOtpDialog(false);
     }
   };
@@ -153,96 +155,97 @@ const EmailOtpForm = () => {
       });
     }
   };
-  if (userType === 'MERCHANT' && (adminData != null || adminData != '')){
-      router.push('/merchant/orders')
+  if (userType && userType === "MERCHANT" && userId) {
+    router.push(`/merchant/manage/view`);
   }
   else {
-    return (
-      <div
-        className="flex-row justify-content-center flex-wrap "
-        style={{ height: "100vh" }}
-      >
-        <Card>
-          <p className="p-card-title text-center">Merchant Sign In Page</p>
-          <div className="flex align-items-center justify-content-center">
-            <form onSubmit={handleEmailSubmit} className="p-fluid">
-              <div className="field">
-                <label htmlFor="email">Email</label>
-                <InputText
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={(e) => blurHandler(e.target.value)}
-                  invalid={emailError == "" ? false : true}
-                  placeholder="Please Enter your Valid Email"
-                  style={{ width: "476px", display: "block" }}
-                />
-                {emailError && <small className="p-error">{emailError}</small>}
-              </div>
-              <div className="p-card-footer min-w-4">
-                <Button
-                  label="Next"
-                  type="submit"
-                  style={{ width: "80px" }}
-                  disabled={emailError == "" ? false : true}
-                  onClick={handleEmail}
-                />
-              </div>
-            </form>
-          </div>
-        </Card>
+     return (
+       <div
+         className="flex-row justify-content-center flex-wrap "
+         style={{ height: "100vh" }}
+       >
+         <Card>
+           <p className="p-card-title text-center">Merchant Sign In Page</p>
+           <div className="flex align-items-center justify-content-center">
+             <form onSubmit={handleEmailSubmit} className="p-fluid">
+               <div className="field">
+                 <label htmlFor="email">Email</label>
+                 <InputText
+                   id="email"
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                   onBlur={(e) => blurHandler(e.target.value)}
+                   invalid={emailError == "" ? false : true}
+                   placeholder="Please Enter your Valid Email"
+                   style={{ width: "476px", display: "block" }}
+                 />
+                 {emailError && <small className="p-error">{emailError}</small>}
+               </div>
+               <div className="p-card-footer min-w-4">
+                 <Button
+                   label="Next"
+                   type="submit"
+                   style={{ width: "80px" }}
+                   disabled={emailError == "" ? false : true}
+                   onClick={handleEmail}
+                 />
+               </div>
+             </form>
+           </div>
+         </Card>
 
-        <Dialog
-          header="Enter OTP"
-          visible={showOtpDialog}
-          onHide={() => setShowOtpDialog(false)}
-          resizable={false}
-          draggable={false}
-          modal={true}
-        >
-          <div className="field">
-            <label htmlFor="otp">OTP</label>
-            <InputOtp
-              id="otp"
-              value={otp}
-              onChange={(e) => setOtp(e.value.toString())}
-              length={6}
-              disabled={disabledCondition}
-            />
-            {otpCount >= 3 && (
-              <Message
-                severity="error"
-                text="Maximum Exhaust reached Please try again later"
-              />
-            )}
-          </div>
-          <div className="flex flex-row flex-wrap">
-            <div>
-              <Button
-                label="Submit"
-                onClick={handleOtpSubmit}
-                disabled={disabledCondition}
-              />
-            </div>
-            <div className="ml-2">
-              <Button
-                label={`Resend OTP ${resendDisabled ? `(${timer}s)` : ""}`}
-                onClick={handleResendOtp}
-                severity="secondary"
-                disabled={resendDisabled || disabledCondition}
-              />
-            </div>
-          </div>
-          {!disabledCondition && (
-            <div className="text-right">
-              <Message severity="info" text="OTP will expire in 30 seconds" />
-            </div>
-          )}
-        </Dialog>
-        <Toast ref={toast} />
-      </div>
-    );
+         <Dialog
+           header="Enter OTP"
+           visible={showOtpDialog}
+           onHide={() => setShowOtpDialog(false)}
+           resizable={false}
+           draggable={false}
+           modal={true}
+         >
+           <div className="field">
+             <label htmlFor="otp">OTP</label>
+             <InputOtp
+               id="otp"
+               value={otp}
+               onChange={(e) => setOtp(e.value.toString())}
+               length={6}
+               disabled={disabledCondition}
+             />
+             {otpCount >= 3 && (
+               <Message
+                 severity="error"
+                 text="Maximum Exhaust reached Please try again later"
+               />
+             )}
+           </div>
+           <div className="flex flex-row flex-wrap">
+             <div>
+               <Button
+                 label="Submit"
+                 onClick={handleOtpSubmit}
+                 disabled={disabledCondition}
+               />
+             </div>
+             <div className="ml-2">
+               <Button
+                 label={`Resend OTP ${resendDisabled ? `(${timer}s)` : ""}`}
+                 onClick={handleResendOtp}
+                 severity="secondary"
+                 disabled={resendDisabled || disabledCondition}
+               />
+             </div>
+           </div>
+           {!disabledCondition && (
+             <div className="text-right">
+               <Message severity="info" text="OTP will expire in 30 seconds" />
+             </div>
+           )}
+         </Dialog>
+         <Toast ref={toast} />
+       </div>
+     );
   }
+  
   
 };
 
