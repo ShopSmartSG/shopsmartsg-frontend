@@ -145,35 +145,60 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const ongoingOrders = orders.filter(
+  const ongoingPickupOrders = orders.filter(
     (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED" || order.status === 'READY'
   );
-  const pastOrders = orders.filter(
+  const ongoingDeliveryOrders = orders.filter(
+    (order) => order.status == "DELIVERY_ACCEPTED" || order.status === 'DELIVERY_PICKED_UP'
+  );
+  const pastPickupOrders = orders.filter(
     (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
   );
-  if (userType && userType === "CUSTOMER" && userId) {
-     return (
-       <div className="p-4">
-         <h2 className="mb-3">Ongoing Orders</h2>
-         <div className="grid">
-           {ongoingOrders.map((order) => (
-             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-               <OrderCard order={order} />
-             </div>
-           ))}
-         </div>
 
-         <h2 className="mb-3 mt-5">Past Orders</h2>
-         <div className="grid">
-           {pastOrders.map((order) => (
-             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-               <OrderCard order={order} />
-             </div>
-           ))}
-         </div>
-       </div>
-     );
-  }
+  const pastDeliveryOrders = orders.filter(
+    (order) =>  order.status === 'DELIVERY_COMPLETED'
+  );
+if (userType && userType === "CUSTOMER" && userId) {
+  return (
+    <div className="p-4">
+      <h2 className="mb-3">Ongoing PICK UP Orders</h2>
+      <div className="grid">
+        {ongoingPickupOrders.map((order) => (
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+            <OrderCard order={order} />
+          </div>
+        ))}
+      </div>
+
+      <h2 className="mb-3">Ongoing DELIVERY Orders</h2>
+      <div className="grid">
+        {ongoingDeliveryOrders.map((order) => (
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+            <OrderCard order={order} />
+          </div>
+        ))}
+      </div>
+
+      <h2 className="mb-3 mt-5">Past PICK UP Orders</h2>
+      <div className="grid">
+        {pastPickupOrders.map((order) => (
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+            <OrderCard order={order} />
+          </div>
+        ))}
+      </div>
+      <h2 className="mb-3 mt-5">Past Delivery Orders</h2>
+      <div className="grid">
+        {pastDeliveryOrders.map((order) => (
+          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+            <OrderCard order={order} />
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+}
   else {
     router.push('/customer/login')
   }
