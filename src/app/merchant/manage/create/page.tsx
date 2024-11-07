@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import axios from "axios";
 import { InputText } from "primereact/inputtext";
-import { useAdminContext } from "@/context/AdminContext";
+
 
 
 const Page = () => {
@@ -115,7 +115,7 @@ const Page = () => {
     const getMerchantDetails = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/fcf8f7da-760f-406d-8d0a-acf06d456ccb`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${userId}`
         );
         setMerchantDetails(response.data);
       } catch (error) {
@@ -197,6 +197,7 @@ const Page = () => {
         summary: "Category Creation Failed",
         detail: "Please Try Again!!",
       });
+      console.log("error", error); // error
     }
   };
 

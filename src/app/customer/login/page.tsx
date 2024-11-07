@@ -11,6 +11,9 @@ import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
 import "./login.css";
 import axios from "axios";
+import { useAdminContext } from "@/context/AdminContext";
+
+import { useRouter } from "next/navigation";
 
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
@@ -20,9 +23,13 @@ const EmailOtpForm = () => {
   const [emailError, setEmailError] = useState("");
   const [otpCount, setOtpCount] = useState(0);
   const [resendDisabled, setResendDisabled] = useState(true);
+  const [customerStatus, setCustomerStatus] = useState<boolean>(true);
   const [timer, setTimer] = useState(30); //
   const disabledCondition: boolean = otpCount >= 3;
+
+  const [userTyped, setUserType] = useState("");
   const toast = useRef(null);
+  const { setAdminData, setUserTyped } = useAdminContext();
 
   useEffect(() => {
     let interval;
@@ -43,27 +50,22 @@ const EmailOtpForm = () => {
     return () => clearInterval(interval);
   }, [resendDisabled]);
 
-  const handleEmailSubmit = async() => {
-    
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/customer`, {
-          email:email
-        }
-      );
+  const router = useRouter();
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    setEmailError("");
+
+    if (!validator.isEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
     }
-    catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to send OTP",
-        life: 3000,
-      })
-    }
+
     setShowOtpDialog(true);
     setResendDisabled(true);
   };
-
+  const userType = localStorage.getItem("userType");
+  const userId = localStorage.getItem("userId");
   const blurHandler = (value: string) => {
     if (validator.isEmail(value)) {
       setEmailError("");
@@ -72,39 +74,40 @@ const EmailOtpForm = () => {
     }
   };
 
-  const handleOtpSubmit = () => {
-    if (parseInt(otp) == 123456) {
+  const handleOtpSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/customer`,
+        {
+          email: email,
+          emailAddress: email,
+          otp: otp,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status) {
+        const { userId } = await response.data;
+        localStorage.setItem("userType", "CUSTOMER");
+        localStorage.setItem("userId", userId);
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Login Successful",
+          life: 3000,
+        });
+        setShowOtpDialog(false);
+      }
+    } catch (error) {
       toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Login Succcessful",
-        life: 3000,
+        status: "error",
+        message: "Error submitting OTP. Please try again later.",
       });
       setShowOtpDialog(false);
-      setOtp("");
-      setOtpCount(0);
-    } else {
-      setOtpError(true);
-      setOtp("");
-      setOtpCount(otpCount + 1);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Invalid OTP",
-        life: 3000,
-      });
+      
     }
   };
 
-  // const otpValidator = (value: string) => {
-  //   const result = validator.isNumeric(value);
-  //   if (result) {
-  //     setOtpError(false);
-  //     setOtp(value);
-  //   } else {
-  //     setOtpError(true);
-  //   }
-  // };
 
   const handleResendOtp = () => {
     setResendDisabled(true);
@@ -116,93 +119,125 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
+  const handleEmail = async () => {
+    setShowOtpDialog(true);
+    setResendDisabled(true);
 
-  return (
-    <div
-      className="flex-row justify-content-center flex-wrap "
-      style={{ height: "100vh" }}
-    >
-      <Card>
-        <p className="p-card-title text-center">Sign In Page</p>
-        <div className="flex align-items-center justify-content-center">
-          <form onSubmit={handleEmailSubmit} className="p-fluid">
-            <div className="field">
-              <label htmlFor="email">Email</label>
-              <InputText
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={(e) => blurHandler(e.target.value)}
-                invalid={emailError == "" ? false : true}
-                placeholder="Please Enter your Valid Email"
-                style={{ width: "476px", display: "block" }}
-              />
-              {emailError && <small className="p-error">{emailError}</small>}
-            </div>
-            <div className="p-card-footer min-w-4">
-              <Button
-                label="Next"
-                type="submit"
-                style={{ width: "80px" }}
-                disabled={emailError == "" ? false : true}
-                onClick={()=>handleEmailSubmit}
-              />
-            </div>
-          </form>
-        </div>
-      </Card>
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/generateOtp/customer`,
+        {
+          email,
+        },
+        {
+          withCredentials: true, // Include credentials with the request
+        }
+      );
+      setCustomerStatus(true);
+    } catch (error) {
+      console.error("Error sending email: ", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to send email. Please try again later.",
+        life: 3000,
+      });
 
-      <Dialog
-        header="Enter OTP"
-        visible={showOtpDialog}
-        onHide={() => setShowOtpDialog(false)}
-        resizable={false}
-        draggable={false}
-        modal={true}
+    }
+   
+  };
+  if (customerStatus == false) {
+    router.push('/customer/register')
+  }
+  if (userType && userType === "CUSTOMER" && userId) {
+    router.push(`/`);
+  } else {
+    return (
+      <div
+        className="flex-row justify-content-center flex-wrap "
+        style={{ height: "100vh" }}
       >
-        <div className="field">
-          <label htmlFor="otp">OTP</label>
-          <InputOtp
-            id="otp"
-            value={otp}
-            onChange={(e) => setOtp(e.value.toString())}
-            length={6}
-            disabled={disabledCondition}
-          />
-          {otpCount >= 3 && (
-            <Message
-              severity="error"
-              text="Maximum Exhaust reached Please try again later"
-            />
-          )}
-        </div>
-        <div className="flex flex-row flex-wrap">
-          <div>
-            <Button
-              label="Submit"
-              onClick={handleOtpSubmit}
+        <Card>
+          <p className="p-card-title text-center">Customer Sign In Page</p>
+          <div className="flex align-items-center justify-content-center">
+            <form onSubmit={handleEmailSubmit} className="p-fluid">
+              <div className="field">
+                <label htmlFor="email">Email</label>
+                <InputText
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={(e) => blurHandler(e.target.value)}
+                  invalid={emailError == "" ? false : true}
+                  placeholder="Please Enter your Valid Email"
+                  style={{ width: "476px", display: "block" }}
+                />
+                {emailError && <small className="p-error">{emailError}</small>}
+              </div>
+              <div className="p-card-footer min-w-4">
+                <Button
+                  label="Next"
+                  type="submit"
+                  style={{ width: "80px" }}
+                  disabled={emailError == "" ? false : true}
+                  onClick={handleEmail}
+                />
+              </div>
+            </form>
+          </div>
+        </Card>
+
+        <Dialog
+          header="Enter OTP"
+          visible={showOtpDialog}
+          onHide={() => setShowOtpDialog(false)}
+          resizable={false}
+          draggable={false}
+          modal={true}
+        >
+          <div className="field">
+            <label htmlFor="otp">OTP</label>
+            <InputOtp
+              id="otp"
+              value={otp}
+              onChange={(e) => setOtp(e.value.toString())}
+              length={6}
               disabled={disabledCondition}
             />
+            {otpCount >= 3 && (
+              <Message
+                severity="error"
+                text="Maximum Exhaust reached Please try again later"
+              />
+            )}
           </div>
-          <div className="ml-2">
-            <Button
-              label={`Resend OTP ${resendDisabled ? `(${timer}s)` : ""}`}
-              onClick={handleResendOtp}
-              severity="secondary"
-              disabled={resendDisabled || disabledCondition}
-            />
+          <div className="flex flex-row flex-wrap">
+            <div>
+              <Button
+                label="Submit"
+                onClick={handleOtpSubmit}
+                disabled={disabledCondition}
+              />
+            </div>
+            <div className="ml-2">
+              <Button
+                label={`Resend OTP ${resendDisabled ? `(${timer}s)` : ""}`}
+                onClick={handleResendOtp}
+                severity="secondary"
+                disabled={resendDisabled || disabledCondition}
+              />
+            </div>
           </div>
-        </div>
-        {!disabledCondition && (
-          <div className="text-right">
-            <Message severity="info" text="OTP will expire in 30 seconds" />
-          </div>
-        )}
-      </Dialog>
-      <Toast ref={toast} />
-      
-    </div>
-  );
+          {!disabledCondition && (
+            <div className="text-right">
+              <Message severity="info" text="OTP will expire in 30 seconds" />
+            </div>
+          )}
+        </Dialog>
+        <Toast ref={toast} />
+      </div>
+    );
+  }
 };
 
 export default EmailOtpForm;

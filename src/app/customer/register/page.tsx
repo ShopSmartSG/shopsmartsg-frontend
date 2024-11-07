@@ -140,15 +140,55 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
+
+
+  const customerRegister = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/customer`,
+        {
+          email,
+          name,
+          addressLine1,
+          addressLine2,
+          phoneNumber,
+          pinCode,
+        },
+        {
+          withCredentials: true, // Include credentials with the request
+        }
+      );
+
+      if (response.status == 200) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Registration Successful",
+          life: 3000,
+        });
+        setShowOtpDialog(true);
+      }
+    }
+    catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to register. Please try again later.",
+        life: 3000,
+      });
+      setShowOtpDialog(false);
+    }
+  }
   const handleEmail = async () => {
     setShowOtpDialog(true);
     setResendDisabled(true);
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/generateOtp/customer`,
+        `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/register/verifyOtp/customer`,
         {
           email,
+          otp,
         },
         {
           withCredentials: true, // Include credentials with the request
@@ -158,11 +198,10 @@ const EmailOtpForm = () => {
         toast.current.show({
           severity: "success",
           summary: "Success",
-          detail: "OTP has been sent to your registered email address.",
+          detail: "OTP Validated Successfully",
           life: 3000,
         });
-        setOtpCount(otpCount + 1);
-        setTimer(30);
+       customerRegister();
       }
     } catch (error) {
       console.error("Error sending email: ", error);
@@ -247,7 +286,7 @@ const EmailOtpForm = () => {
                 type="submit"
                 style={{ width: "80px" }}
                 disabled={emailError == "" ? false : true}
-                onClick={() => generateOtp}
+                onClick={generateOtp}
               />
             </div>
           </form>

@@ -195,7 +195,7 @@ const Page: React.FC = () => {
       try {
         // Make the API call
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${userId}`
+          `${process.env.NEXT_PUBLIC_GETALLMERCHANT_API_URL}/${userId}`
         );
 
         // Set the fetched data to state

@@ -28,7 +28,8 @@ const Orders = () => {
     };
     fetchMerchantOrderRequests();
   }, []);
-  const { adminData, userType } = useAdminContext();
+  const userType = localStorage.getItem('userType');
+  const userId = localStorage.getItem('userId');
   const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
@@ -100,7 +101,7 @@ const Orders = () => {
     }
   };
 
- if  (userType === 'MERCHANT' && (adminData != null || adminData != '')) {
+ if  (userType === 'MERCHANT' && (userId != null || userId != '')) {
     return (
       <div>
         <h2>Ongoing Orders</h2>

@@ -7,8 +7,12 @@ import { Image } from "primereact/image";
 import { Steps } from "primereact/steps";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
+
+
+ 
 const getActiveIndex = (status) => {
   switch (status) {
     case "CREATED":
@@ -23,6 +27,11 @@ const getActiveIndex = (status) => {
       return 0;
   }
 };
+
+
+const userId = localStorage.getItem("userId");
+const userType = localStorage.getItem("userType");
+
 
 const OrderCard = ({ order }) => {
   const activeIndex = getActiveIndex(order.status);
@@ -73,6 +82,7 @@ const OrderCard = ({ order }) => {
       template: (item) => itemRenderer(item, 3),
     },
   ];
+ 
 
   return (
     <Card title={`Order ID: ${order.orderId}`} className="mb-3">
@@ -117,6 +127,7 @@ const OrderCard = ({ order }) => {
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -140,28 +151,32 @@ const Orders = () => {
   const pastOrders = orders.filter(
     (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
   );
+  if (userType && userType === "CUSTOMER" && userId) {
+     return (
+       <div className="p-4">
+         <h2 className="mb-3">Ongoing Orders</h2>
+         <div className="grid">
+           {ongoingOrders.map((order) => (
+             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+               <OrderCard order={order} />
+             </div>
+           ))}
+         </div>
 
-  return (
-    <div className="p-4">
-      <h2 className="mb-3">Ongoing Orders</h2>
-      <div className="grid">
-        {ongoingOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
-
-      <h2 className="mb-3 mt-5">Past Orders</h2>
-      <div className="grid">
-        {pastOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+         <h2 className="mb-3 mt-5">Past Orders</h2>
+         <div className="grid">
+           {pastOrders.map((order) => (
+             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+               <OrderCard order={order} />
+             </div>
+           ))}
+         </div>
+       </div>
+     );
+  }
+  else {
+    router.push('/customer/login')
+  }
 };
 
 export default Orders;

@@ -66,6 +66,8 @@ const defaultFilters: DataTableFilterMeta = {
 
 export default function AdvancedFilterDemo() {
   const [customers, setCustomers] = useState([]);
+  const userType = localStorage.getItem('userType');
+  const userId = localStorage.getItem('userId');
 
   const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(false);
@@ -420,79 +422,84 @@ export default function AdvancedFilterDemo() {
   };
 
   const header = renderHeader();
+  if (userType && userType == 'ADMIN' && userId) {
+     return (
+       <div className="card">
+         <DataTable
+           value={customers}
+           paginator
+           showGridlines
+           rows={6}
+           loading={loading}
+           dataKey="id"
+           filters={filters}
+           globalFilterFields={[
+             "name",
+             "country.name",
+             "representative.name",
+             "balance",
+             "status",
+           ]}
+           header={header}
+           emptyMessage="No customers found."
+           onFilter={(e) => setFilters(e.filters)}
+         >
+           <Column
+             field="name"
+             header="Name"
+             filterField="name"
+             filterPlaceholder="Search by name"
+             style={{ minWidth: "12rem" }}
+             className="capitalize"
+           />
 
-  return (
-    <div className="card">
-      <DataTable
-        value={customers}
-        paginator
-        showGridlines
-        rows={6}
-        loading={loading}
-        dataKey="id"
-        filters={filters}
-        globalFilterFields={[
-          "name",
-          "country.name",
-          "representative.name",
-          "balance",
-          "status",
-        ]}
-        header={header}
-        emptyMessage="No customers found."
-        onFilter={(e) => setFilters(e.filters)}
-      >
-        <Column
-          field="name"
-          header="Name"
-          filterField="name"
-          filterPlaceholder="Search by name"
-          style={{ minWidth: "12rem" }}
-          className="capitalize"
-        />
+           <Column
+             header="Balance"
+             filterField="balance"
+             dataType="numeric"
+             style={{ minWidth: "10rem" }}
+             body={balanceBodyTemplate}
+             filter
+             filterElement={balanceFilterTemplate}
+           />
 
-        <Column
-          header="Balance"
-          filterField="balance"
-          dataType="numeric"
-          style={{ minWidth: "10rem" }}
-          body={balanceBodyTemplate}
-          filter
-          filterElement={balanceFilterTemplate}
-        />
-
-        <Column
-          field="merchantId"
-          header="ID"
-          filter={true}
-          filterField="merchantId"
-          filterPlaceholder="Search by ID"
-          style={{ minWidth: "12rem" }}
-        />
-        <Column
-          field="merchantId"
-          header="Update Details"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={verifiedUpdateTemplate}
-        />
-        <Column
-          field="merchantId"
-          header="Delete"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={verifiedDeleteTemplate}
-        />
-        <Column
-          field="Block"
-          header="Block"
-          bodyClassName="text-center"
-          style={{ minWidth: "8rem" }}
-          body={blockTemplate}
-        />
-      </DataTable>
-      <Toast ref={toast} />
-      <ConfirmDialog />
-    </div>
-  );
+           <Column
+             field="merchantId"
+             header="ID"
+             filter={true}
+             filterField="merchantId"
+             filterPlaceholder="Search by ID"
+             style={{ minWidth: "12rem" }}
+           />
+           <Column
+             field="merchantId"
+             header="Update Details"
+             bodyClassName="text-center"
+             style={{ minWidth: "8rem" }}
+             body={verifiedUpdateTemplate}
+           />
+           <Column
+             field="merchantId"
+             header="Delete"
+             bodyClassName="text-center"
+             style={{ minWidth: "8rem" }}
+             body={verifiedDeleteTemplate}
+           />
+           <Column
+             field="Block"
+             header="Block"
+             bodyClassName="text-center"
+             style={{ minWidth: "8rem" }}
+             body={blockTemplate}
+           />
+         </DataTable>
+         <Toast ref={toast} />
+         <ConfirmDialog />
+       </div>
+     );
+  }
+  else {
+    router.push('/admin/login');
+}
+ 
 }
