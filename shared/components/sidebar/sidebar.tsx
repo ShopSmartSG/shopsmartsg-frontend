@@ -20,12 +20,13 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const btnRef3 = useRef<any>(null);
   const { session } = useSession();
   const [name, setName] = useState("");
+ const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const username = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${session}`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${userId}`,
           {
             withCredentials: true,
           }

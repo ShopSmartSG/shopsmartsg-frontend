@@ -123,6 +123,9 @@ const Page: React.FC = () => {
     }
   };
 
+  const userId = localStorage.getItem('userId');
+
+
   const accept = async () => {
    const data = {
      name: merchantName,
@@ -135,7 +138,7 @@ const Page: React.FC = () => {
    };
     try {
        const response = await axios.put(
-         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb
+         `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/${userId}
 
 `,
          data
@@ -192,7 +195,7 @@ const Page: React.FC = () => {
       try {
         // Make the API call
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PROFILEMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb`
+          `${process.env.NEXT_PUBLIC_GETALLMERCHANT_API_URL}/${userId}`
         );
 
         // Set the fetched data to state
@@ -247,7 +250,7 @@ const Page: React.FC = () => {
            <form onSubmit={confirmUpdate}>
              <div className="flex flex-column gap-2">
                <label htmlFor="id">Merchant ID</label>
-               <p>de2e56fa-b127-4bf4-bd01-163b23ef2db0</p>
+               <p>{userId}</p>
                <div className="form-grid grid">
                  <div className="field col-12">
                    <label htmlFor="email">Email ID { usetType}</label>

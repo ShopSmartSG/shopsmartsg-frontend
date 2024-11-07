@@ -3,8 +3,8 @@ import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { useSession } from "next-auth/react";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "./merchant.css";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
@@ -25,8 +25,10 @@ interface Errors {
 }
 
 const Page: React.FC = () => {
-  const { data: session ,status} = useSession();
+
   const toast = useRef<Toast>(null);
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -52,7 +54,9 @@ const Page: React.FC = () => {
     setEditDetailsEnable(true);
   };
 
-  
+  const userType = localStorage.getItem('userType');
+  const userId = localStorage.getItem('userId');
+
   const confirm1 = () => {
     confirmDialog({
       message: "Are you sure you want to proceed?",
@@ -86,6 +90,8 @@ const Page: React.FC = () => {
         break;
     }
   };
+
+  
 
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
@@ -151,10 +157,24 @@ const Page: React.FC = () => {
       });
     }
   };
-  if(status === 'unauthenticated'){
-    return <div>Unauthenticated</div>
-  }
-  if(status === 'authenticated'){
+
+
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const response = await fetch(`/api/customers/${userId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch user details");
+        }
+        const data = await response.json();
+        setFormData(data);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    }
+  })
+ if(userType && userType == 'CUSTOMER' && userId)
+ {
     return (
       <fieldset>
         <legend>Customer</legend>
@@ -178,7 +198,7 @@ const Page: React.FC = () => {
           <form onSubmit={confirmUpdate}>
             <div className="flex flex-column gap-2">
               <label htmlFor="id">Customer ID</label>
-              <p>DUMMY Customer</p>
+              <p>{userId}</p>
               <div className="form-grid grid">
                 <div className="field col-12">
                   <label htmlFor="email">Email ID</label>
@@ -284,7 +304,9 @@ const Page: React.FC = () => {
       </fieldset>
     );
   }
-
+ else {
+    router.push('customer/login')
+  }
  
 };
 

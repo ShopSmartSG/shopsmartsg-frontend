@@ -12,12 +12,7 @@ export async function getSession() {
     if (!session) return null;
     const sessvalue = await session;
 
-    // Set localStorage values
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('userId', sessvalue);
-        localStorage.setItem('USER_TYPE', 'merchant');
-    }
-
+    
     return sessvalue;
 }
 
