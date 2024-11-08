@@ -4,28 +4,57 @@ import Link from "next/link";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import axios from "axios";
-import { useAdminContext } from "@/context/AdminContext";
+import { Message } from "primereact/message";
+import { Tooltip } from "primereact/tooltip";
 import { useRouter } from "next/navigation";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const userId = localStorage.getItem('userId');
-  const userType = localStorage.getItem('userType');
+  const [merchantIds, setMerchantIds] = useState([]);
+  const [customerIds, setCustomerIds] = useState([]);
 
-  // Fetch Merchant Order Requests
+  const userId = localStorage.getItem("userId");
+  const userType = localStorage.getItem("userType");
+
   useEffect(() => {
-    const fetchMerchantOrderRequests = async () => {
+    const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/${userId}`
         );
-        setOrders(response.data);
+
+        const ordersWithDetails = await Promise.all(
+          response.data.map(async (order) => {
+            const merchantDetails = await getMerchantDetails(order.merchantId);
+            const customerDetails = await getCustomerDetails(order.customerId);
+            return {
+              ...order,
+              merchantDetails,
+              merchantLatitude: merchantDetails.latitude,
+              merchantLongitude: merchantDetails.longitude,
+              customerLatitude: customerDetails.latitude,
+              customerLongitude: customerDetails.longitude,
+              customerDetails,
+            };
+          })
+        );
+
+        setOrders(ordersWithDetails);
       } catch (error) {
-        console.error("Error fetching merchant order requests:", error);
+        console.error("Error fetching orders:", error);
       }
     };
-    fetchMerchantOrderRequests();
-  }, []);
+
+    fetchOrders();
+  }, [userId]);
+
+  const handleDirections = (lat, long) => {
+    window.open(
+      `https://www.google.com/maps?q=@${lat},${long}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
@@ -48,11 +77,36 @@ const Orders = () => {
   };
 
   const ongoingOrders = orders.filter(
-    (order) => order.status === "READY" || order.status === "DELIVERY_ACCEPTED"
+    (order) =>
+      order.status === "READY" ||
+      order.status === "DELIVERY_ACCEPTED" ||
+      order.status === "DELIVERY_PICKED_UP"
   );
   const pastOrders = orders.filter(
-    (order) => order.status === "DELIVERY_COMPLETED"
+    (order) => order.status === "COMPLETED"
   );
+
+  const getMerchantDetails = async (merchantId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchantId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getCustomerDetails = async (customerId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${customerId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const renderButtons = (orderId, status) => {
     switch (status) {
@@ -74,7 +128,15 @@ const Orders = () => {
             onClick={() => updateOrderStatus(orderId, "DELIVERY_PICKED_UP")}
           />
         );
-      case "DELIVERY_COMPLETED":
+      case "DELIVERY_PICKED_UP":
+        return (
+          <Button
+            label="Order Completed"
+            className="p-button-success m-3"
+            onClick={() => updateOrderStatus(orderId, "COMPLETED")}
+          />
+        );
+      case "COMPLETED":
         return (
           <Button
             label="Order Completed"
@@ -87,15 +149,55 @@ const Orders = () => {
     }
   };
 
-  //  if  (userType === 'DELIVERY' && (adminData != null || adminData != '')) {
-  if (true) {
+  const footer = (order) => (
+    <div>
+      <Tooltip
+        target=".navigate-tooltip"
+        content="Click to navigate to merchant."
+        position="bottom"
+      ></Tooltip>
+      <div className="flex ">
+        <div
+          className="mr-2 mt-2 navigate-tooltip "
+          onClick={() =>
+            handleDirections(order?.merchantLatitude, order?.merchantLongitude)
+          }
+        >
+          <i className="pi pi-arrow-circle-right block mt-2 navigate-tooltip cursor-pointer"></i>
+        </div>
+        <div>
+          <Message severity="info" text="Click To Navigate Merchant." />
+        </div>
+      </div>
+      <Tooltip
+        target=".navigate-tooltip"
+        content="Click to navigate to Customer."
+        position="bottom"
+      ></Tooltip>
+      <div className="flex ">
+        <div
+          className="mr-2 mt-2 navigate-tooltip "
+          onClick={() =>
+            handleDirections(order?.customerLatitude, order?.customerLongitude)
+          }
+        >
+          <i className="pi pi-arrow-circle-right block mt -2 navigate-tooltip cursor-pointer"></i>
+        </div>
+        <div>
+          <Message severity="info" text="Click To Navigate Customer." />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (userType === "DELIVERY") {
     return (
       <div>
         <h2>Ongoing Orders</h2>
         <div className="p-grid">
           {ongoingOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-4">
-              <Card title={`Order ID: ${order.orderId}`}>
+              <Card title={`Order ID: ${order.orderId}`} footer={footer(order)}>
                 <div
                   style={{
                     display: "flex",
@@ -109,10 +211,8 @@ const Orders = () => {
                     <p>
                       Date: {new Date(order.createdDate).toLocaleDateString()}
                     </p>
-                    <p>Customer: {order.customerId}</p>
-                    <Link href={`/merchant/orders/${order.orderId}`}>
-                      View Order Details
-                    </Link>
+                    <p>Customer: {order.customerDetails?.name}</p>
+                    <p>Merchant: {order.merchantDetails?.name}</p>
                   </div>
                   {renderButtons(order.orderId, order.status)}
                 </div>
@@ -125,7 +225,7 @@ const Orders = () => {
         <div className="p-grid">
           {pastOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-4">
-              <Card title={`Order ID: ${order.orderId}`}>
+              <Card title={`Order ID: ${order.orderId}`} footer={footer(order)}>
                 <div
                   style={{
                     display: "flex",
@@ -139,10 +239,8 @@ const Orders = () => {
                     <p>
                       Date: {new Date(order.createdDate).toLocaleDateString()}
                     </p>
-                    <p>Customer: {order.customerId}</p>
-                    <Link href={`/delivery/orders/${order.orderId}`}>
-                      View Order Details
-                    </Link>
+                    <p>Customer: {order.customerDetails?.name}</p>
+                    <p>Merchant: {order.merchantDetails?.name}</p>
                   </div>
                   {renderButtons(order.orderId, order.status)}
                 </div>
@@ -153,6 +251,7 @@ const Orders = () => {
       </div>
     );
   } else {
+    return null;
   }
 };
 

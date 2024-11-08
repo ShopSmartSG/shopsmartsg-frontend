@@ -24,10 +24,27 @@ const getActiveIndex = (status) => {
   }
 };
 
+const getActiveIndexForDelivery = (status) => {
+  switch (status) {
+    case "CREATED":
+      return 0;
+    case "READY":
+      return 1;
+    case "COMPLETED":
+      return 2;
+    case "DELIVERED":
+      return 3;
+    case "CANCELLED":
+      return 4;
+    default:
+      return 0;
+  }
+};
+
 const userId = localStorage.getItem("userId");
 const userType = localStorage.getItem("userType");
 
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, isDelivery }) => {
   const [merchantDetails, setMerchantDetails] = useState(null);
 
   useEffect(() => {
@@ -47,7 +64,9 @@ const OrderCard = ({ order }) => {
     fetchMerchantDetails();
   }, [order.merchantId]);
 
-  const activeIndex = getActiveIndex(order.status);
+  const activeIndex = isDelivery
+    ? getActiveIndexForDelivery(order.status)
+    : getActiveIndex(order.status);
   const itemRenderer = (item, itemIndex) => {
     const isActiveItem = activeIndex === itemIndex;
     const backgroundColor = isActiveItem
@@ -73,7 +92,7 @@ const OrderCard = ({ order }) => {
     );
   };
 
-  const orderSteps = [
+  const pickupOrderSteps = [
     {
       label: "Order Placed",
       icon: "pi pi-shopping-cart",
@@ -96,6 +115,34 @@ const OrderCard = ({ order }) => {
     },
   ];
 
+  const deliveryOrderSteps = [
+    {
+      label: "Order Placed",
+      icon: "pi pi-shopping-cart",
+      template: (item) => itemRenderer(item, 0),
+    },
+    {
+      label: "Ready",
+      icon: "pi pi-box",
+      template: (item) => itemRenderer(item, 1),
+    },
+    {
+      label: "Order Picked Up",
+      icon: "pi pi-check",
+      template: (item) => itemRenderer(item, 2),
+    },
+    {
+      label: "Order Delivered",
+      icon: "pi pi-check-circle",
+      template: (item) => itemRenderer(item, 3),
+    },
+    {
+      label: "Order Cancelled",
+      icon: "pi pi-times",
+      template: (item) => itemRenderer(item, 4),
+    },
+  ];
+
   const handleDirections = (lat, long) => {
     window.open(
       `https://www.google.com/maps?q=@${lat},${long}`,
@@ -109,7 +156,7 @@ const OrderCard = ({ order }) => {
       <div className="flex flex-column md:flex-row justify-content-between align-items-center">
         <div className="flex-grow-1 mr-3 w-full" style={{ marginTop: "-50px" }}>
           <Steps
-            model={orderSteps}
+            model={isDelivery ? deliveryOrderSteps : pickupOrderSteps}
             activeIndex={activeIndex}
             readOnly={true}
             className="m-2 pt-4"
@@ -184,7 +231,9 @@ const Orders = () => {
   const ongoingDeliveryOrders = orders.filter(
     (order) =>
       order.useDelivery &&
-      (order.status === "CREATED" || order.status === "READY")
+      (order.status === "CREATED" ||
+        order.status === "READY" ||
+        order.status === "COMPLETED")
   );
   const pastPickupOrders = orders.filter(
     (order) =>
@@ -192,7 +241,7 @@ const Orders = () => {
       !order.useDelivery
   );
   const pastDeliveryOrders = orders.filter(
-    (order) => order.useDelivery && order.status === "COMPLETED"
+    (order) => order.useDelivery && order.status === "DELIVERED"
   );
 
   if (userType && userType === "CUSTOMER" && userId) {
@@ -202,7 +251,7 @@ const Orders = () => {
         <div className="grid">
           {ongoingPickupOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-              <OrderCard order={order} />
+              <OrderCard order={order} isDelivery={false} />
             </div>
           ))}
         </div>
@@ -211,7 +260,7 @@ const Orders = () => {
         <div className="grid">
           {ongoingDeliveryOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-              <OrderCard order={order} />
+              <OrderCard order={order} isDelivery={true} />
             </div>
           ))}
         </div>
@@ -220,7 +269,7 @@ const Orders = () => {
         <div className="grid">
           {pastPickupOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-              <OrderCard order={order} />
+              <OrderCard order={order} isDelivery={false} />
             </div>
           ))}
         </div>
@@ -228,7 +277,7 @@ const Orders = () => {
         <div className="grid">
           {pastDeliveryOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-              <OrderCard order={order} />
+              <OrderCard order={order} isDelivery={true} />
             </div>
           ))}
         </div>
