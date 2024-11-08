@@ -122,7 +122,7 @@ const ProductCatalog = () => {
     const getMerchantProducts = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/fcf8f7da-760f-406d-8d0a-acf06d456ccb/products`
+          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/${userId}/products`
         );
 
         const groupByCategory = response.data.reduce((acc, product) => {

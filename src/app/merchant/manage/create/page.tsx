@@ -63,6 +63,10 @@ const Page = () => {
       life: 3000,
     });
   };
+
+
+  const userId = localStorage.getItem("userId");
+  const userType = localStorage.getItem("userType");
   const onUpload = async (event) => {
     try {
       const file = event.files[0];
@@ -130,8 +134,7 @@ const Page = () => {
     getMerchantDetails();
   }, []);
 
-  const userType = localStorage.getItem('userType');
-  const userId = localStorage.getItem('userId');
+  
 
   const createProduct = async () => {
     const dataObj = {

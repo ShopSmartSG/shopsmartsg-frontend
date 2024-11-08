@@ -15,11 +15,7 @@ const Orders = () => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersMerchant/fcf8f7da-760f-406d-8d0a-acf06d456ccb
-
-
-
-`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/merchant/id/${userId}`
         );
         setOrders(response.data);
       } catch (error) {
@@ -28,8 +24,8 @@ const Orders = () => {
     };
     fetchMerchantOrderRequests();
   }, []);
-  const userType = localStorage.getItem('userType');
-  const userId = localStorage.getItem('userId');
+  const userType = localStorage.getItem("userType");
+  const userId = localStorage.getItem("userId");
   const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
@@ -89,19 +85,21 @@ const Orders = () => {
             className="p-button-secondary"
             disabled
           />
-        )
+        );
       case "CANCELLED":
         return (
           <Button
             label="Order Cancelled"
             className="p-button-secondary"
-            disabled/>)
+            disabled
+          />
+        );
       default:
         return null;
     }
   };
 
- if  (userType === 'MERCHANT' && (userId != null || userId != '')) {
+  if (userType === "MERCHANT" && (userId != null || userId != "")) {
     return (
       <div>
         <h2>Ongoing Orders</h2>
@@ -165,12 +163,9 @@ const Orders = () => {
         </div>
       </div>
     );
- }
- else {
-   router.push('/merchant/login')
+  } else {
+    router.push("/merchant/login");
   }
-
-  
 };
 
 export default Orders;

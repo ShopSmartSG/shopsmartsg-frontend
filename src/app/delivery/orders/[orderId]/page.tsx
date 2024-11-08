@@ -12,7 +12,7 @@ const Order = ({ params }) => {
     products: [
       { id: 'P12345', name: 'Sample Product 1', quantity: '2' },
       { id: 'P12346', name: 'Sample Product 2', quantity: '1' },
-      // Add more products as needed
+      
     ],
   };
 

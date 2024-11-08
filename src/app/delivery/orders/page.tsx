@@ -9,14 +9,15 @@ import { useRouter } from "next/navigation";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const userId = localStorage.getItem('userId');
+  const userType = localStorage.getItem('userType');
 
   // Fetch Merchant Order Requests
   useEffect(() => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersMerchant/fcf8f7da-760f-406d-8d0a-acf06d456ccb
-`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
         );
         setOrders(response.data);
       } catch (error) {
@@ -25,17 +26,17 @@ const Orders = () => {
     };
     fetchMerchantOrderRequests();
   }, []);
-  const { adminData, userType } = useAdminContext();
+
   const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/updateOrderStatus/${orderId}/${status}`,
         {
-          k: "",
+          deliveryPartnerId: userId,
         }
       );
-      // Update the local state to reflect the status change
+
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.orderId === orderId ? { ...order, status } : order
@@ -68,9 +69,9 @@ const Orders = () => {
       case "DELIVERY_ACCEPTED":
         return (
           <Button
-              label="Order Picked Up"
-              className="p-button-success m-3"
-              onClick={() => updateOrderStatus(orderId, "DELIVERY_PICKED_UP")}
+            label="Order Picked Up"
+            className="p-button-success m-3"
+            onClick={() => updateOrderStatus(orderId, "DELIVERY_PICKED_UP")}
           />
         );
       case "DELIVERY_COMPLETED":
@@ -80,14 +81,14 @@ const Orders = () => {
             className="p-button-secondary"
             disabled
           />
-        )
+        );
       default:
         return null;
     }
   };
 
-//  if  (userType === 'DELIVERY' && (adminData != null || adminData != '')) {
-if(true) {
+  //  if  (userType === 'DELIVERY' && (adminData != null || adminData != '')) {
+  if (true) {
     return (
       <div>
         <h2>Ongoing Orders</h2>
@@ -151,12 +152,8 @@ if(true) {
         </div>
       </div>
     );
- }
- else {
-  //  router.push('/merchant/login')
+  } else {
   }
-
-  
 };
 
 export default Orders;

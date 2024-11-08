@@ -1,7 +1,8 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { Image } from 'primereact/image';
+import axios from 'axios';
 
 const Order = ({ params }) => {
   const orderDetails = {
@@ -15,7 +16,15 @@ const Order = ({ params }) => {
       // Add more products as needed
     ],
   };
-
+  useEffect(() => {
+    const getOrderDetails = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrderById/${params.orderId}`
+      );
+      console.log(response.data);
+    }
+    getOrderDetails();
+  },[])
   return (
     <div>
       <Card title={`Order ID: ${params.orderId}`}>

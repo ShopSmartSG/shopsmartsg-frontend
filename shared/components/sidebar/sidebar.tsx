@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
-import { useSession } from "@/context/SessionContext";
+
 import Link from "next/link";
 import axios from "axios";
 
@@ -15,10 +15,10 @@ interface HeadlessDemoProps {
 }
 
 export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
-  const btnRef1 = useRef<any>(null);
-  const btnRef2 = useRef<any>(null);
-  const btnRef3 = useRef<any>(null);
-  const { session } = useSession();
+  const btnRef1 = useRef(null);
+  const btnRef2 = useRef(null);
+  const btnRef3 = useRef(null);
+
   const [name, setName] = useState("");
  const userId = localStorage.getItem("userId");
 
@@ -42,6 +42,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
     username();
   }, []);
+
 
   return (
     <div>

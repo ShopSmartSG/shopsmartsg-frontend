@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "primereact/card";
@@ -10,9 +9,6 @@ import { Tooltip } from "primereact/tooltip";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-
-
- 
 const getActiveIndex = (status) => {
   switch (status) {
     case "CREATED":
@@ -28,14 +24,30 @@ const getActiveIndex = (status) => {
   }
 };
 
-
 const userId = localStorage.getItem("userId");
 const userType = localStorage.getItem("userType");
 
-
 const OrderCard = ({ order }) => {
+  const [merchantDetails, setMerchantDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchMerchantDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${order.merchantId}`
+        );
+        if (response.status === 200) {
+          setMerchantDetails(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchMerchantDetails();
+  }, [order.merchantId]);
+
   const activeIndex = getActiveIndex(order.status);
-  console.log(activeIndex,'activeIndex');
   const itemRenderer = (item, itemIndex) => {
     const isActiveItem = activeIndex === itemIndex;
     const backgroundColor = isActiveItem
@@ -60,6 +72,7 @@ const OrderCard = ({ order }) => {
       </div>
     );
   };
+
   const orderSteps = [
     {
       label: "Order Placed",
@@ -82,7 +95,14 @@ const OrderCard = ({ order }) => {
       template: (item) => itemRenderer(item, 3),
     },
   ];
- 
+
+  const handleDirections = (lat, long) => {
+    window.open(
+      `https://www.google.com/maps?q=@${lat},${long}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   return (
     <Card title={`Order ID: ${order.orderId}`} className="mb-3">
@@ -98,7 +118,9 @@ const OrderCard = ({ order }) => {
           <p className="mb-2">
             Date: {new Date(order.createdDate).toLocaleDateString()}
           </p>
-          <p className="mb-2">Merchant: {order.merchantId}</p>
+          <p className="mb-2">
+            Merchant: {merchantDetails ? merchantDetails.name : "Loading..."}
+          </p>
           <Link
             href={`/customer/orders/${order.orderId}`}
             className="p-button p-button-text"
@@ -111,7 +133,15 @@ const OrderCard = ({ order }) => {
             position="bottom"
           ></Tooltip>
           <div className="flex ">
-            <div className="mr-2 mt-2 navigate-tooltip ">
+            <div
+              className="mr-2 mt-2 navigate-tooltip "
+              onClick={() =>
+                handleDirections(
+                  merchantDetails?.latitude,
+                  merchantDetails?.longitude
+                )
+              }
+            >
               <i className="pi pi-arrow-circle-right block mt-2 navigate-tooltip cursor-pointer"></i>
             </div>
             <div>
@@ -119,7 +149,6 @@ const OrderCard = ({ order }) => {
             </div>
           </div>
         </div>
-        
       </div>
     </Card>
   );
@@ -133,7 +162,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getAllOrdersCustomer/4c699c23-81bf-4a25-9dee-7fb7c37f7f60`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id/${userId}`
         );
         if (response.status === 200) {
           setOrders(response.data);
@@ -146,61 +175,67 @@ const Orders = () => {
   }, []);
 
   const ongoingPickupOrders = orders.filter(
-    (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED" || order.status === 'READY'
+    (order) =>
+      (order.status !== "COMPLETED" &&
+        order.status !== "CANCELLED" &&
+        !order.useDelivery) ||
+      order.status === "READY"
   );
   const ongoingDeliveryOrders = orders.filter(
-    (order) => order.status == "DELIVERY_ACCEPTED" || order.status === 'DELIVERY_PICKED_UP'
+    (order) =>
+      order.useDelivery &&
+      (order.status === "CREATED" || order.status === "READY")
   );
   const pastPickupOrders = orders.filter(
-    (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
+    (order) =>
+      (order.status === "COMPLETED" || order.status === "CANCELLED") &&
+      !order.useDelivery
   );
-
   const pastDeliveryOrders = orders.filter(
-    (order) =>  order.status === 'DELIVERY_COMPLETED'
+    (order) => order.useDelivery && order.status === "COMPLETED"
   );
-if (userType && userType === "CUSTOMER" && userId) {
-  return (
-    <div className="p-4">
-      <h2 className="mb-3">Ongoing PICK UP Orders</h2>
-      <div className="grid">
-        {ongoingPickupOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
 
-      <h2 className="mb-3">Ongoing DELIVERY Orders</h2>
-      <div className="grid">
-        {ongoingDeliveryOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
+  if (userType && userType === "CUSTOMER" && userId) {
+    return (
+      <div className="p-4">
+        <h2 className="mb-3">Ongoing PICK UP Orders</h2>
+        <div className="grid">
+          {ongoingPickupOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+              <OrderCard order={order} />
+            </div>
+          ))}
+        </div>
 
-      <h2 className="mb-3 mt-5">Past PICK UP Orders</h2>
-      <div className="grid">
-        {pastPickupOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
-      <h2 className="mb-3 mt-5">Past Delivery Orders</h2>
-      <div className="grid">
-        {pastDeliveryOrders.map((order) => (
-          <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
-            <OrderCard order={order} />
-          </div>
-        ))}
-      </div>
+        <h2 className="mb-3">Ongoing DELIVERY Orders</h2>
+        <div className="grid">
+          {ongoingDeliveryOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+              <OrderCard order={order} />
+            </div>
+          ))}
+        </div>
 
-    </div>
-  );
-}
-  else {
-    router.push('/customer/login')
+        <h2 className="mb-3 mt-5">Past PICK UP Orders</h2>
+        <div className="grid">
+          {pastPickupOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+              <OrderCard order={order} />
+            </div>
+          ))}
+        </div>
+        <h2 className="mb-3 mt-5">Past Delivery Orders</h2>
+        <div className="grid">
+          {pastDeliveryOrders.map((order) => (
+            <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
+              <OrderCard order={order} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  } else {
+    router.push("/customer/login");
   }
 };
 

@@ -36,7 +36,8 @@ const Page = () => {
     originalPrice: string;
     listingPrice: string;
   }
-
+  const userId = localStorage.getItem("userId");
+  const userType = localStorage.getItem("userType");
   interface ProductQuantity {
     [key: string]: number;
   }
@@ -121,7 +122,7 @@ const Page = () => {
 
     try {
 const response = await axios.put(
-  `${process.env.NEXT_PUBLIC_CentralService_API_URL}/addToCart/4c699c23-81bf-4a25-9dee-7fb7c37f7f60/merchant/${product.merchantId}`,
+  `${process.env.NEXT_PUBLIC_CentralService_API_URL}/addToCart/${userId}/merchant/${product.merchantId}`,
   {
     productId: product.productId,
     quantity,

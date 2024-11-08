@@ -25,11 +25,15 @@ const EmailOtpForm = () => {
   const [resendDisabled, setResendDisabled] = useState(true);
   const [timer, setTimer] = useState(30); //
   const disabledCondition: boolean = otpCount >= 3;
-  const [userId, setUserId] = useState("");
+
   const [userTyped, setUserType] = useState("");
   const toast = useRef(null);
   const { setAdminData, setUserTyped } = useAdminContext();
-  const { adminData, userType } = useAdminContext();
+
+
+  const userId = localStorage.getItem("userId");
+  const userType = localStorage.getItem("userType");
+
   useEffect(() => {
     let interval;
     if (resendDisabled) {
@@ -85,12 +89,8 @@ const EmailOtpForm = () => {
       );
 
       if (response.status) {
-        const cookie = await response.data 
-        console.log(cookie, "COOKIE")
-        setUserId(cookie.userId)
-        setUserType("DELIVERY");
-        setAdminData(userId);
-        setUserTyped("DELIVERY");
+        localStorage.setItem('userType', 'DELIVERY');
+        localStorage.setItem('userId',response.data.userId);
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -109,15 +109,7 @@ const EmailOtpForm = () => {
     }
   };
 
-  // const otpValidator = (value: string) => {
-  //   const result = validator.isNumeric(value);
-  //   if (result) {
-  //     setOtpError(false);
-  //     setOtp(value);
-  //   } else {
-  //     setOtpError(true);
-  //   }
-  // };
+
 
   const handleResendOtp = () => {
     setResendDisabled(true);
@@ -153,7 +145,7 @@ const EmailOtpForm = () => {
       });
     }
   };
-  if (userType === 'DELIVERY' && (adminData != null || adminData != '')){
+  if (userType === 'DELIVERY' && (userId != null || userId != '')){
       router.push('/delivery/orders')
   }
   else {
