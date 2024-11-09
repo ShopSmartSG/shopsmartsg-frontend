@@ -26,10 +26,14 @@ export default function Navbar() {
   const [cartVisibility, setCartVisibility] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [merchantId, setMerchantId] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [rewardPoints, setRewardPoints] = useState(0);
   const [loading, setLoading] = useState(false);
   const [homeDelivered, setHomeDelivered] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [useRewardPoints, setUseRewardPoints] = useState(false);
   const router = useRouter();
+  
 
   const itemRenderer = (item) => (
     <Link className="flex align-items-center p-menuitem-link" href={item.url}>
@@ -52,11 +56,27 @@ export default function Navbar() {
         shape="circle"
       />
       <span className="font-bold white-space-nowrap">
-        Yatharth's Cart <i className="pi pi-cart-plus"></i>
+        {customerName}'s  Cart <i className="pi pi-cart-plus"></i>
       </span>
     </div>
   );
-
+  useEffect(() => {
+    const getCustomerDetails = async () => {
+       try {
+         const response = await axios.get(
+           `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${userId}`
+         );
+         if (response.status == 200) {
+           setCustomerName(response.data.name);
+           setRewardPoints(response.data.rewardPoints);
+           
+         }
+       } catch (error) {
+         console.error(error);
+       }
+    }
+    getCustomerDetails();
+  })
   const toast = useRef(null);
 
   // Calculate total price whenever cart items change
@@ -73,7 +93,7 @@ export default function Navbar() {
     setLoading(true);
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}/rewards/false/delivery/${homeDelivered}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
         {
           data: "k",
           useDelivery:homeDelivered
@@ -194,7 +214,17 @@ export default function Navbar() {
           onChange={(e) => setHomeDelivered(e.checked)}
           checked={homeDelivered}
         />
-       
+      </div>
+      <div className="field flex align-items-center">
+        <label>Reward Points Available : {rewardPoints}</label>
+      </div>
+      <div className="field flex align-items-center">
+        <label className="mr-2 mt-2">Use Reward Points</label>
+        <Checkbox
+          inputId="binary"
+          onChange={(e) => setUseRewardPoints(e.checked)}
+          checked={useRewardPoints}
+        />
       </div>
       <div>
         <Button
