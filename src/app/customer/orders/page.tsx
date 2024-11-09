@@ -173,33 +173,42 @@ const OrderCard = ({ order, isDelivery }) => {
           <p className="mb-2">
             Merchant: {merchantDetails ? merchantDetails.name : "Loading..."}
           </p>
-          <Link
-            href={`/customer/orders/${order.orderId}`}
-            className="p-button p-button-text"
-          >
-            View Order Details
-          </Link>
-          <Tooltip
-            target=".navigate-tooltip"
-            content="Click to navigate."
-            position="bottom"
-          ></Tooltip>
-          <div className="flex ">
-            <div
-              className="mr-2 mt-2 navigate-tooltip "
-              onClick={() =>
-                handleDirections(
-                  merchantDetails?.latitude,
-                  merchantDetails?.longitude
-                )
-              }
+          <p className="mb-2">
+            Delivery Type : {isDelivery ? "Partner Assisted" : "Self Pickup"}
+          </p>
+          <div>
+            <Link
+              href={`/customer/orders/${order.orderId}`}
+              className="p-button p-button-text"
             >
-              <i className="pi pi-arrow-circle-right block mt-2 navigate-tooltip cursor-pointer"></i>
-            </div>
-            <div>
-              <Message severity="info" text="Click To Navigate." />
-            </div>
+              View Order Details
+            </Link>
+            <Tooltip
+              target=".navigate-tooltip"
+              content="Click to navigate."
+              position="bottom"
+            ></Tooltip>
           </div>
+          {isDelivery ? (
+            <div></div>
+          ) : (
+            <div className="flex ">
+              <div
+                className="mr-2 mt-2 navigate-tooltip "
+                onClick={() =>
+                  handleDirections(
+                    merchantDetails?.latitude,
+                    merchantDetails?.longitude
+                  )
+                }
+              >
+                <i className="pi pi-arrow-circle-right block mt-2 navigate-tooltip cursor-pointer"></i>
+              </div>
+              <div>
+                <Message severity="info" text="Click To Navigate." />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Card>
@@ -225,6 +234,10 @@ const Orders = () => {
     };
     fetchOrders();
   }, []);
+
+
+
+ 
 
   const ongoingPickupOrders = orders.filter(
     (order) =>

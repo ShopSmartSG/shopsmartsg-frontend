@@ -32,6 +32,7 @@ export default function Navbar() {
   const [homeDelivered, setHomeDelivered] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [useRewardPoints, setUseRewardPoints] = useState(false);
+  const [discountedPrice, setDiscountedPrice] = useState(0);
   const router = useRouter();
   
 
@@ -86,6 +87,17 @@ export default function Navbar() {
     }, 0);
     setTotalPrice(total);
   }, [cartItems]);
+
+  useEffect(() => {
+    getDiscountedPrice();
+    if (useRewardPoints) {
+      const disPrice = totalPrice - discountedPrice;
+      setTotalPrice(disPrice);
+    }
+    else {
+      setTotalPrice(totalPrice+discountedPrice);
+    }
+  },[useRewardPoints])
 
   const placeOrder = async (customerId: string) => {
 
@@ -203,6 +215,21 @@ export default function Navbar() {
 
     fetchData();
   }, []);
+
+
+  const getDiscountedPrice = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${userId}/rewards`
+      );
+      if (response.status == 200) {
+        setDiscountedPrice(response.data.rewardAmount)
+      }
+    }
+    catch (error) {
+      console.error("Error fetching discount price:", error);
+    }
+  }
 
   const footerContent = (
     <div className="p-2 flex justify-content-between align-items-center">

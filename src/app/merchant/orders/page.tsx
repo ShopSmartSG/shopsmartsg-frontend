@@ -125,6 +125,10 @@ const Orders = () => {
                     <Link href={`/merchant/orders/${order.orderId}`}>
                       View Order Details
                     </Link>
+                    <p>
+                      Delivery :{" "}
+                      {order.useDelivery ? "Partner Assisted" : "Self - Pickup"}{" "}
+                    </p>
                   </div>
                   {renderButtons(
                     order.orderId,
