@@ -47,10 +47,10 @@ const Orders = () => {
   };
 
   const ongoingOrders = orders.filter(
-    (order) => order.status === "CREATED" || order.status === "READY"
+    (order) => order.status === "CREATED" || order.status === "READY" || order.status == "DELIVERY_ACCEPTED"
   );
   const pastOrders = orders.filter(
-    (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
+    (order) => order.status === "COMPLETED" || order.status === "CANCELLED" || order.status === "DELIVERY_PICKED_UP"
   );
 
   const renderButtons = (orderId, status,delivery) => {
