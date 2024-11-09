@@ -237,7 +237,7 @@ const Orders = () => {
     (order) =>
       order.useDelivery &&
       (order.status === "CREATED" ||
-        order.status === "READY" ||
+       
         
         order.status == "DELIVERY_ACCEPTED" ||
       order.status === "DELIVERY_PICKED_UP" 

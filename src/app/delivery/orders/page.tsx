@@ -16,65 +16,45 @@ const Orders = () => {
   const userId = localStorage.getItem("userId");
   const userType = localStorage.getItem("userType");
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const [profileResponse, activeResponse] = await Promise.all([
+        axios.get(
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/${userId}`
-        );
+        ),
+        axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
+        ),
+      ]);
 
-        const ordersWithDetails = await Promise.all(
-          response.data.map(async (order) => {
-            const merchantDetails = await getMerchantDetails(order.merchantId);
-            const customerDetails = await getCustomerDetails(order.customerId);
-            return {
-              ...order,
-              merchantDetails,
-              merchantLatitude: merchantDetails.latitude,
-              merchantLongitude: merchantDetails.longitude,
-              customerLatitude: customerDetails.latitude,
-              customerLongitude: customerDetails.longitude,
-              customerDetails,
-            };
-          })
-        );
+      const allOrders = [...profileResponse.data, ...activeResponse.data];
 
-        setOrders(ordersWithDetails);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
+      const ordersWithDetails = await Promise.all(
+        allOrders.map(async (order) => {
+          const merchantDetails = await getMerchantDetails(order.merchantId);
+          const customerDetails = await getCustomerDetails(order.customerId);
+          return {
+            ...order,
+            merchantDetails,
+            merchantLatitude: merchantDetails.latitude,
+            merchantLongitude: merchantDetails.longitude,
+            customerLatitude: customerDetails.latitude,
+            customerLongitude: customerDetails.longitude,
+            customerDetails,
+          };
+        })
+      );
 
- const fetchActiveOrders = async () => {
-   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
-    );
+      setOrders(ordersWithDetails);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
 
-     const ordersWithDetails = await Promise.all(
-       response.data.map(async (order) => {
-         const merchantDetails = await getMerchantDetails(order.merchantId);
-         const customerDetails = await getCustomerDetails(order.customerId);
-         return {
-           ...order,
-           merchantDetails,
-           merchantLatitude: merchantDetails.latitude,
-           merchantLongitude: merchantDetails.longitude,
-           customerLatitude: customerDetails.latitude,
-           customerLongitude: customerDetails.longitude,
-           customerDetails,
-         };
-       })
-     );
+  fetchOrders();
+}, []);
 
-     setOrders(ordersWithDetails);
-   } catch (error) {
-     console.error("Error fetching orders:", error);
-   }
- };
-    fetchOrders();
-    fetchActiveOrders();
-  }, [userId]);
 
   const handleDirections = (lat, long) => {
     window.open(

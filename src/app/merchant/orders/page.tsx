@@ -53,7 +53,7 @@ const Orders = () => {
     (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
   );
 
-  const renderButtons = (orderId, status) => {
+  const renderButtons = (orderId, status,delivery) => {
     switch (status) {
       case "CREATED":
         return (
@@ -76,6 +76,7 @@ const Orders = () => {
             label="Order Picked Up"
             className="p-button-info"
             onClick={() => updateOrderStatus(orderId, "COMPLETED")}
+            disabled = {delivery}
           />
         );
       case "COMPLETED":
@@ -91,7 +92,7 @@ const Orders = () => {
           <Button
             label="Order Cancelled"
             className="p-button-secondary"
-            disabled
+          disabled
           />
         );
       default:
@@ -125,7 +126,11 @@ const Orders = () => {
                       View Order Details
                     </Link>
                   </div>
-                  {renderButtons(order.orderId, order.status)}
+                  {renderButtons(
+                    order.orderId,
+                    order.status,
+                    order.useDelivery
+                  )}
                 </div>
               </Card>
             </div>
@@ -155,7 +160,11 @@ const Orders = () => {
                       View Order Details
                     </Link>
                   </div>
-                  {renderButtons(order.orderId, order.status)}
+                  {renderButtons(
+                    order.orderId,
+                    order.status,
+                    order.useDelivery
+                  )}
                 </div>
               </Card>
             </div>
