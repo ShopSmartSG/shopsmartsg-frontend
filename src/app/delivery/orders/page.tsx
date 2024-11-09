@@ -16,45 +16,92 @@ const Orders = () => {
   const userId = localStorage.getItem("userId");
   const userType = localStorage.getItem("userType");
 
-useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      const [profileResponse, activeResponse] = await Promise.all([
-        axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/${userId}`
-        ),
-        axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
-        ),
-      ]);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        // Fetch orders from both endpoints independently
+        const [profileResponse, activeResponse] = await Promise.allSettled([
+          axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/${userId}`
+          ),
+          axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
+          ),
+        ]);
 
-      const allOrders = [...profileResponse.data, ...activeResponse.data];
+        // Handle responses, using empty arrays for failed requests
+        const profileOrders =
+          profileResponse.status === "fulfilled"
+            ? profileResponse.value.data
+            : [];
+        const activeOrders =
+          activeResponse.status === "fulfilled"
+            ? activeResponse.value.data
+            : [];
 
-      const ordersWithDetails = await Promise.all(
-        allOrders.map(async (order) => {
-          const merchantDetails = await getMerchantDetails(order.merchantId);
-          const customerDetails = await getCustomerDetails(order.customerId);
-          return {
-            ...order,
-            merchantDetails,
-            merchantLatitude: merchantDetails.latitude,
-            merchantLongitude: merchantDetails.longitude,
-            customerLatitude: customerDetails.latitude,
-            customerLongitude: customerDetails.longitude,
-            customerDetails,
-          };
-        })
-      );
+        // Combine orders from both successful responses
+        const allOrders = [...profileOrders, ...activeOrders];
 
-      setOrders(ordersWithDetails);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+        // Fetch additional details for each order
+        const ordersWithDetails = await Promise.all(
+          allOrders.map(async (order) => {
+            try {
+              // Fetch merchant and customer details independently
+              const [merchantResponse, customerResponse] =
+                await Promise.allSettled([
+                  getMerchantDetails(order.merchantId),
+                  getCustomerDetails(order.customerId),
+                ]);
 
-  fetchOrders();
-}, []);
+              // Use default values if detail fetching fails
+              const merchantDetails =
+                merchantResponse.status === "fulfilled"
+                  ? merchantResponse.value
+                  : { latitude: null, longitude: null };
 
+              const customerDetails =
+                customerResponse.status === "fulfilled"
+                  ? customerResponse.value
+                  : { latitude: null, longitude: null };
+
+              return {
+                ...order,
+                merchantDetails,
+                merchantLatitude: merchantDetails.latitude,
+                merchantLongitude: merchantDetails.longitude,
+                customerLatitude: customerDetails.latitude,
+                customerLongitude: customerDetails.longitude,
+                customerDetails,
+              };
+            } catch (error) {
+              // If detail fetching fails, return order with default values
+              console.error(
+                `Error fetching details for order ${order.id}:`,
+                error
+              );
+              return {
+                ...order,
+                merchantDetails: {},
+                merchantLatitude: null,
+                merchantLongitude: null,
+                customerLatitude: null,
+                customerLongitude: null,
+                customerDetails: {},
+              };
+            }
+          })
+        );
+
+        setOrders(ordersWithDetails);
+      } catch (error) {
+        console.error("Error in order fetching process:", error);
+        // Even if there's an error, ensure orders state is at least an empty array
+        setOrders([]);
+      }
+    };
+
+    fetchOrders();
+  }, [userId]); // Added userId to dependency array
 
   const handleDirections = (lat, long) => {
     window.open(
@@ -90,9 +137,7 @@ useEffect(() => {
       order.status === "DELIVERY_ACCEPTED" ||
       order.status === "DELIVERY_PICKED_UP"
   );
-  const pastOrders = orders.filter(
-    (order) => order.status === "COMPLETED"
-  );
+  const pastOrders = orders.filter((order) => order.status === "COMPLETED");
 
   const getMerchantDetails = async (merchantId) => {
     try {
