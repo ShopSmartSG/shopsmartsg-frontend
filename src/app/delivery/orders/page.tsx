@@ -45,7 +45,35 @@ const Orders = () => {
       }
     };
 
+ const fetchActiveOrders = async () => {
+   try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
+    );
+
+     const ordersWithDetails = await Promise.all(
+       response.data.map(async (order) => {
+         const merchantDetails = await getMerchantDetails(order.merchantId);
+         const customerDetails = await getCustomerDetails(order.customerId);
+         return {
+           ...order,
+           merchantDetails,
+           merchantLatitude: merchantDetails.latitude,
+           merchantLongitude: merchantDetails.longitude,
+           customerLatitude: customerDetails.latitude,
+           customerLongitude: customerDetails.longitude,
+           customerDetails,
+         };
+       })
+     );
+
+     setOrders(ordersWithDetails);
+   } catch (error) {
+     console.error("Error fetching orders:", error);
+   }
+ };
     fetchOrders();
+    fetchActiveOrders();
   }, [userId]);
 
   const handleDirections = (lat, long) => {

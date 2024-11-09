@@ -31,11 +31,16 @@ const getActiveIndexForDelivery = (status) => {
     case "READY":
       return 1;
     case "COMPLETED":
-      return 2;
-    case "DELIVERED":
       return 3;
+    
+    
     case "CANCELLED":
       return 4;
+    case "DELIVERY_ACCEPTED":
+      return 1;
+    case "DELIVERY_PICKED_UP":
+      return 2;
+    
     default:
       return 0;
   }
@@ -233,7 +238,10 @@ const Orders = () => {
       order.useDelivery &&
       (order.status === "CREATED" ||
         order.status === "READY" ||
-        order.status === "COMPLETED")
+        
+        order.status == "DELIVERY_ACCEPTED" ||
+      order.status === "DELIVERY_PICKED_UP" 
+     )
   );
   const pastPickupOrders = orders.filter(
     (order) =>
@@ -241,13 +249,13 @@ const Orders = () => {
       !order.useDelivery
   );
   const pastDeliveryOrders = orders.filter(
-    (order) => order.useDelivery && order.status === "DELIVERED"
+    (order) => order.useDelivery && order.status === "COMPLETED"
   );
 
   if (userType && userType === "CUSTOMER" && userId) {
     return (
       <div className="p-4">
-        <h2 className="mb-3">Ongoing PICK UP Orders</h2>
+        <h2 className="mb-3">Ongoing  Orders</h2>
         <div className="grid">
           {ongoingPickupOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
@@ -265,7 +273,7 @@ const Orders = () => {
           ))}
         </div>
 
-        <h2 className="mb-3 mt-5">Past PICK UP Orders</h2>
+        <h2 className="mb-3 mt-5">Past Orders</h2>
         <div className="grid">
           {pastPickupOrders.map((order) => (
             <div key={order.orderId} className="col-12 md:col-6 lg:col-4">
