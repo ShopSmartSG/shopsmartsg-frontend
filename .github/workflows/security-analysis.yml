@@ -68,4 +68,4 @@ jobs:
           path: |
             zap_report.html
             eslint_report.json
-            npm_audit_report.json
+            SAST_report.json
