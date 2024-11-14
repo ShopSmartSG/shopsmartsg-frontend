@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "./merchant.css";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -159,20 +158,20 @@ const Page: React.FC = () => {
   };
 
 
-  useEffect(() => {
-    const getUserDetails = async () => {
-      try {
-        const response = await fetch(`/api/customers/${userId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch user details");
-        }
-        const data = await response.json();
-        setFormData(data);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    }
-  })
+  // useEffect(() => {
+  //   const getUserDetails = async () => {
+  //     try {
+  //       const response = await fetch(`/api/customers/${userId}`);
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch user details");
+  //       }
+  //       const data = await response.json();
+  //       setFormData(data);
+  //     } catch (error) {
+  //       console.error("Error fetching user details:", error);
+  //     }
+  //   }
+  // })
  if(userType && userType == 'CUSTOMER' && userId)
  {
     return (

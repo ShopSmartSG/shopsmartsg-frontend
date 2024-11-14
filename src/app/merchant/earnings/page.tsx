@@ -5,7 +5,6 @@ import React, { useEffect,useState } from 'react'
 const Page = () => {
 
     const userId = localStorage.getItem("userId");
-    const userType = localStorage.getItem("userType");
     const [merchantDetails, setMerchantDetails] = useState(null);
 
     useEffect(() => {
