@@ -33,6 +33,10 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
+      # SAST Analysis with npm audit
+      - name: Run npm audit
+        run: npm audit --json > npm_audit_report.json || true
+
      # DAST Analysis with OWASP ZAP
       - name: Start frontend application
         run: |
