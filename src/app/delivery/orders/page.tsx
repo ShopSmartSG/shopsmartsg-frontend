@@ -6,7 +6,6 @@ import { Button } from "primereact/button";
 import axios from "axios";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
-import { useRouter } from "next/navigation";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -109,7 +108,6 @@ const Orders = () => {
     );
   };
 
-  const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(

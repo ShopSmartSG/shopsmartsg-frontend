@@ -1,12 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Card } from "primereact/card";
-import { Image } from "primereact/image";
 import { Steps } from "primereact/steps";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
 import { useRouter } from "next/navigation";
+import { Card } from "primereact/card";
 import axios from "axios";
 
 const getActiveIndex = (status) => {

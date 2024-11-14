@@ -8,7 +8,6 @@ import { ProductService } from "./ProductService";
 
 
 import { Divider } from "primereact/divider";
-import axios from "axios";
 
 import { InputText } from "primereact/inputtext";
 import { PrimeIcons } from "primereact/api";
@@ -16,9 +15,6 @@ import Link from "next/link";
 import FilterSearch from "../../shared/components/filter/filterSearch";
 import { useRouter } from "next/navigation";
 import { Image } from "primereact/image";
-        
-
-const apiUrlProduct = process.env.NEXT_PUBLIC_API_PRODUCTS_URL;
 
 const Page = () => {
   
@@ -26,14 +22,6 @@ const Page = () => {
 
 
 const router = useRouter();
-
-  const header = () => {
-    return (
-      <div className="w-100">
-        <h4 className="pt-2 ml-2">Best Of Shopsmart</h4>
-      </div>
-    )
-  }
 
  
   const [products, setProducts] = useState([]);
