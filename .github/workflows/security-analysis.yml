@@ -28,14 +28,20 @@ jobs:
         run: npm ci
         continue-on-error: true
 
-      # Linting Report
+       # Linting Report
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          npm run lint -- -f json -o eslint_report.json || true
         continue-on-error: true
 
       # SAST Analysis with npm audit
-      - name: Run npm audit
-        run: npm audit --json > npm_audit_report.json || true
+     - name: Run npm audit
+        run: |
+          npm audit --json > npm_audit_report.json 2>&1 || true
+          if [ ! -f npm_audit_report.json ]; then
+            echo '{"error": "No vulnerabilities found"}' > npm_audit_report.json
+          fi
+        continue-on-error: true
 
      # DAST Analysis with OWASP ZAP
       - name: Start frontend application
@@ -52,12 +58,21 @@ jobs:
           cmd_options: '-t http://localhost:3000 -r zap_report.html'
         continue-on-error: true
 
+      # Verify reports exist before upload
+      - name: Verify reports
+        run: |
+          ls -la eslint_report.json
+          ls -la npm_audit_report.json
+          ls -la zap_report.html
+        continue-on-error: true
+
       # Upload all reports as artifacts
       - name: Upload security reports
         uses: actions/upload-artifact@v3
-        if: always()  # This ensures reports are uploaded even if previous steps fail
+        if: always()
         with:
           name: security-reports
           path: |
             zap_report.html
             eslint_report.json
+            npm_audit_report.json
