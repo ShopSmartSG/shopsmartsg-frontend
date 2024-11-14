@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import axios from "axios";
@@ -10,8 +10,6 @@ import { useRouter } from "next/navigation";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const [merchantIds, setMerchantIds] = useState([]);
-  const [customerIds, setCustomerIds] = useState([]);
 
   const userId = localStorage.getItem("userId");
   const userType = localStorage.getItem("userType");

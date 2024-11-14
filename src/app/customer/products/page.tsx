@@ -37,7 +37,7 @@ const Page = () => {
     listingPrice: string;
   }
   const userId = localStorage.getItem("userId");
-  const userType = localStorage.getItem("userType");
+  // const userType = localStorage.getItem("userType");
   interface ProductQuantity {
     [key: string]: number;
   }
@@ -57,9 +57,9 @@ const Page = () => {
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
   const [first, setFirst] = useState(0);
   const [rows] = useState(4);
-  const getCurrentPageProducts = () => {
-    return products.slice(first, first + rows);
-  };
+  // const getCurrentPageProducts = () => {
+  //   return products.slice(first, first + rows);
+  // };
   const onPageChange = (event: { first: number; rows: number }) => {
     setFirst(event.first);
   };

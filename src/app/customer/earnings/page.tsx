@@ -22,7 +22,7 @@ const Page = () => {
             
         }
         getMerchantDetails();
-    },[])
+    },[userId])
   return (
     <div className="text-center">
       <h4> Rewards</h4>

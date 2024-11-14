@@ -191,7 +191,7 @@ const Page: React.FC = () => {
 
     // Call the fetch function
     fetchData();
-  }, []);
+  }, [adminData]);
 
   return (
     <fieldset>

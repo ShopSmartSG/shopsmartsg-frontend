@@ -12,6 +12,7 @@ import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
+import Image from 'next/image'
 import { Calendar } from "primereact/calendar";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Slider, SliderChangeEvent } from "primereact/slider";
@@ -216,7 +217,7 @@ export default function AdvancedFilterDemo() {
   const countryBodyTemplate = (rowData: Customer) => {
     return (
       <div className="flex align-items-center gap-2">
-        <img
+        <Image
           alt="flag"
           src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
           className={`flag flag-${rowData.country.code}`}
@@ -258,7 +259,7 @@ export default function AdvancedFilterDemo() {
 
     return (
       <div className="flex align-items-center gap-2">
-        <img
+        <Image
           alt={representative.name}
           src={`https://primefaces.org/cdn/primereact/images/avatar/${representative.image}`}
           width="32"
@@ -289,7 +290,7 @@ export default function AdvancedFilterDemo() {
   const representativesItemTemplate = (option: Representative) => {
     return (
       <div className="flex align-items-center gap-2">
-        <img
+        <Image
           alt={option.name}
           src={`https://primefaces.org/cdn/primereact/images/avatar/${option.image}`}
           width="32"

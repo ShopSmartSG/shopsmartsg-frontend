@@ -189,6 +189,7 @@ const router = useRouter();
                 <Image
                   src="https://img.freepik.com/free-psd/hand-drawn-shopping-cart-isolated_23-2151551324.jpg"
                   height="122px"
+                  alt="Cart"
                 />
               </Card>
             </div>
