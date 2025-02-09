@@ -2,6 +2,7 @@
 @import "../../node_modules/primeflex/primeflex.css";
 @import "../../node_modules/primeicons/primeicons.css";
 
+@import url('https://fonts.googleapis.com/css2?family=Liter&display=swap');
 
 
 .pagePadding{
@@ -35,4 +36,10 @@ body{
         padding: 0.5rem;
         width: 24%;
     }
+}
+
+.liter-regular {
+    font-family: "Liter", serif;
+    font-weight: 400;
+    font-style: normal;
 }
