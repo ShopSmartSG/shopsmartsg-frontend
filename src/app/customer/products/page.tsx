@@ -6,10 +6,10 @@ import { Image } from "primereact/image";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
 import {
-  GoogleMap,
-  useJsApiLoader,
-  Marker,
-  InfoWindow,
+    GoogleMap,
+    useJsApiLoader,
+    Marker,
+    InfoWindow,
 } from "@react-google-maps/api";
 import { Knob } from "primereact/knob";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -18,389 +18,282 @@ import { useSearchParams } from "next/navigation";
 import FilterSearch from "../../../../shared/components/filter/filterSearch";
 
 const Page = () => {
-  const toast = useRef<Toast>(null);
-  const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId");
-  const maxPrice = searchParams.get("maxPrice");
-  const minPrice = searchParams.get("minPrice");
-  const pincode = searchParams.get("pincode");
-  const searchText = searchParams.get("searchText");
-  const [merchants, setMerchants] = useState<string[]>([]);
+    const toast = useRef(null);
+    const searchParams = useSearchParams();
+    const categoryId = searchParams.get("categoryId");
+    const maxPrice = searchParams.get("maxPrice");
+    const minPrice = searchParams.get("minPrice");
+    const pincode = searchParams.get("pincode");
+    const searchText = searchParams.get("searchText");
 
-  interface Product {
-    productId: string;
-    productName: string;
-    productDescription: string;
-    imageUrl: string;
-    merchantId: string;
-    originalPrice: string;
-    listingPrice: string;
-  }
- let userId: string | null = null;
-  try {
-    userId = localStorage.getItem("userId");
-  } catch (error) {
-    console.error("Error accessing localStorage:", error);
-  }
-  // const userType = localStorage.getItem("userType");
-  interface ProductQuantity {
-    [key: string]: number;
-  }
+    const [merchants, setMerchants] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [productQuantities, setProductQuantities] = useState({});
+    const [coordinates, setCoordinates] = useState([]);
+    const [first, setFirst] = useState(0);
+    const [rows] = useState(4);
+    const [selectedMarker, setSelectedMarker] = useState(null);
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [productQuantities, setProductQuantities] = useState<ProductQuantity>(
-    {}
-  );
+    const userId = localStorage.getItem("userId");
 
-  interface Coordinate {
-    id: string;
-    name: string;
-    lat: number;
-    lng: number;
-  }
-
-  const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
-  const [first, setFirst] = useState(0);
-  const [rows] = useState(4);
-  // const getCurrentPageProducts = () => {
-  //   return products.slice(first, first + rows);
-  // };
-  const onPageChange = (event: { first: number; rows: number }) => {
-    setFirst(event.first);
-  };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/searchProducts`,
-          {
-            categoryId,
-            maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
-            minPrice: minPrice ? parseFloat(minPrice) : undefined,
-            pincode,
-            searchText,
-          }
-        );
-
-        const merchantIds = response.data.map(
-          (product: Product) => product.merchantId
-        );
-        const uniqueMerchantIds: string[] = Array.from(new Set(merchantIds));
-        setMerchants(Array.from(new Set(uniqueMerchantIds)));
-        setProducts(Array.from(new Set(response.data)));
-
-        // Initialize quantities for all products
-        const initialQuantities: ProductQuantity = {};
-        response.data.forEach((product: Product) => {
-          initialQuantities[product.productId] = 0;
-        });
-        setProductQuantities(initialQuantities);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, [categoryId, maxPrice, minPrice, pincode, searchText]);
-
-  const handleQuantityChange = (productId: string, newValue: number) => {
-    setProductQuantities((prev) => ({
-      ...prev,
-      [productId]: newValue,
-    }));
-  };
-
-  const addToCart = async (product: Product) => {
-    const quantity = productQuantities[product.productId];
-
-    if (quantity <= 0) {
-      toast.current?.show({
-        severity: "warn",
-        summary: "Warning",
-        detail: "Please select a quantity greater than 0",
-        life: 3000,
-      });
-      return;
-    }
-    console.log(product)
-
-    try {
-const response = await axios.put(
-  `${process.env.NEXT_PUBLIC_CentralService_API_URL}/addToCart/${userId}/merchant/${product.merchantId}`,
-  {
-    productId: product.productId,
-    quantity,
-    price: product.listingPrice,
-  }
-);
-      if (response.status == 200) {
-        toast.current?.show({
-          severity: "success",
-          summary: "Success",
-          detail: `Added ${quantity} ${product.productName} to cart`,
-          life: 3000,
-        });
-        // Reset quantity after successful addition
-        handleQuantityChange(product.productId, 0);
-      }
-    }
-    catch (error) {
-      console.log(error)
-    }
-    // try {
-    //   // Assuming you have an API endpoint for adding to cart
-    //   await axios.post(`${process.env.NEXT_PUBLIC_CART_API_URL}/cart/add`, {
-    //     productId: product.productId,
-    //     quantity: quantity,
-    //   });
-
-    //   toast.current?.show({
-    //     severity: "success",
-    //     summary: "Success",
-    //     detail: `Added ${quantity} ${product.productName} to cart`,
-    //     life: 3000,
-    //   });
-
-    //   // Reset quantity after successful addition
-    //   handleQuantityChange(product.productId, 0);
-    // } catch (error) {
-    //   console.error("Error adding to cart:", error);
-    //   toast.current?.show({
-    //     severity: "error",
-    //     summary: "Error",
-    //     detail: "Failed to add item to cart",
-    //     life: 3000,
-    //   });
-    // }
-  };
-
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-  });
-
-  const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
-
-  const center = {
-    lat: 1.31901,
-    lng: 103.884983,
-  };
-
-  const panToLocation = (lat: number, lng: number) => {
-    if (mapRef.current) {
-      mapRef.current.panTo({ lat, lng });
-      mapRef.current.setZoom(15);
-    }
-  };
-
-  const handleMarkerClick = (id: string) => {
-    setSelectedMarker(id);
-    panToLocation(
-      coordinates.find((coord) => coord.id === id)?.lat || center.lat,
-      coordinates.find((coord) => coord.id === id)?.lng || center.lng
-    );
-  };
-
-  useEffect(() => {
-    const getMerchantCoordinates = async () => {
-      if (merchants.length > 0) {
-        const coords = await Promise.all(
-          merchants.map(async (merchant) => {
+    useEffect(() => {
+        const fetchProducts = async () => {
             try {
-              const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchant}`
-              );
-              const data = response.data;
-              return {
-                id: data.merchantId,
-                name: data.name,
-                lat: data.latitude,
-                lng: data.longitude,
-              };
-            } catch (error) {
-              console.error("Error fetching merchant coordinates:", error);
-              return null;
-            }
-          })
-        );
+                const dummyProducts = [
+                    {
+                        productId: "1",
+                        productName: "Dummy Product 1",
+                        productDescription: "Description for Dummy Product 1",
+                        imageUrl: "https://via.placeholder.com/150",
+                        merchantId: "merchant1",
+                        originalPrice: "20.00",
+                        listingPrice: "15.00",
+                    },
+                    {
+                        productId: "2",
+                        productName: "Dummy Product 2",
+                        productDescription: "Description for Dummy Product 2",
+                        imageUrl: "https://via.placeholder.com/150",
+                        merchantId: "merchant2",
+                        originalPrice: "30.00",
+                        listingPrice: "25.00",
+                    },
+                    {
+                        productId: "3",
+                        productName: "Dummy Product 3",
+                        productDescription: "Description for Dummy Product 3",
+                        imageUrl: "https://via.placeholder.com/150",
+                        merchantId: "merchant3",
+                        originalPrice: "40.00",
+                        listingPrice: "35.00",
+                    },
+                ];
+                setProducts(dummyProducts);
+                const merchantIds = dummyProducts.map((product) => product.merchantId);
+                const uniqueMerchantIds = Array.from(new Set(merchantIds));
+                setMerchants(uniqueMerchantIds);
 
-        const validCoords = coords.filter((coord) => coord !== null);
-        setCoordinates((prevCoords) => [...prevCoords, ...validCoords]);
-      }
+                const initialQuantities = {};
+                dummyProducts.forEach((product) => {
+                    initialQuantities[product.productId] = 0;
+                });
+                setProductQuantities(initialQuantities);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
+        };
+
+        fetchProducts();
+    }, [categoryId, maxPrice, minPrice, pincode, searchText]);
+
+    const handleQuantityChange = (productId, newValue) => {
+        setProductQuantities((prev) => ({
+            ...prev,
+            [productId]: newValue,
+        }));
     };
 
-    getMerchantCoordinates();
-  }, [merchants]);
+    const addToCart = async (product) => {
+        const quantity = productQuantities[product.productId];
+        if (quantity <= 0) {
+            toast.current?.show({
+                severity: "warn",
+                summary: "Warning",
+                detail: "Please select a quantity greater than 0",
+                life: 3000,
+            });
+            return;
+        }
 
-  const header = (imageUrl: string): JSX.Element => (
-    <Image alt="Card" src={imageUrl} />
-  );
-
-  const footer = (product: Product): JSX.Element => (
-    <div className="flex">
-      <div className="mt-7">
-        <Button
-          label="Add To Cart"
-          icon="pi pi-shopping-cart"
-          onClick={() => addToCart(product)}
-        />
-      </div>
-      <div className="ml-2">
-        <Knob
-          value={productQuantities[product.productId]}
-          size={60}
-          className="ml-4"
-          onChange={(e) => handleQuantityChange(product.productId, e.value)}
-        />
-        <div className="flex gap-2">
-          <Button
-            icon="pi pi-plus"
-            onClick={() =>
-              handleQuantityChange(
-                product.productId,
-                Math.min(productQuantities[product.productId] + 1, 100)
-              )
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/addToCart/${userId}/merchant/${product.merchantId}`,
+                {
+                    productId: product.productId,
+                    quantity,
+                    price: product.listingPrice,
+                }
+            );
+            if (response.status === 200) {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `Added ${quantity} ${product.productName} to cart`,
+                    life: 3000,
+                });
+                handleQuantityChange(product.productId, 0);
             }
-            disabled={productQuantities[product.productId] === 100}
-          />
-          <Button
-            icon="pi pi-minus"
-            onClick={() =>
-              handleQuantityChange(
-                product.productId,
-                Math.max(productQuantities[product.productId] - 1, 0)
-              )
-            }
-            disabled={productQuantities[product.productId] === 0}
-          />
-        </div>
-      </div>
-    </div>
-  );
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-  return (
-    <div>
-      <Toast ref={toast} />
-      <FilterSearch />
-      <div className="grid">
-        <div className="col-6">
-          <div className="grid">
-            {products.map((product, id) => (
-              <div className="col-6" key={id}>
-                <Card
-                  header={header(product.imageUrl)}
-                  footer={footer(product)}
-                >
-                  <h2>{product.productName}</h2>
-                  <p className="m-0">{product.productDescription}</p>
-                  <p className="mt-4">
-                    <b>SGD {product.listingPrice}</b>
-                  </p>
-                </Card>
-              </div>
-            ))}
-          </div>
-          <div className="card">
-            <Paginator
-              first={first}
-              rows={rows}
-              totalRecords={products.length}
-              onPageChange={onPageChange}
-              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-            />
-          </div>
-        </div>
-        <div className="col-6">
-          <Card style={{ height: "124.5vh" }}>
-            {!isLoaded ? (
-              <ProgressSpinner
-                style={{ width: "50px", height: "50px" }}
-                strokeWidth="8"
-                fill="var(--surface-ground)"
-                animationDuration=".5s"
-              />
-            ) : (
-              <div className="grid" style={{ marginTop: "20vh" }}>
-                <div className="col-7">
-                  <GoogleMap
-                    zoom={15}
-                    center={center}
-                    mapContainerStyle={{ width: "400px", height: "400px" }}
-                    onLoad={(map) => {
-                      mapRef.current = map;
-                    }}
-                    options={{
-                      streetViewControl: false,
-                      fullscreenControl: false,
-                      disableDefaultUI: true,
-                      zoomControl: true,
-                      mapTypeControl: false,
-                      scaleControl: false,
-                    }}
-                  >
-                    {coordinates.map((position) => (
-                      <Marker
-                        key={position.id}
-                        position={{ lat: position.lat, lng: position.lng }}
-                        onClick={() => handleMarkerClick(position.id)}
-                      />
-                    ))}
+    const onPageChange = (event) => {
+        setFirst(event.first);
+    };
 
-                    {selectedMarker &&
-                      coordinates.map((location) =>
-                        selectedMarker === location.id ? (
-                          <InfoWindow
-                            key={location.id}
-                            position={{ lat: location.lat, lng: location.lng }}
-                            onCloseClick={() => setSelectedMarker(null)}
-                          >
-                            <div>
-                              <small>{location.name}</small>
-                              <br />
-                              <a
-                                href={`https://www.google.com/maps?q=@${location.lat},${location.lng}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                View Directions on Google Maps
-                              </a>
-                            </div>
-                          </InfoWindow>
-                        ) : null
-                      )}
-                  </GoogleMap>
-                </div>
-                <div
-                  className="col-4 mt-2 overflow-scroll"
-                  style={{
-                    border: "1px solid",
-                    height: "400px",
-                    marginLeft: "5px",
-                  }}
-                >
-                  <ul>
-                    {coordinates.map((position) => (
-                      <li
-                        key={position.id}
-                        onClick={() =>
-                          panToLocation(position.lat, position.lng)
+    const getCurrentPageProducts = () => {
+        return products.slice(first, first + rows);
+    };
+
+    // Map-related logic
+    const { isLoaded } = useJsApiLoader({
+        id: "google-map-script",
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    });
+
+    const mapRef = useRef(null);
+    const center = {
+        lat: 1.31901,
+        lng: 103.884983,
+    };
+
+    const panToLocation = (lat, lng) => {
+        if (mapRef.current) {
+            mapRef.current.panTo({ lat, lng });
+            mapRef.current.setZoom(15);
+        }
+    };
+
+    const handleMarkerClick = (id) => {
+        setSelectedMarker(id);
+        panToLocation(
+            coordinates.find((coord) => coord.id === id)?.lat || center.lat,
+            coordinates.find((coord) => coord.id === id)?.lng || center.lng
+        );
+    };
+
+    useEffect(() => {
+        const getMerchantCoordinates = async () => {
+            if (merchants.length > 0) {
+                const coords = await Promise.all(
+                    merchants.map(async (merchant) => {
+                        try {
+                            const response = await axios.get(
+                                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchant}`
+                            );
+                            const data = response.data;
+                            return {
+                                id: data.merchantId,
+                                name: data.name,
+                                lat: data.latitude,
+                                lng: data.longitude,
+                            };
+                        } catch (error) {
+                            console.error("Error fetching merchant coordinates:", error);
+                            return null;
                         }
-                        className="cursor-pointer"
-                      >
-                        {position.name}
-                      </li>
-                    ))}
-                  </ul>
+                    })
+                );
+                const validCoords = coords.filter((coord) => coord !== null);
+                setCoordinates(validCoords);
+            }
+        };
+
+        getMerchantCoordinates();
+    }, [merchants]);
+
+    return (
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+            {/* Main Content */}
+            <div className="grid flex-grow-1">
+                {/* Left Section: Products */}
+                <div className="col-12 md:col-8">
+                    <Toast ref={toast} />
+                    <div className="grid">
+                        {getCurrentPageProducts().map((product, id) => (
+                            <div key={id} className="col-12 md:col-6 lg:col-3">
+                                <Card>
+                                    <Image src={product.imageUrl} alt={product.productName} width="100%" />
+                                    <h3>{product.productName}</h3>
+                                    <p>{product.productDescription}</p>
+                                    <p>SGD {product.listingPrice}</p>
+                                    <Knob
+                                        value={productQuantities[product.productId] || 0}
+                                        onChange={(e) =>
+                                            handleQuantityChange(product.productId, e.value)
+                                        }
+                                        min={0}
+                                        max={100}
+                                        size={100}
+                                    />
+                                    <Button
+                                        label="Add to Cart"
+                                        onClick={() => addToCart(product)}
+                                    />
+                                </Card>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            )}
-          </Card>
+
+                {/* Right Section: Map */}
+                <div className="col-12 md:col-4">
+                    {!isLoaded ? (
+                        <ProgressSpinner />
+                    ) : (
+                        <GoogleMap
+                            mapContainerStyle={{ height: "400px", width: "100%" }}
+                            center={center}
+                            zoom={12}
+                            onLoad={(map) => (mapRef.current = map)}
+                            options={{
+                                streetViewControl: false,
+                                fullscreenControl: false,
+                                disableDefaultUI: true,
+                                zoomControl: true,
+                                mapTypeControl: false,
+                                scaleControl: false,
+                            }}
+                        >
+                            {coordinates.map((position) => (
+                                <Marker
+                                    key={position.id}
+                                    position={{ lat: position.lat, lng: position.lng }}
+                                    onClick={() => handleMarkerClick(position.id)}
+                                />
+                            ))}
+                            {selectedMarker &&
+                                coordinates
+                                    .filter((location) => location.id === selectedMarker)
+                                    .map((location) => (
+                                        <InfoWindow
+                                            key={location.id}
+                                            position={{ lat: location.lat, lng: location.lng }}
+                                            onCloseClick={() => setSelectedMarker(null)}
+                                        >
+                                            <div>
+                                                <h4>{location.name}</h4>
+                                                <p>View Directions on Google Maps</p>
+                                            </div>
+                                        </InfoWindow>
+                                    ))}
+                        </GoogleMap>
+                    )}
+                </div>
+            </div>
+
+            {/* Paginator at the Bottom */}
+            <div
+                className="flex justify-content-center align-items-center"
+                style={{
+                    padding: "1rem",
+                    background: "#fff",
+                    boxShadow: "0 -2px 5px rgba(0,0,0,0.1)",
+                    position: "sticky",
+                    bottom: "0",
+                    zIndex: 10,
+                }}
+            >
+                <Paginator
+                    first={first}
+                    rows={rows}
+                    totalRecords={products.length}
+                    onPageChange={onPageChange}
+                />
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Page;
