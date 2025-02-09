@@ -195,6 +195,11 @@ const Page = () => {
 
     return (
         <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+            {/* Filter Search Section */}
+            <div className="col-12">
+                <FilterSearch />
+            </div>
+
             {/* Main Content */}
             <div className="grid flex-grow-1">
                 {/* Left Section: Products */}
