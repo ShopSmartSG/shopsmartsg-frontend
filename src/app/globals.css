@@ -15,7 +15,7 @@ label{
 
 body{
     margin: 0px;
-   
+
 }
 .col-6{
     width: 48% !important;
@@ -27,4 +27,12 @@ body{
 
 .col-10{
     width: 68% !important;
+}
+
+@media screen and (min-width: 650px) {
+    .md\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 24%;
+    }
 }
