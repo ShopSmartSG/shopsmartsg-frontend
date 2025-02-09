@@ -45,8 +45,13 @@ const getActiveIndexForDelivery = (status) => {
   }
 };
 
-const userId = localStorage.getItem("userId");
-const userType = localStorage.getItem("userType");
+let userId, userType;
+try {
+  userId = localStorage.getItem("userId");
+  userType = localStorage.getItem("userType");
+} catch (error) {
+  console.error("Error accessing localStorage", error);
+}
 
 const OrderCard = ({ order, isDelivery }) => {
   const [merchantDetails, setMerchantDetails] = useState(null);

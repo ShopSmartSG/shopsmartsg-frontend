@@ -4,7 +4,13 @@ import React, { useEffect,useState } from 'react'
 
 const Page = () => {
 
-    const userId = localStorage.getItem("userId");
+    let userId;
+    try {
+        userId = localStorage.getItem("userId");
+    } catch (error) {
+        console.error("Error accessing localStorage:", error);
+        userId = null;
+    }
     const [merchantDetails, setMerchantDetails] = useState(null);
 
     useEffect(() => {

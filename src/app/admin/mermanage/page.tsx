@@ -22,7 +22,7 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import {CustomerService, getStaticProps} from "../services/CustomerService"
+import { getStaticProps} from "../services/CustomerService"
 import { Toast } from "primereact/toast"
 
 interface Representative {
@@ -137,13 +137,13 @@ export default function AdvancedFilterDemo() {
     }
   };
   const toast = useRef(null);
-  useEffect(() => {
-    CustomerService.getCustomersMedium().then((data: Customer[]) => {
-      setCustomers(getCustomers(data));
-      setLoading(false);
-    });
-    initFilters();
-  }, []);
+  // useEffect(() => {
+  //   CustomerService.getCustomersMedium().then((data: Customer[]) => {
+  //     setCustomers(getCustomers(data));
+  //     setLoading(false);
+  //   });
+  //   initFilters();
+  // }, []);
 
   const getCustomers = (data: Customer[]) => {
     return [...(data || [])].map((d) => {

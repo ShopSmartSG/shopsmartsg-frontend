@@ -123,7 +123,12 @@ const Page: React.FC = () => {
     }
   };
 
-  const userId = localStorage.getItem('userId');
+  let userId;
+  try {
+    userId = localStorage.getItem('userId');
+  } catch (error) {
+    console.error('Error retrieving userId from localStorage:', error);
+  }
 
 
   const accept = async () => {
@@ -219,8 +224,14 @@ const Page: React.FC = () => {
   const [usetType, SetUserType] = useState('');
 
   useEffect(() => {
-    const userType = localStorage.getItem("USER_TYPE");
-    SetUserType(userType);
+    try {
+      const userType = localStorage.getItem("USER_TYPE");
+      SetUserType(userType);
+    } catch (error) {
+      console.error('Error retrieving USER_TYPE from localStorage:', error);
+      SetUserType("");
+    }
+
   }, []);
 
   if (session == '' || session == null || session == undefined) {

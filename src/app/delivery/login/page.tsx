@@ -31,9 +31,13 @@ const EmailOtpForm = () => {
   const { setAdminData, setUserTyped } = useAdminContext();
 
 
-  const userId = localStorage.getItem("userId");
-  const userType = localStorage.getItem("userType");
-
+  let userId, userType;
+try {
+  userId = localStorage.getItem("userId");
+  userType = localStorage.getItem("userType");
+} catch (error) {
+  console.error("Error accessing localStorage: ", error);
+}
   useEffect(() => {
     let interval;
     if (resendDisabled) {

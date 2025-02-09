@@ -36,7 +36,12 @@ const Page = () => {
     originalPrice: string;
     listingPrice: string;
   }
-  const userId = localStorage.getItem("userId");
+ let userId: string | null = null;
+  try {
+    userId = localStorage.getItem("userId");
+  } catch (error) {
+    console.error("Error accessing localStorage:", error);
+  }
   // const userType = localStorage.getItem("userType");
   interface ProductQuantity {
     [key: string]: number;

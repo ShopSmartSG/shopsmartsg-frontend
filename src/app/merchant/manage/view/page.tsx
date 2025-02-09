@@ -42,8 +42,13 @@ const ProductCatalog = () => {
   
   };
 
-  const userId = localStorage.getItem("userId");
-  const userTyped = localStorage.getItem("userType");
+  let userId, userTyped;
+  try {
+    userId = localStorage.getItem("userId");
+    userTyped = localStorage.getItem("userType");
+  } catch (error) {
+    console.error("Error accessing localStorage:", error);
+  }
 
   const router = useRouter();
   const handleUpdateClick = (product) => {

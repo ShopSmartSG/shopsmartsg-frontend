@@ -66,8 +66,13 @@ const defaultFilters: DataTableFilterMeta = {
 
 export default function AdvancedFilterDemo() {
   const [customers, setCustomers] = useState([]);
-  const userType = localStorage.getItem('userType');
-  const userId = localStorage.getItem('userId');
+  let userType, userId;
+  try {
+    userType = localStorage.getItem('userType');
+    userId = localStorage.getItem('userId');
+  } catch (error) {
+    console.error('Error accessing localStorage', error);
+  }
 
   const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(false);

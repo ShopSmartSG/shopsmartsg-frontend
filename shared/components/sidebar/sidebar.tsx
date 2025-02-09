@@ -23,7 +23,15 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const [name, setName] = useState("");
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    let userId;
+    try{
+        userId = localStorage.getItem("userId");
+    }
+    catch(error){
+        console.error("Error retrieving userId from localStorage", error);
+        userId = null
+    }
+
 
     const fetchUsername = async () => {
       try {

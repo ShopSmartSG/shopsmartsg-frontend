@@ -53,8 +53,13 @@ const Page: React.FC = () => {
     setEditDetailsEnable(true);
   };
 
-  const userType = localStorage.getItem('userType');
-  const userId = localStorage.getItem('userId');
+ let userType, userId;
+  try {
+    userType = localStorage.getItem('userType');
+    userId = localStorage.getItem('userId');
+  } catch (error) {
+    console.error('Error accessing localStorage:', error);
+  }
 
   const confirm1 = () => {
     confirmDialog({
