@@ -28,10 +28,3 @@ body{
 .col-10{
     width: 68% !important;
 }
-@media screen and (min-width: 768px) {
-    .md\:col-4 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 31.3333%;
-    }
-}
