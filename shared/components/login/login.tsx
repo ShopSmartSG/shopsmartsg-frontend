@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { FloatLabel } from "primereact/floatlabel";
@@ -8,6 +7,8 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dialog } from "primereact/dialog";
+import { InputOtp } from "primereact/inputotp";
 import "./login.css";
 
 const Login = () => {
@@ -17,7 +18,9 @@ const Login = () => {
     const [isOtpGenerated, setIsOtpGenerated] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
-    const toast = React.useRef(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toast = useRef(null);
 
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,7 +36,6 @@ const Login = () => {
             });
             return;
         }
-
         if (!password) {
             toast.current.show({
                 severity: "error",
@@ -48,6 +50,7 @@ const Login = () => {
         setTimeout(() => {
             setShowLoader(false);
             setIsOtpGenerated(true);
+            setIsModalOpen(true); // Open the modal after OTP generation
             toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -75,15 +78,41 @@ const Login = () => {
                 summary: "Success",
                 detail: "Login successful!",
             });
+            setIsModalOpen(false); // Close the modal after successful login
         }, 2000);
     };
+
+    const handleResendOTP = () => {
+        setOtp(""); // Reset OTP
+        toast.current.show({
+            severity: "info",
+            summary: "Info",
+            detail: "OTP has been reset. Please generate a new one.",
+        });
+    };
+
+    const footerContent = (
+        <div className="flex justify-content-between">
+            <Button
+                label="Resend OTP"
+                icon="pi pi-refresh"
+                onClick={handleResendOTP}
+                className="p-button-text"
+            />
+            <Button
+                label="Login"
+                icon="pi pi-check"
+                onClick={handleLogin}
+                disabled={!otp}
+            />
+        </div>
+    );
 
     return (
         <div className="flex justify-content-center align-items-center min-h-screen">
             <Card title="Login" className="w-full md:w-30rem shadow-2">
                 <Toast ref={toast} />
                 <div className="grid">
-
                     <div className="col-12">
                         <FloatLabel>
                             <InputText
@@ -121,35 +150,35 @@ const Login = () => {
                             </div>
                         )}
                     </div>
-                    {isOtpGenerated && (
-                        <>
-                            <div className="col-12 mt-4">
-                                <FloatLabel>
-                                    <InputText
-                                        id="otp"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                        className="w-full"
-                                    />
-                                    <label htmlFor="otp">Enter OTP</label>
-                                </FloatLabel>
-                            </div>
-                            <div className="col-12 mt-4">
-                                <Button
-                                    label="Login"
-                                    className="w-full"
-                                    onClick={handleLogin}
-                                    disabled={!otp}
-                                />
-                                {isLoading && (
-                                    <div className="flex justify-content-center mt-3">
-                                        <ProgressSpinner style={{ width: "50px", height: "50px" }} />
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
                 </div>
+
+                {/* OTP Modal */}
+                <Dialog
+                    header="Enter OTP"
+                    draggable={false}
+                    dismissableMask={true}
+
+                    visible={isModalOpen}
+                    onHide={() => setIsModalOpen(false)}
+                    footer={footerContent}
+                    style={{ width: "30vw" }
+                }
+                >
+                    <div className="flex flex-column gap-3">
+                        <InputOtp
+                            value={otp}
+                            onChange={(e) => setOtp(e.value.toString())}
+                            length={6}
+                            className="w-full"
+                            mask={true}
+                        />
+                        {isLoading && (
+                            <div className="flex justify-content-center mt-3">
+                                <ProgressSpinner style={{ width: "50px", height: "50px" }} />
+                            </div>
+                        )}
+                    </div>
+                </Dialog>
             </Card>
         </div>
     );
