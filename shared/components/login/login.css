@@ -1,0 +1,8 @@
+.p-icon-field-right > .p-inputtext{
+    padding-right: 2.5rem;
+    width: 100% !important;
+}
+.p-icon-field {
+    position: relative;
+    width: 100%;
+}

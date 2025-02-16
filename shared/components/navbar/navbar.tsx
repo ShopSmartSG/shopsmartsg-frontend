@@ -290,12 +290,7 @@ export default function Navbar() {
       url: "/merchant",
       template: itemRenderer,
     },
-    {
-      label: "Admin",
-      icon: "pi pi-user",
-      url: "/admin",
-      template: itemRenderer,
-    },
+
     {
       label: "Orders",
       icon: "pi pi-gift",
