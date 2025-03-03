@@ -36,14 +36,7 @@ const Login = () => {
             });
             return;
         }
-        if (!password) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Password cannot be empty.",
-            });
-            return;
-        }
+
 
         // Simulate OTP generation with a loader
         setShowLoader(true);
@@ -65,6 +58,15 @@ const Login = () => {
                 severity: "error",
                 summary: "Error",
                 detail: "Please enter the OTP.",
+            });
+            return;
+        }
+
+        if (!password) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Please enter the password.",
             });
             return;
         }
@@ -103,7 +105,7 @@ const Login = () => {
                 label="Login"
                 icon="pi pi-check"
                 onClick={handleLogin}
-                disabled={!otp}
+                disabled={!otp || !password}
             />
         </div>
     );
@@ -124,25 +126,12 @@ const Login = () => {
                             <label htmlFor="username">Email ID</label>
                         </FloatLabel>
                     </div>
-                    <div className="col-12 mt-3">
-                        <FloatLabel>
-                            <Password
-                                inputId="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                toggleMask
-                                feedback={false}
-                                className="w-full"
-                            />
-                            <label htmlFor="password">Password</label>
-                        </FloatLabel>
-                    </div>
                     <div className="col-12 mt-4">
                         <Button
                             label="Generate OTP"
                             className="w-full p-button-outlined"
                             onClick={handleGenerateOTP}
-                            disabled={!email || !password}
+                            disabled={!email}
                         />
                         {showLoader && (
                             <div className="flex justify-content-center mt-3">
@@ -152,12 +141,13 @@ const Login = () => {
                     </div>
                 </div>
 
-                {/* OTP Modal */}
-                <Dialog
-                    header="Enter OTP"
-                    draggable={false}
-                    dismissableMask={true}
 
+                <Dialog
+                    header="Login"
+                    draggable={false}
+
+                    dismissableMask={true}
+                    resizable={false}
                     visible={isModalOpen}
                     onHide={() => setIsModalOpen(false)}
                     footer={footerContent}
@@ -165,13 +155,31 @@ const Login = () => {
                 }
                 >
                     <div className="flex flex-column gap-3">
-                        <InputOtp
-                            value={otp}
-                            onChange={(e) => setOtp(e.value.toString())}
-                            length={6}
-                            className="w-full"
-                            mask={true}
-                        />
+                        <div className="col-12 mt-3">
+                            <FloatLabel>
+                                <Password
+                                    inputId="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    toggleMask
+                                    feedback={false}
+                                    className="w-full"
+                                />
+                                <label htmlFor="password">Password</label>
+                            </FloatLabel>
+                        </div>
+                        <div className={"col-12 mt-3 mx-3"}>
+                            <div className="field">
+                                <label htmlFor="otp">OTP</label>
+                                <InputOtp
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.value.toString())}
+                                    length={6}
+                                    className="w-full"
+                                    mask={true}
+                                />
+                            </div>
+                        </div>
                         {isLoading && (
                             <div className="flex justify-content-center mt-3">
                                 <ProgressSpinner style={{ width: "50px", height: "50px" }} />

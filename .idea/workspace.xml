@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a0d78722-0b7d-46d4-8155-0c1fb02e7fda" name="Changes" comment="Responsive For the Merchant Products Page">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/add/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/admin.main.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/login/login.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/login/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/mermanage/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/services/CustomerService.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/update/page.tsx" beforeDir="false" />
+    <list default="true" id="a0d78722-0b7d-46d4-8155-0c1fb02e7fda" name="Changes" comment="Login Component Added Styles">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/components/login/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/shared/components/login/login.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,14 +43,32 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
     "ts.external.directory.path": "/Users/aakashdarsi/Downloads/shopsmartsg-frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157" />
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-WS-243.24978.60" />
       </set>
     </attachedChunks>
   </component>
@@ -69,6 +81,9 @@
       <option name="presentableId" value="Default" />
       <updated>1739076419990</updated>
       <workItem from="1739076421043" duration="1711000" />
+      <workItem from="1739920208239" duration="36000" />
+      <workItem from="1739920258773" duration="26000" />
+      <workItem from="1740977258139" duration="1248000" />
     </task>
     <task id="LOCAL-00001" summary="Responsive For the Front Page">
       <option name="closed" value="true" />
