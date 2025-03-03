@@ -127,7 +127,7 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 onBlur={(e) => blurHandler(e.target.value)}
-                                invalid={emailError == "" ? false : true}
+                                invalid={emailError != ""}
                                 placeholder="Please Enter your Valid Email"
                                 style={{width: "476px", display: "block"}}
                             />
@@ -164,7 +164,7 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                                 label="Next"
                                 type="submit"
                                 style={{width: "80px"}}
-                                disabled={emailError == "" ? false : true}
+                                disabled={emailError != ""}
                             />
                         </div>
                     </form>

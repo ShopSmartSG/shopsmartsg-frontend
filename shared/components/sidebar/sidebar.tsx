@@ -13,7 +13,7 @@ interface HeadlessDemoProps {
   onHide: () => void;
 }
 
-export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
+export default ({visible, onHide}: HeadlessDemoProps) => {
   // Create unique refs for each dropdown
   const favoritesRef = useRef(null);
   const merchantRef = useRef(null);
