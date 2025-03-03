@@ -102,6 +102,22 @@ const Login = () => {
         });
     };
 
+    const handleGoogleSignIn = () => {
+        toast.current.show({
+            severity: "info",
+            summary: "Info",
+            detail: "Redirecting to Google for authentication...",
+        });
+        // Simulate Google Sign-In process
+        setTimeout(() => {
+            toast.current.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Signed in successfully via Google!",
+            });
+        }, 2000);
+    };
+
     const footerContent = (
         <div className="flex justify-content-between">
             <Button
@@ -166,6 +182,7 @@ const Login = () => {
                             </div>
                         )}
                     </div>
+
                 </div>
 
                 <Dialog

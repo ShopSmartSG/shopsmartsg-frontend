@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import Login from "../../../shared/components/login/login";
+import Login from "../../../shared/components/login/Login";
 
 
 

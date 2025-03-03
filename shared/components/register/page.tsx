@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {Button} from "primereact/button";
 import {InputText} from "primereact/inputtext";
 import {Dialog} from "primereact/dialog";
@@ -12,6 +12,7 @@ import {InputOtp} from "primereact/inputotp";
 import { Password } from 'primereact/password';
 
 import "./register.css";
+import {Checkbox} from "primereact/checkbox";
 
 interface RegisterFormProps {
     type?: string
@@ -25,6 +26,8 @@ const RegisterForm = ({type}: RegisterFormProps) => {
     const [addressLine1, setAddressLine1] = useState("");
     const [addressLine2, setAddressLine2] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
     const [otpError, setOtpError] = useState(false);
     const [pinCode, setPinCode] = useState("");
     const [showOtpDialog, setShowOtpDialog] = useState(false);
@@ -53,7 +56,23 @@ const RegisterForm = ({type}: RegisterFormProps) => {
 
         return () => clearInterval(interval);
     }, [resendDisabled]);
-
+    const policyDialogContent = (
+        <div className="policy-dialog-content">
+            <p>
+                This Privacy Policy outlines how we collect, use, and protect your personal information.
+                By agreeing to these terms, you acknowledge that:
+            </p>
+            <ul>
+                <li>We will only use your data for legitimate purposes.</li>
+                <li>Your data will be stored securely and not shared with third parties.</li>
+                <li>You have the right to request access, correction, or deletion of your data.</li>
+            </ul>
+            <p>
+                For more details, please contact our support team at{" "}
+                <a href="mailto:support@shopsmartsg.com">support@shopsmartsg.com</a>.
+            </p>
+        </div>
+    );
     const handleEmailSubmit = (e) => {
         e.preventDefault();
         setEmailError("");
@@ -201,7 +220,26 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                         />
                     )}
                 </div>
-                <div className="flex flex-row flex-wrap">
+                <div className="col-12 mt-3">
+                    <div className="flex align-items-center">
+                        <Checkbox
+                            inputId="terms"
+                            checked={termsAccepted}
+                            onChange={(e) => setTermsAccepted(e.checked)}
+                        />
+                        <label htmlFor="terms" className="ml-2">
+                            I have read and agree to the{" "}
+                            <span
+                                style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+                                onClick={() => setIsPolicyDialogOpen(true)}
+                            >
+                                        Privacy and PII Policy
+                                    </span>
+                            .
+                        </label>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap my-2">
                     <div>
                         <Button
                             label="Submit"
@@ -223,6 +261,15 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                         <Message severity="info" text="OTP will expire in 30 seconds"/>
                     </div>
                 )}
+            </Dialog>
+            <Dialog
+                header="Privacy and PII Policy"
+                visible={isPolicyDialogOpen}
+                onHide={() => setIsPolicyDialogOpen(false)}
+                closeIcon={false}
+                style={{ width: "50vw" }}
+            >
+                {policyDialogContent}
             </Dialog>
             <Toast ref={toast}/>
         </div>
