@@ -13,11 +13,10 @@ interface HeadlessDemoProps {
   onHide: () => void;
 }
 
-export default ({visible, onHide}: HeadlessDemoProps) => {
+export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   // Create unique refs for each dropdown
   const favoritesRef = useRef(null);
   const merchantRef = useRef(null);
-  const revenueRef = useRef(null);
   const customerRef = useRef(null);
 
   const [name, setName] = useState("");
