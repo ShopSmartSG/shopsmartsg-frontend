@@ -1,7 +1,13 @@
 appId: shopsmartsg
 region: asia-east1  # Use the region shown in your output
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 50
+  cpu: 1
+  memoryMiB: 512
 routes:
   - source: '**'
     destination: '/'
 envVars:
-  NEXT_PUBLIC_MAP: ${secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
