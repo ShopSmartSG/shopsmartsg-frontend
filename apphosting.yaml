@@ -4,4 +4,4 @@ routes:
   - source: '**'
     destination: '/'
 envVars:
-  NEXT_PUBLIC_MAP: ${secrets.NEXT_PUBLIC_MAP}
+  NEXT_PUBLIC_MAP: ${secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
