@@ -1,0 +1,7 @@
+appId: shopsmartsg
+region: asia-east1  # Use the region shown in your output
+routes:
+  - source: '**'
+    destination: '/'
+envVars:
+  NEXT_PUBLIC_MAP: ${secrets.NEXT_PUBLIC_MAP}
