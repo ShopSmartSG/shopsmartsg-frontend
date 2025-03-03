@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
+    "@serwist/next": "^9.0.11",
     "axios": "^1.7.7",
     "cookies-next": "^4.3.0",
     "formik": "^2.4.6",
@@ -32,6 +33,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
+    "serwist": "^9.0.11",
     "typescript": "^5"
   }
 }

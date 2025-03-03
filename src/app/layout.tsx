@@ -7,6 +7,7 @@ import Navbar from '../../shared/components/navbar/navbar';
 import { AdminProvider } from "@/context/AdminContext";
 import { getSession } from "@/lib";
 import { SessionProvider as CustomSessionProvider } from "@/context/SessionContext";
+import ServiceWorkerRegistration from '../../shared/components/ServiceWorkerRegistration';
 export const metadata: Metadata = {
   title: "ShopSmart",
   description: 'ShopSmart is a advanced application which helps to screen through the all the stores and give you the best price for what you want',
@@ -29,6 +30,7 @@ export default async function RootLayout({
           <PrimeReactProvider>
             <CustomSessionProvider session={session}>
               <Navbar />
+              <ServiceWorkerRegistration />
               
               <div className="p-2 surface-ground">{children}</div>
             </CustomSessionProvider>
