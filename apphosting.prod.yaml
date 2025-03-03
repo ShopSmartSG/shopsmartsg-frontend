@@ -10,7 +10,7 @@ routes:
   - source: '**'
     destination: '/'
 env:
--   variable: NEXT_PUBLIC_STORAGE_BUCKET
+-   variable: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     secret: projects/461501268972/secrets/NEXT_PUBLIC_GOOGLE_MAPS_API_KEY/versions/1
     availability:
     -   BUILD
