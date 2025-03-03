@@ -13,7 +13,6 @@
     "@serwist/next": "^9.0.11",
     "axios": "^1.7.7",
     "cookies-next": "^4.3.0",
-    "cross-spawn": "^7.0.6",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "js-cookies": "^1.0.4",
