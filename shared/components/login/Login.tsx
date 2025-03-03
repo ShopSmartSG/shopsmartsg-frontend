@@ -1,19 +1,23 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { Card } from "primereact/card";
-import { InputText } from "primereact/inputtext";
-import { FloatLabel } from "primereact/floatlabel";
-import { Password } from "primereact/password";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { ProgressSpinner } from "primereact/progressspinner";
-import { Dialog } from "primereact/dialog";
-import { InputOtp } from "primereact/inputotp";
-import { Checkbox } from "primereact/checkbox";
+import React, {useState, useRef} from "react";
+import {Card} from "primereact/card";
+import {InputText} from "primereact/inputtext";
+import {FloatLabel} from "primereact/floatlabel";
+import {Password} from "primereact/password";
+import {Button} from "primereact/button";
+import {Toast} from "primereact/toast";
+import {ProgressSpinner} from "primereact/progressspinner";
+import {Dialog} from "primereact/dialog";
+import {InputOtp} from "primereact/inputotp";
+import {Checkbox} from "primereact/checkbox";
 import validator from "validator";
 import "./login.css";
 
-const Login = () => {
+interface LoginProps {
+    type?: string
+}
+
+const Login = ({type}: LoginProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [otp, setOtp] = useState("");
@@ -155,8 +159,8 @@ const Login = () => {
 
     return (
         <div className="flex justify-content-center align-items-center min-h-screen">
-            <Card title="Login" className="w-full md:w-30rem shadow-2">
-                <Toast ref={toast} />
+            <Card title={type+" Login"} className="w-full md:w-30rem shadow-2">
+                <Toast ref={toast}/>
                 <div className="grid">
                     <div className="col-12">
                         <FloatLabel>
@@ -171,6 +175,14 @@ const Login = () => {
                     </div>
                     <div className="col-12 mt-4">
                         <Button
+                            label="Sign In with Google"
+                            icon="pi pi-google"
+                            className="w-full p-button-outlined p-button-secondary"
+                            onClick={handleGoogleSignIn}
+                        />
+                    </div>
+                    <div className="col-12 mt-4">
+                        <Button
                             label="Generate OTP"
                             className="w-full p-button-outlined"
                             onClick={handleGenerateOTP}
@@ -178,7 +190,7 @@ const Login = () => {
                         />
                         {showLoader && (
                             <div className="flex justify-content-center mt-3">
-                                <ProgressSpinner style={{ width: "50px", height: "50px" }} />
+                                <ProgressSpinner style={{width: "50px", height: "50px"}}/>
                             </div>
                         )}
                     </div>
@@ -193,7 +205,7 @@ const Login = () => {
                     visible={isModalOpen}
                     onHide={() => setIsModalOpen(false)}
                     footer={footerContent}
-                    style={{ width: "30vw" }}
+                    style={{width: "30vw", height: "auto"}}
                 >
                     <div className="flex flex-column gap-3">
                         <div className="col-12 mt-3">
@@ -231,7 +243,7 @@ const Login = () => {
                                 <label htmlFor="terms" className="ml-2">
                                     I have read and agree to the{" "}
                                     <span
-                                        style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+                                        style={{color: "blue", cursor: "pointer", textDecoration: "underline"}}
                                         onClick={() => setIsPolicyDialogOpen(true)}
                                     >
                                         Privacy and PII Policy
@@ -242,7 +254,7 @@ const Login = () => {
                         </div>
                         {isLoading && (
                             <div className="flex justify-content-center mt-3">
-                                <ProgressSpinner style={{ width: "50px", height: "50px" }} />
+                                <ProgressSpinner style={{width: "50px", height: "50px"}}/>
                             </div>
                         )}
                     </div>
@@ -253,7 +265,7 @@ const Login = () => {
                     visible={isPolicyDialogOpen}
                     onHide={() => setIsPolicyDialogOpen(false)}
                     closeIcon={false}
-                    style={{ width: "50vw" }}
+                    style={{width: "50vw"}}
                 >
                     {policyDialogContent}
                 </Dialog>
