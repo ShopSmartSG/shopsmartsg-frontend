@@ -9,5 +9,9 @@ runConfig:
 routes:
   - source: '**'
     destination: '/'
-envVars:
-  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+env:
+-   variable: NEXT_PUBLIC_STORAGE_BUCKET
+    secret: projects/461501268972/secrets/NEXT_PUBLIC_GOOGLE_MAPS_API_KEY/versions/1
+    availability:
+    -   BUILD
+    -   RUNTIME
