@@ -9,6 +9,8 @@ import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Dialog } from "primereact/dialog";
 import { InputOtp } from "primereact/inputotp";
+import { Checkbox } from "primereact/checkbox";
+import validator from "validator";
 import "./login.css";
 
 const Login = () => {
@@ -19,12 +21,13 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
 
     const toast = useRef(null);
 
     const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        return validator.isEmail(email);
     };
 
     const handleGenerateOTP = () => {
@@ -37,8 +40,6 @@ const Login = () => {
             return;
         }
 
-
-        // Simulate OTP generation with a loader
         setShowLoader(true);
         setTimeout(() => {
             setShowLoader(false);
@@ -53,6 +54,15 @@ const Login = () => {
     };
 
     const handleLogin = () => {
+        if (!termsAccepted) {
+            toast.current.show({
+                severity: "warn",
+                summary: "Warning",
+                detail: "You must accept the Privacy and PII terms to proceed.",
+            });
+            return;
+        }
+
         if (!otp) {
             toast.current.show({
                 severity: "error",
@@ -71,7 +81,6 @@ const Login = () => {
             return;
         }
 
-        // Simulate login processing with a loader
         setIsLoading(true);
         setTimeout(() => {
             setIsLoading(false);
@@ -80,12 +89,12 @@ const Login = () => {
                 summary: "Success",
                 detail: "Login successful!",
             });
-            setIsModalOpen(false); // Close the modal after successful login
+            setIsModalOpen(false);
         }, 2000);
     };
 
     const handleResendOTP = () => {
-        setOtp(""); // Reset OTP
+        setOtp("");
         toast.current.show({
             severity: "info",
             summary: "Info",
@@ -105,8 +114,26 @@ const Login = () => {
                 label="Login"
                 icon="pi pi-check"
                 onClick={handleLogin}
-                disabled={!otp || !password}
+                disabled={!otp || !password || !termsAccepted}
             />
+        </div>
+    );
+
+    const policyDialogContent = (
+        <div className="policy-dialog-content">
+            <p>
+                This Privacy Policy outlines how we collect, use, and protect your personal information.
+                By agreeing to these terms, you acknowledge that:
+            </p>
+            <ul>
+                <li>We will only use your data for legitimate purposes.</li>
+                <li>Your data will be stored securely and not shared with third parties.</li>
+                <li>You have the right to request access, correction, or deletion of your data.</li>
+            </ul>
+            <p>
+                For more details, please contact our support team at{" "}
+                <a href="mailto:support@shopsmartsg.com">support@shopsmartsg.com</a>.
+            </p>
         </div>
     );
 
@@ -141,18 +168,15 @@ const Login = () => {
                     </div>
                 </div>
 
-
                 <Dialog
                     header="Login"
                     draggable={false}
-
                     dismissableMask={true}
                     resizable={false}
                     visible={isModalOpen}
                     onHide={() => setIsModalOpen(false)}
                     footer={footerContent}
-                    style={{ width: "30vw" }
-                }
+                    style={{ width: "30vw" }}
                 >
                     <div className="flex flex-column gap-3">
                         <div className="col-12 mt-3">
@@ -180,12 +204,41 @@ const Login = () => {
                                 />
                             </div>
                         </div>
+                        <div className="col-12 mt-3">
+                            <div className="flex align-items-center">
+                                <Checkbox
+                                    inputId="terms"
+                                    checked={termsAccepted}
+                                    onChange={(e) => setTermsAccepted(e.checked)}
+                                />
+                                <label htmlFor="terms" className="ml-2">
+                                    I have read and agree to the{" "}
+                                    <span
+                                        style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+                                        onClick={() => setIsPolicyDialogOpen(true)}
+                                    >
+                                        Privacy and PII Policy
+                                    </span>
+                                    .
+                                </label>
+                            </div>
+                        </div>
                         {isLoading && (
                             <div className="flex justify-content-center mt-3">
                                 <ProgressSpinner style={{ width: "50px", height: "50px" }} />
                             </div>
                         )}
                     </div>
+                </Dialog>
+
+                <Dialog
+                    header="Privacy and PII Policy"
+                    visible={isPolicyDialogOpen}
+                    onHide={() => setIsPolicyDialogOpen(false)}
+                    closeIcon={false}
+                    style={{ width: "50vw" }}
+                >
+                    {policyDialogContent}
                 </Dialog>
             </Card>
         </div>
