@@ -200,38 +200,38 @@ const OrderCard = ({ order, isDelivery }) => {
 
 const Orders = () => {
   const [orders, setOrders] = useState([
-    {
-      orderId: "12345",
-      status: "CREATED",
-      totalPrice: 50.0,
-      createdDate: "2023-10-01",
-      useDelivery: false,
-      merchantId: "1",
-    },
-    {
-      orderId: "67890",
-      status: "READY",
-      totalPrice: 75.0,
-      createdDate: "2023-10-02",
-      useDelivery: true,
-      merchantId: "2",
-    },
-    {
-      orderId: "11223",
-      status: "COMPLETED",
-      totalPrice: 100.0,
-      createdDate: "2023-10-03",
-      useDelivery: false,
-      merchantId: "3",
-    },
-    {
-      orderId: "44556",
-      status: "CANCELLED",
-      totalPrice: 25.0,
-      createdDate: "2023-10-04",
-      useDelivery: true,
-      merchantId: "4",
-    },
+    // {
+    //   orderId: "12345",
+    //   status: "CREATED",
+    //   totalPrice: 50.0,
+    //   createdDate: "2023-10-01",
+    //   useDelivery: false,
+    //   merchantId: "1",
+    // },
+    // {
+    //   orderId: "67890",
+    //   status: "READY",
+    //   totalPrice: 75.0,
+    //   createdDate: "2023-10-02",
+    //   useDelivery: true,
+    //   merchantId: "2",
+    // },
+    // {
+    //   orderId: "11223",
+    //   status: "COMPLETED",
+    //   totalPrice: 100.0,
+    //   createdDate: "2023-10-03",
+    //   useDelivery: false,
+    //   merchantId: "3",
+    // },
+    // {
+    //   orderId: "44556",
+    //   status: "CANCELLED",
+    //   totalPrice: 25.0,
+    //   createdDate: "2023-10-04",
+    //   useDelivery: true,
+    //   merchantId: "4",
+    // },
   ]);
   const router = useRouter();
 
