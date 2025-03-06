@@ -200,8 +200,8 @@ const OrderCard = ({ order, isDelivery }) => {
                       className="mr-2 mt-2 navigate-tooltip"
                       onClick={() =>
                           handleDirections(
-                              merchantDetails.latitude,
-                              merchantDetails.longitude
+                              merchantDetails?.latitude,
+                              merchantDetails?.longitude
                           )
                       }
                   >
@@ -254,6 +254,21 @@ const Orders = () => {
     // },
   ]);
   const router = useRouter();
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id/${userId}`
+        );
+        if (response.status === 200) {
+          setOrders(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   const ongoingPickupOrders = orders.filter(
       (order) =>
