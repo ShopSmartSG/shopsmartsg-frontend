@@ -9,7 +9,6 @@ import { Toast } from "primereact/toast";
 import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
-import "./login.css";
 
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
