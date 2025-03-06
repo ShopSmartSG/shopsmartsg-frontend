@@ -43,15 +43,35 @@ const getActiveIndexForDelivery = (status) => {
 };
 
 // Dummy user ID and type for testing
-const userId = "12345";
-const userType = "CUSTOMER";
+// const userId = "12345";
+// const userType = "CUSTOMER";
+let userId, userType;
+try {
+  userId = localStorage.getItem("userId");
+  userType = localStorage.getItem("userType");
+} catch (error) {
+  console.error("Error accessing localStorage", error);
+}
 
 const OrderCard = ({ order, isDelivery }) => {
-  const [merchantDetails, setMerchantDetails] = useState({
-    name: "Dummy Merchant",
-    latitude: 12.9716,
-    longitude: 77.5946,
-  });
+  const [merchantDetails, setMerchantDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchMerchantDetails = async () => {
+      try {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${order.merchantId}`
+        );
+        if (response.status === 200) {
+          setMerchantDetails(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchMerchantDetails();
+  }, [order.merchantId]);
 
   const activeIndex = isDelivery
       ? getActiveIndexForDelivery(order.status)

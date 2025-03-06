@@ -124,58 +124,12 @@ const ProductCatalog = () => {
   useEffect(() => {
     // Simulate fetching data with dummy data
     const dummyProducts = {
-      Electronics: [
-        {
-          id: 1,
-          name: "Smartphone X",
-          price: 699,
-          listingPrice: 599,
-          description: "A high-end smartphone with advanced features.",
-          quantity: 50,
-          image: "https://via.placeholder.com/150",
-          merchantId: "merchant1",
-          pincode: "12345",
-          categoryId: "electronics",
-        },
-        {
-          id: 2,
-          name: "Wireless Earbuds",
-          price: 99,
-          listingPrice: 89,
-          description: "Noise-cancelling wireless earbuds.",
-          quantity: 200,
-          image: "https://via.placeholder.com/150",
-          merchantId: "merchant1",
-          pincode: "12345",
-          categoryId: "electronics",
-        },
-      ],
-      Clothing: [
-        {
-          id: 3,
-          name: "Men's Jacket",
-          price: 120,
-          listingPrice: 100,
-          description: "Waterproof jacket for outdoor activities.",
-          quantity: 30,
-          image: "https://via.placeholder.com/150",
-          merchantId: "merchant2",
-          pincode: "67890",
-          categoryId: "clothing",
-        },
-        {
-          id: 4,
-          name: "Women's Dress",
-          price: 80,
-          listingPrice: 70,
-          description: "Elegant summer dress.",
-          quantity: 100,
-          image: "https://via.placeholder.com/150",
-          merchantId: "merchant2",
-          pincode: "67890",
-          categoryId: "clothing",
-        },
-      ],
+      // Electronics: [
+      //
+      // ],
+      // Clothing: [
+      //
+      // ],
     };
     setProducts(dummyProducts);
   }, []);
