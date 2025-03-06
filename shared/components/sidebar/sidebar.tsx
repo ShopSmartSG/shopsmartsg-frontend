@@ -17,7 +17,6 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   // Create unique refs for each dropdown
   const favoritesRef = useRef(null);
   const merchantRef = useRef(null);
-  const revenueRef = useRef(null);
   const customerRef = useRef(null);
 
   const [name, setName] = useState("");
@@ -193,8 +192,19 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                                 <Ripple />
                               </Link>
                             </li>
+                            <li>
+                              <Link
+                                  href="/merchant/reset"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-key mr-2"></i>
+                                <span className="font-medium">Reset Password</span>
+                                <Ripple />
+                              </Link>
+                            </li>
                           </ul>
                         </li>
+
 
                         {/* Customer Section */}
                         <li>
@@ -238,6 +248,17 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                                 <Ripple />
                               </Link>
                             </li>
+                            <li>
+                              <Link
+                                  href="/customer/reset"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-key
+                                   mr-2"></i>
+                                <span className="font-medium">Reset Password</span>
+                                <Ripple />
+                              </Link>
+                            </li>
                           </ul>
                         </li>
                       </ul>
@@ -245,7 +266,6 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                   </ul>
                 </div>
 
-                {/* User Profile Section */}
                 <div className="mt-auto">
                   <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
                   <div className="grid p-3">
