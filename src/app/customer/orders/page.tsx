@@ -292,7 +292,7 @@ const Orders = () => {
   const pastDeliveryOrders = orders.filter(
       (order) => order.useDelivery && order.status === "COMPLETED"
   );
-
+  if (userType && userType === "CUSTOMER" && userId) {
 
   return (
       <div className="p-4">
@@ -333,6 +333,10 @@ const Orders = () => {
       </div>
   );
 
+}
+ else {
+  router.push("/customer/login");
+}
 };
 
 export default Orders;
