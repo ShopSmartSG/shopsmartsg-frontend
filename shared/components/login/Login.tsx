@@ -133,6 +133,8 @@ const Login = ({type}: LoginProps) => {
              }
            } catch (error) {
                console.log(error,"Error");
+               const location  = error.response.data;
+                window.location.href = location;
              toast.current.show({
                status: "error",
                message: "Error submitting OTP. Please try again later.",
