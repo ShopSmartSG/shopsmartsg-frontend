@@ -12,6 +12,7 @@ import {InputOtp} from "primereact/inputotp";
 import {Checkbox} from "primereact/checkbox";
 import validator from "validator";
 import "./login.css";
+import axios from "axios";
 
 interface LoginProps {
     type?: string
@@ -106,20 +107,34 @@ const Login = ({type}: LoginProps) => {
         });
     };
 
-    const handleGoogleSignIn = () => {
-        toast.current.show({
-            severity: "info",
-            summary: "Info",
-            detail: "Redirecting to Google for authentication...",
-        });
-        // Simulate Google Sign-In process
-        setTimeout(() => {
-            toast.current.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Signed in successfully via Google!",
-            });
-        }, 2000);
+    const handleGoogleSignIn = async () => {
+        const userType = type === "Customer" ? "customer" : "merchant";
+           try {
+             const response = await axios.get(
+               `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/${userType}`,
+               { withCredentials: true }
+             );
+
+             if (response.status) {
+              console.log(response,"RESPONSE Google");
+
+               toast.current.show({
+                 severity: "success",
+                 summary: "Success",
+                 detail: "Login Successful",
+                 life: 3000,
+               });
+
+
+             }
+           } catch (error) {
+               console.log(error,"Error");
+             toast.current.show({
+               status: "error",
+               message: "Error submitting OTP. Please try again later.",
+             });
+
+           }
     };
 
     const footerContent = (
