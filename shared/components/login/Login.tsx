@@ -111,7 +111,7 @@ const Login = ({type}: LoginProps) => {
         const userType = type === "Customer" ? "customer" : "merchant";
            try {
              const response = await axios.get(
-               `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/${userType}`,
+               `${process.env.NEXT_PUBLIC_CentralService_API_URL}/auth/google/login/${userType}/`,
                { withCredentials: true }
              );
 
