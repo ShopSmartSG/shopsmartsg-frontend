@@ -12,6 +12,8 @@ import {InputOtp} from "primereact/inputotp";
 import {Checkbox} from "primereact/checkbox";
 import validator from "validator";
 import "./login.css";
+import { Divider } from 'primereact/divider';
+
 import axios from "axios";
 
 interface LoginProps {
@@ -115,9 +117,9 @@ const Login = ({type}: LoginProps) => {
                  { withCredentials: true }
              );
 
-             if (response.status) {
-              console.log(response,"RESPONSE Google");
-
+             if (response.status == 302) {
+                const location = await response.data;
+                window.location.href  = location;
                toast.current.show({
                  severity: "success",
                  summary: "Success",
@@ -190,15 +192,7 @@ const Login = ({type}: LoginProps) => {
                     </div>
                     <div className="col-12 mt-4">
                         <Button
-                            label="Sign In with Google"
-                            icon="pi pi-google"
-                            className="w-full p-button-outlined p-button-secondary"
-                            onClick={handleGoogleSignIn}
-                        />
-                    </div>
-                    <div className="col-12 mt-4">
-                        <Button
-                            label="Generate OTP"
+                            label="Sign In with Password & OTP"
                             className="w-full p-button-outlined"
                             onClick={handleGenerateOTP}
                             disabled={!email}
@@ -209,6 +203,16 @@ const Login = ({type}: LoginProps) => {
                             </div>
                         )}
                     </div>
+                    <Divider/>
+                    <div className="col-12 mt-4">
+                        <Button
+                            label="Sign In with Google"
+                            icon="pi pi-google"
+                            className="w-full p-button-outlined p-button-secondary"
+                            onClick={handleGoogleSignIn}
+                        />
+                    </div>
+
 
                 </div>
 
