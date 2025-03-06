@@ -15,3 +15,8 @@ env:
     availability:
     -   BUILD
     -   RUNTIME
+-   variable: NEXT_PUBLIC_CENTRAL_SERVICE_API_URL
+    secret: projects/461501268972/secrets/NEXT_PUBLIC_CentralService_API_URL/versions/1
+    availability:
+    -   BUILD
+    -   RUNTIME
