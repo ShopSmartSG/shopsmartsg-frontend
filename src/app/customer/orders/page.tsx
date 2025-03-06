@@ -292,6 +292,7 @@ const Orders = () => {
   const pastDeliveryOrders = orders.filter(
       (order) => order.useDelivery && order.status === "COMPLETED"
   );
+  // noinspection LanguageDetectionInspection
   if (userType && userType === "CUSTOMER" && userId) {
 
   return (
