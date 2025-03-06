@@ -18,6 +18,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const favoritesRef = useRef(null);
   const merchantRef = useRef(null);
   const customerRef = useRef(null);
+  const deliveryPartnerRef = useRef(null);
 
   const [name, setName] = useState("");
 
@@ -245,6 +246,62 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               >
                                 <i className="pi pi-shopping-bag mr-2"></i>
                                 <span className="font-medium">Rewards</span>
+                                <Ripple />
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                  href="/customer/reset"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-key
+                                   mr-2"></i>
+                                <span className="font-medium">Reset Password</span>
+                                <Ripple />
+                              </Link>
+                            </li>
+                          </ul>
+                        </li>
+
+                        {/* Delivery Partner section */}
+                        <li>
+                          <StyleClass
+                              nodeRef={deliveryPartnerRef}
+                              selector="@next"
+                              enterClassName="hidden"
+                              enterActiveClassName="slidedown"
+                              leaveToClassName="hidden"
+                              leaveActiveClassName="slideup"
+                          >
+                            <button
+                                ref={customerRef}
+                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                            >
+                              <i className="pi pi-users mr-2"></i>
+                              <span className="font-medium">Delivery</span>
+                              <i className="pi pi-chevron-down ml-auto"></i>
+                              <Ripple />
+                            </button>
+                          </StyleClass>
+
+                          <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden">
+                            <li>
+                              <Link
+                                  href="/delivery/login"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-shopping-bag mr-2"></i>
+                                <span className="font-medium">Delivery Partner Login</span>
+                                <Ripple />
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                  href="/delivery/orders"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              >
+                                <i className="pi pi-shopping-bag mr-2"></i>
+                                <span className="font-medium">Orders</span>
                                 <Ripple />
                               </Link>
                             </li>
