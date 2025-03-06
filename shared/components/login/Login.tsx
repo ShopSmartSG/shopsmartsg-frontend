@@ -111,12 +111,14 @@ const Login = ({type}: LoginProps) => {
 
     const handleGoogleSignIn = async () => {
         const userType = type === "Customer" ? "customer" : "merchant";
+
            try {
              const response = await axios.get(
-               `${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/google/login/${userType}`,
+               `https://central-hub.shopsmartsg.com/auth/google/login/${userType}`,
                  { withCredentials: true }
              );
 
+             console.log(response,"RESPONESE GOOGLE");
              if (response.status == 302) {
                 const location = await response.data;
                 window.location.href  = location;
