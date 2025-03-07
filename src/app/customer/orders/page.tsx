@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import { Steps } from "primereact/steps";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
 import { useRouter } from "next/navigation";
+import {Toast} from "primereact/toast";
 import { Card } from "primereact/card";
 import axios from "axios";
 
@@ -45,13 +46,6 @@ const getActiveIndexForDelivery = (status) => {
 // Dummy user ID and type for testing
 // const userId = "12345";
 // const userType = "CUSTOMER";
-let userId, userType;
-try {
-  userId = localStorage.getItem("userId");
-  userType = localStorage.getItem("userType");
-} catch (error) {
-  console.error("Error accessing localStorage", error);
-}
 
 const OrderCard = ({ order, isDelivery }) => {
   const [merchantDetails, setMerchantDetails] = useState(null);
@@ -85,6 +79,7 @@ const OrderCard = ({ order, isDelivery }) => {
     const textColor = isActiveItem
         ? "var(--surface-b)"
         : "var(--text-color-secondary)";
+
 
     return (
         <div
@@ -253,12 +248,39 @@ const Orders = () => {
     //   merchantId: "4",
     // },
   ]);
+  const [isValidSession,setValidSession] = useState(false);
+  const toast = useRef(null);
+
+  useEffect(()=>{
+    const validator = async() => {
+      try{
+        const response  = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`,{
+          withCredentials:true
+        })
+
+        const {status} = (await response.data).toLowerCase();
+        if(status == 'success'){
+          setValidSession(true);
+        }
+        else{
+          setValidSession(false);
+          toast.current.show({severity: "error", detail: "You are logged out!! Please Login Again",summary:'Error'});
+        }
+
+      }
+      catch(error){
+        setValidSession(false);
+        toast.current.show({severity: "error", detail: "Please try again after sometime",summary:'Network Error'});
+      }
+    }
+    validator();
+  },[])
   const router = useRouter();
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id/${userId}`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id`
         );
         if (response.status === 200) {
           setOrders(response.data);
@@ -293,7 +315,8 @@ const Orders = () => {
       (order) => order.useDelivery && order.status === "COMPLETED"
   );
   // noinspection LanguageDetectionInspection
-  if (userType && userType === "CUSTOMER" && userId) {
+if(isValidSession){
+
 
   return (
       <div className="p-4">
@@ -330,6 +353,7 @@ const Orders = () => {
                 <OrderCard order={order} isDelivery={true} />
               </div>
           ))}
+          <Toast ref={toast} />
         </div>
       </div>
   );
