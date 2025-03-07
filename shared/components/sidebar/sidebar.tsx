@@ -218,7 +218,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
 
                         {/* Customer Section */}
-                        <li>
+                        <li className={"mt-2"}>
                           <StyleClass
                             nodeRef={customerRef}
                             selector="@next"
@@ -274,7 +274,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                         </li>
 
                         {/* Delivery Partner section */}
-                        <li>
+                        <li className={"mt-2"}>
                           <StyleClass
                               nodeRef={deliveryPartnerRef}
                               selector="@next"
