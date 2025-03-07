@@ -227,7 +227,7 @@ const response = await axios.put(
             }
         }
         validator();
-    },[])
+    },[isValidSession])
   useEffect(() => {
     const getMerchantCoordinates = async () => {
       if (merchants.length > 0) {

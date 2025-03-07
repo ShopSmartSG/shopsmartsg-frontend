@@ -273,7 +273,7 @@ const Orders = () => {
       }
     }
     validator();
-  },[])
+  },[isValidSession])
   const router = useRouter();
   useEffect(() => {
     const fetchOrders = async () => {
