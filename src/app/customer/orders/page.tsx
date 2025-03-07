@@ -258,19 +258,18 @@ const Orders = () => {
           withCredentials:true
         })
 
-        const {status} = (await response.data).toLowerCase();
-        if(status == 'success'){
+        const data = (await response.data);
+        if(data.status.toLowerCase() == 'success'){
           setValidSession(true);
         }
         else{
           setValidSession(false);
-          toast.current.show({severity: "error", detail: "You are logged out!! Please Login Again",summary:'Error'});
+
         }
 
       }
       catch(error){
         setValidSession(false);
-        toast.current.show({severity: "error", detail: "Please try again after sometime",summary:'Network Error'});
       }
     }
     validator();
@@ -314,10 +313,7 @@ const Orders = () => {
   const pastDeliveryOrders = orders.filter(
       (order) => order.useDelivery && order.status === "COMPLETED"
   );
-  // noinspection LanguageDetectionInspection
 if(isValidSession){
-
-
   return (
       <div className="p-4">
         <h2 className="mb-3">Ongoing Orders</h2>
