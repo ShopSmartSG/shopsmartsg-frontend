@@ -60,7 +60,7 @@ const Login = ({type}: LoginProps) => {
         }, 2000);
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!termsAccepted) {
             toast.current.show({
                 severity: "warn",
@@ -89,15 +89,50 @@ const Login = ({type}: LoginProps) => {
         }
 
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
+        const userType = type?.toLowerCase() || "customer";
+        
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/native/login/${userType}`,
+                {
+                    email: email,
+                    emailAddress: email,
+                    otp: otp,
+                    password: password
+                },
+                { withCredentials: true }
+            );
+            
+            if (response.data.status === 'success') {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Login successful!",
+                });
+                
+                // Redirect to the provided URI if success
+                if (response.data.redirect_uri) {
+                    window.location.href = response.data.redirect_uri;
+                }
+                
+                setIsModalOpen(false);
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Invalid Email OTP or Password. Try again or sign in with Google.",
+                });
+            }
+        } catch (error) {
+            console.error("Login error:", error);
             toast.current.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Login successful!",
+                severity: "error",
+                summary: "Error",
+                detail: "Invalid Email OTP or Password. Try again or sign in with Google.",
             });
-            setIsModalOpen(false);
-        }, 2000);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleResendOTP = () => {
