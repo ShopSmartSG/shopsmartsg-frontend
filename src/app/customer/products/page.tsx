@@ -16,6 +16,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import FilterSearch from "../../../../shared/components/filter/filterSearch";
+import {router} from "next/client";
 
 const Page = () => {
   const toast = useRef<Toast>(null);
@@ -26,6 +27,7 @@ const Page = () => {
   const pincode = searchParams.get("pincode");
   const searchText = searchParams.get("searchText");
   const [merchants, setMerchants] = useState<string[]>([]);
+  const [isValidSession,setValidSession] = useState(false);
 
   interface Product {
     productId: string;
@@ -202,7 +204,29 @@ const response = await axios.put(
       coordinates.find((coord) => coord.id === id)?.lng || center.lng
     );
   };
+    useEffect(()=>{
+        const validator = async() => {
+            try{
+                const response  = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`,{
+                    withCredentials:true
+                })
 
+                const data = (await response.data);
+                if(data.status.toLowerCase() == 'success'){
+                    setValidSession(true);
+                }
+                else{
+                    setValidSession(false);
+                    toast.current.show({severity: "error", detail: "You are logged out!! Please Login Again",summary:'Error'});
+                }
+
+            }
+            catch(error){
+                setValidSession(false);
+            }
+        }
+        validator();
+    },[])
   useEffect(() => {
     const getMerchantCoordinates = async () => {
       if (merchants.length > 0) {
@@ -279,128 +303,133 @@ const response = await axios.put(
       </div>
     </div>
   );
-
-  return (
-    <div>
-      <Toast ref={toast} />
-      <FilterSearch />
-      <div className="grid">
-        <div className="col-6">
-          <div className="grid">
-            {products.map((product, id) => (
-              <div className="col-6" key={id}>
-                <Card
-                  header={header(product.imageUrl)}
-                  footer={footer(product)}
-                >
-                  <h2>{product.productName}</h2>
-                  <p className="m-0">{product.productDescription}</p>
-                  <p className="mt-4">
-                    <b>SGD {product.listingPrice}</b>
-                  </p>
-                </Card>
-              </div>
-            ))}
-          </div>
-          <div className="card">
-            <Paginator
-              first={first}
-              rows={rows}
-              totalRecords={products.length}
-              onPageChange={onPageChange}
-              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-            />
-          </div>
-        </div>
-        <div className="col-6">
-          <Card style={{ height: "124.5vh" }}>
-            {!isLoaded ? (
-              <ProgressSpinner
-                style={{ width: "50px", height: "50px" }}
-                strokeWidth="8"
-                fill="var(--surface-ground)"
-                animationDuration=".5s"
-              />
-            ) : (
-              <div className="grid" style={{ marginTop: "20vh" }}>
-                <div className="col-7">
-                  <GoogleMap
-                    zoom={15}
-                    center={center}
-                    mapContainerStyle={{ width: "400px", height: "400px" }}
-                    onLoad={(map) => {
-                      mapRef.current = map;
-                    }}
-                    options={{
-                      streetViewControl: false,
-                      fullscreenControl: false,
-                      disableDefaultUI: true,
-                      zoomControl: true,
-                      mapTypeControl: false,
-                      scaleControl: false,
-                    }}
-                  >
-                    {coordinates.map((position) => (
-                      <Marker
-                        key={position.id}
-                        position={{ lat: position.lat, lng: position.lng }}
-                        onClick={() => handleMarkerClick(position.id)}
-                      />
-                    ))}
-
-                    {selectedMarker &&
-                      coordinates.map((location) =>
-                        selectedMarker === location.id ? (
-                          <InfoWindow
-                            key={location.id}
-                            position={{ lat: location.lat, lng: location.lng }}
-                            onCloseClick={() => setSelectedMarker(null)}
-                          >
-                            <div>
-                              <small>{location.name}</small>
-                              <br />
-                              <a
-                                href={`https://www.google.com/maps?q=@${location.lat},${location.lng}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                View Directions on Google Maps
-                              </a>
+if(isValidSession){
+    return (
+        <div>
+            <Toast ref={toast} />
+            <FilterSearch />
+            <div className="grid">
+                <div className="col-6">
+                    <div className="grid">
+                        {products.map((product, id) => (
+                            <div className="col-6" key={id}>
+                                <Card
+                                    header={header(product.imageUrl)}
+                                    footer={footer(product)}
+                                >
+                                    <h2>{product.productName}</h2>
+                                    <p className="m-0">{product.productDescription}</p>
+                                    <p className="mt-4">
+                                        <b>SGD {product.listingPrice}</b>
+                                    </p>
+                                </Card>
                             </div>
-                          </InfoWindow>
-                        ) : null
-                      )}
-                  </GoogleMap>
+                        ))}
+                    </div>
+                    <div className="card">
+                        <Paginator
+                            first={first}
+                            rows={rows}
+                            totalRecords={products.length}
+                            onPageChange={onPageChange}
+                            template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                        />
+                    </div>
                 </div>
-                <div
-                  className="col-4 mt-2 overflow-scroll"
-                  style={{
-                    border: "1px solid",
-                    height: "400px",
-                    marginLeft: "5px",
-                  }}
-                >
-                  <ul>
-                    {coordinates.map((position) => (
-                      <li
-                        key={position.id}
-                        onClick={() =>
-                          panToLocation(position.lat, position.lng)
-                        }
-                        className="cursor-pointer"
-                      >
-                        {position.name}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="col-6">
+                    <Card style={{ height: "124.5vh" }}>
+                        {!isLoaded ? (
+                            <ProgressSpinner
+                                style={{ width: "50px", height: "50px" }}
+                                strokeWidth="8"
+                                fill="var(--surface-ground)"
+                                animationDuration=".5s"
+                            />
+                        ) : (
+                            <div className="grid" style={{ marginTop: "20vh" }}>
+                                <div className="col-7">
+                                    <GoogleMap
+                                        zoom={15}
+                                        center={center}
+                                        mapContainerStyle={{ width: "400px", height: "400px" }}
+                                        onLoad={(map) => {
+                                            mapRef.current = map;
+                                        }}
+                                        options={{
+                                            streetViewControl: false,
+                                            fullscreenControl: false,
+                                            disableDefaultUI: true,
+                                            zoomControl: true,
+                                            mapTypeControl: false,
+                                            scaleControl: false,
+                                        }}
+                                    >
+                                        {coordinates.map((position) => (
+                                            <Marker
+                                                key={position.id}
+                                                position={{ lat: position.lat, lng: position.lng }}
+                                                onClick={() => handleMarkerClick(position.id)}
+                                            />
+                                        ))}
+
+                                        {selectedMarker &&
+                                            coordinates.map((location) =>
+                                                selectedMarker === location.id ? (
+                                                    <InfoWindow
+                                                        key={location.id}
+                                                        position={{ lat: location.lat, lng: location.lng }}
+                                                        onCloseClick={() => setSelectedMarker(null)}
+                                                    >
+                                                        <div>
+                                                            <small>{location.name}</small>
+                                                            <br />
+                                                            <a
+                                                                href={`https://www.google.com/maps?q=@${location.lat},${location.lng}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                            >
+                                                                View Directions on Google Maps
+                                                            </a>
+                                                        </div>
+                                                    </InfoWindow>
+                                                ) : null
+                                            )}
+                                    </GoogleMap>
+                                </div>
+                                <div
+                                    className="col-4 mt-2 overflow-scroll"
+                                    style={{
+                                        border: "1px solid",
+                                        height: "400px",
+                                        marginLeft: "5px",
+                                    }}
+                                >
+                                    <ul>
+                                        {coordinates.map((position) => (
+                                            <li
+                                                key={position.id}
+                                                onClick={() =>
+                                                    panToLocation(position.lat, position.lng)
+                                                }
+                                                className="cursor-pointer"
+                                            >
+                                                {position.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+                    </Card>
                 </div>
-              </div>
-            )}
-          </Card>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
+}
+else{
+    router.push("/customer/login")
+}
+
 };
 
 export default Page;
