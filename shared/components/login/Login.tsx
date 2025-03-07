@@ -93,7 +93,7 @@ const Login = ({type}: LoginProps) => {
         
         try {
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/auth/native/login/${userType}`,
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/native/login/${userType}`,
                 {
                     email: email,
                     emailAddress: email,
