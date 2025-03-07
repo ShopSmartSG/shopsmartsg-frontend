@@ -114,7 +114,7 @@ const Login = ({type}: LoginProps) => {
 
            try {
              const response = await axios.get(
-               `https://central-hub.shopsmartsg.com/auth/google/login/${userType}`,
+               `${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/google/login/${userType}`,
                  { withCredentials: true }
              );
 

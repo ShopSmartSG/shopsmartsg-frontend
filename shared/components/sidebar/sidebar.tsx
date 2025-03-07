@@ -55,10 +55,18 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
     fetchUsername();
   }, []);
 
-  const handleLogout = () => {
-    // Add logout logic here
-    localStorage.removeItem("userId");
-    // Add navigation logic if needed
+  const handleLogout = async() => {
+    try{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`);
+      console.log("Logged Out Successfully", response);
+
+    }
+    catch(error){
+      console.error("Error logging out", error);
+    }
+    finally {
+      console.log("User logged out");
+    }
   };
 
   return (
@@ -274,7 +282,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               leaveActiveClassName="slideup"
                           >
                             <button
-                                ref={customerRef}
+                                ref={deliveryPartnerRef}
                                 className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             >
                               <i className="pi pi-users mr-2"></i>
