@@ -213,7 +213,7 @@ const response = await axios.put(
                 })
 
                 const data = (await response.data);
-                if(data.status.toLowerCase() == 'success'){
+                if(data.status.toLowerCase() != 'failure'){
                     setValidSession(true);
                 }
                 else{
