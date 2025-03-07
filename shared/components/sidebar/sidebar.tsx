@@ -57,7 +57,9 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
   const handleLogout = async() => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`,{
+        withCredentials:true
+      });
       console.log("Logged Out Successfully", response);
 
     }
@@ -216,7 +218,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
 
                         {/* Customer Section */}
-                        <li>
+                        <li className={"mt-2"}>
                           <StyleClass
                             nodeRef={customerRef}
                             selector="@next"
@@ -272,7 +274,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                         </li>
 
                         {/* Delivery Partner section */}
-                        <li>
+                        <li className={"mt-2"}>
                           <StyleClass
                               nodeRef={deliveryPartnerRef}
                               selector="@next"
