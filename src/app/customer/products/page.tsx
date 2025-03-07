@@ -16,7 +16,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import FilterSearch from "../../../../shared/components/filter/filterSearch";
-import {router} from "next/client";
+import {useRouter} from "next/navigation";
 
 const Page = () => {
   const toast = useRef<Toast>(null);
@@ -204,6 +204,7 @@ const response = await axios.put(
       coordinates.find((coord) => coord.id === id)?.lng || center.lng
     );
   };
+  const router = useRouter()
     useEffect(()=>{
         const validator = async() => {
             try{
