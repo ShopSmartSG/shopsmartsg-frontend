@@ -57,7 +57,9 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
   const handleLogout = async() => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`,{
+        withCredentials:true
+      });
       console.log("Logged Out Successfully", response);
 
     }
