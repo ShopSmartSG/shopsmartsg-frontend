@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 
 const FilterSearch = () => {
     const router = useRouter();
-    const apiUrlProduct = process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL;
+    const apiUrlProduct = process.env.NEXT_PUBLIC_CentralService_API_URL;
   const [selectedCategory, setSelectedCategory] = useState(null);
 
     const [maxPrice, setMaxPrice] = useState<number>();
@@ -23,7 +23,7 @@ const FilterSearch = () => {
     useEffect(() => {
       const fetchCategories = async () => {
         try {
-          const response = await axios.get(`${apiUrlProduct}/categories`);
+          const response = await axios.get(`${apiUrlProduct}/getCategories`);
           const data = response.data;
           const formattedCategories = data.map((category) => ({
             label: category.categoryName,

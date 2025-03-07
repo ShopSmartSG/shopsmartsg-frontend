@@ -107,7 +107,7 @@ const Page = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/categories`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCategories`
         );
         setCategories([
           ...response.data,
@@ -162,7 +162,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/products`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchantProducts`,
         dataObj
       );
       toast.current.show({
@@ -183,7 +183,7 @@ const Page = () => {
   const categoryHandler = async () => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/categories`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCategories`,
         {
           categoryName: newCategory,
           categoryDescription: newCategoryDescription,
