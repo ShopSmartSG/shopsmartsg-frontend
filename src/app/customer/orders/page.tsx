@@ -248,49 +248,58 @@ const Orders = () => {
     //   merchantId: "4",
     // },
   ]);
-  const [isValidSession,setValidSession] = useState(false);
+  const [isValidSession,setValidSession] = useState(null);
   const toast = useRef(null);
-
-  useEffect(()=>{
-    const validator = async() => {
-      try{
-        const response  = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`,{
-          withCredentials:true
-        })
-
-        const data = (await response.data);
-        if(data.status.toLowerCase() != 'failure'){
-          setValidSession(true);
-        }
-        else{
-          setValidSession(false);
-
-        }
-
-      }
-      catch(error){
-        setValidSession(false);
-      }
-    }
-    validator();
-  },[isValidSession])
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  // Handle session validation
   useEffect(() => {
-    const fetchOrders = async () => {
+    const validator = async() => {
       try {
-        const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id`
-        );
-        if (response.status === 200) {
-          setOrders(response.data);
+        const response = await axios.get('https://central-hub.shopsmartsg.com/auth/validate-token', {
+          withCredentials: true
+        });
+        
+        const data = await response.data;
+        if(data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+        } else {
+          setValidSession(false);
+          router.push("/customer/login");
         }
-      } catch (error) {
-        console.error(error);
+      } catch(error) {
+        setValidSession(false);
+        router.push("/customer/login");
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchOrders();
-  }, []);
+    validator();
+  }, []); // No dependencies to prevent loops
 
+  // Fetch orders only when session is valid
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (isValidSession) {
+        try {
+          setIsLoading(true);
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/customer/id`
+          );
+          if (response.status === 200) {
+            setOrders(response.data);
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    fetchOrders();
+  }, [isValidSession]); // Only re-run when session validation changes
   const ongoingPickupOrders = orders.filter(
       (order) =>
           (order.status !== "COMPLETED" &&
@@ -313,6 +322,12 @@ const Orders = () => {
   const pastDeliveryOrders = orders.filter(
       (order) => order.useDelivery && order.status === "COMPLETED"
   );
+
+ // Show loading state until everything is ready
+ if (isLoading) {
+  return <div>Loading...</div>;
+}
+
 if(isValidSession){
   return (
       <div className="p-4">
