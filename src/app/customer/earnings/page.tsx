@@ -2,6 +2,7 @@
 import axios from 'axios';
 import React, {useEffect, useRef, useState} from 'react'
 import {useRouter} from "next/navigation";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const Page = () => {
     const [isValidSession, setValidSession] = useState(false);
@@ -62,6 +63,9 @@ const Page = () => {
                 )}
             </div>
         );
+    }
+    if(userType != 'customer'){
+        <ForbiddenPage/>
     }
 
     else {

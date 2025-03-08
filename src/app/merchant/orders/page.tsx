@@ -6,11 +6,13 @@ import { Button } from "primereact/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import {Toast} from "primereact/toast";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
     const [isValidSession, setValidSession] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [user,setUser] = useState("");
     const toast = useRef(null);
 
   // Fetch Merchant Order Requests
@@ -38,6 +40,7 @@ const Orders = () => {
                 console.log('API Response:', data); // Debug the response
                 if (data.status && data.status.toLowerCase() !== 'failure') {
                     setValidSession(true);
+                    setUser(data.profileType);
                 } else {
                     setValidSession(false);
                     toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
@@ -128,6 +131,9 @@ const Orders = () => {
   };
     if (isLoading) {
         return <div>Loading...</div>;
+    }
+    if(user != 'merchant'){
+        <ForbiddenPage/>
     }
     if(isValidSession){
         return (

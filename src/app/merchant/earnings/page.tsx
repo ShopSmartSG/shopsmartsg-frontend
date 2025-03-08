@@ -8,7 +8,6 @@ const Page = () => {
 
 
     const [merchantDetails, setMerchantDetails] = useState(null);
-
     useEffect(() => {
         const getMerchantDetails = async () => {
             try {   
