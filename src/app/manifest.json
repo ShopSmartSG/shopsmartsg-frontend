@@ -1,23 +1,71 @@
 {
-    "name": "Shop Smart SG",
-    "short_name": "ShopSmartSg",
-    "description": "ShopSmartSg - Local Shopping, Heavy Savings",
-    "icons": [
-      {
-        "src": "icons/icon-192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "maskable"
-      },
-      {
-        "src": "icons/icon-512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ],
-    "theme_color": "#FFFFFF",
-    "background_color": "#FFFFFF",
-    "start_url": "/",
-    "display": "standalone",
-    "orientation": "portrait"
-  }
+  "name": "Shop Smart SG",
+  "short_name": "ShopSmartSg",
+  "description": "ShopSmartSg - Local Shopping, Smart Savings",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/customer_cart.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "platform": "wide",
+      "form_factor" : "wide",
+      "label": "Shopping cart with Kaya Jam products"
+    },
+    {
+      "src": "screenshots/customer_home.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "platform": "wide",
+      "form_factor" : "wide",
+      "label": "Browse product categories"
+    },
+    {
+      "src": "screenshots/customer_search.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "platform": "wide",
+      "form_factor" : "wide",
+      "label": "Kaya Jam search results with store locations"
+    },
+    {
+      "src": "screenshots/merchant_add_product.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "platform": "wide",
+      "form_factor" : "wide",
+      "label": "Merchant product creation interface"
+    },
+    {
+      "src": "screenshots/home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Mobile product browsing"
+    },
+    {
+      "src": "screenshots/login.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Mobile customer login view"
+    }
+  ],
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
