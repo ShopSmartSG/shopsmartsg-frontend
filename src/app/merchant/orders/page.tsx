@@ -133,7 +133,7 @@ const Orders = () => {
         return <div>Loading...</div>;
     }
     if(user != 'merchant'){
-        <ForbiddenPage/>
+       return <ForbiddenPage/>
     }
     if(isValidSession){
         return (
