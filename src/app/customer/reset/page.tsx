@@ -42,7 +42,7 @@ const Page = () => {
         return <div>Loading...</div>;
     }
 
-    if(userType != 'customer'){
+    if(userType && userType != 'customer'){
         return <ForbiddenPage/>
     }
 
