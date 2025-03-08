@@ -32,8 +32,8 @@ const ProductCatalog = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const toast = useRef(null);
   const { adminData, userType } = useAdminContext();
-  const userId = localStorage.getItem("userId");
-  const userTyped = localStorage.getItem("userType");
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const router = useRouter();
 
   // Handlers for delete and update
@@ -133,168 +133,197 @@ const ProductCatalog = () => {
     };
     setProducts(dummyProducts);
   }, []);
+  useEffect(() => {
+    const validator = async () => {
+      try {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        console.log('API Response:', data); // Debug the response
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
+        }
+      } catch (error) {
+        console.error('Validation Error:', error); // Log the error
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    validator();
+  }, []);
 
 
-  return (
-      <div className="p-grid p-p-4">
-        <Toast ref={toast} />
-        <h1 className="p-col-12">Product Catalog</h1>
-        {Object.keys(products).length > 0 ? (
-            Object.keys(products).map((categoryName) => (
-                <Panel
-                    key={categoryName}
-                    header={categoryName}
-                    className="p-col-12 p-mb-4"
-                >
-                  <div className="p-grid">
-                    {products[categoryName].map((product) => (
-                        <div
-                            key={product.id}
-                            className="p-col-12 p-md-6 p-lg-4 p-p-3 mt-2"
-                        >
-                          <Card
-                              header={<img alt={product.name} src={product.image} style={{ width: "100%", height: "150px", objectFit: "cover" }} />}
-                              title={product.name}
-                              subTitle={`Price: $${product.price}`}
-                              style={{ padding: "1rem" }}
-                          >
-                            <p>Quantity: {product.quantity}</p>
-                            <p>{product.description}</p>
-                            <div className="grid ">
-                              <div>
-                                <Button
-                                    label="Update"
-                                    className="p-button-success"
-                                    onClick={() => handleUpdateClick(product)}
-                                />
-                              </div>
-                              <div >
-                                <Button
-                                    label="Delete"
-                                    className="p-button-danger"
-                                    onClick={() => handleDeleteClick(product)}
-                                />
-                              </div>
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+    if(isValidSession){
+      return (
+          <div className="p-grid p-p-4">
+            <Toast ref={toast} />
+            <h1 className="p-col-12">Product Catalog</h1>
+            {Object.keys(products).length > 0 ? (
+                Object.keys(products).map((categoryName) => (
+                    <Panel
+                        key={categoryName}
+                        header={categoryName}
+                        className="p-col-12 p-mb-4"
+                    >
+                      <div className="p-grid">
+                        {products[categoryName].map((product) => (
+                            <div
+                                key={product.id}
+                                className="p-col-12 p-md-6 p-lg-4 p-p-3 mt-2"
+                            >
+                              <Card
+                                  header={<img alt={product.name} src={product.image} style={{ width: "100%", height: "150px", objectFit: "cover" }} />}
+                                  title={product.name}
+                                  subTitle={`Price: $${product.price}`}
+                                  style={{ padding: "1rem" }}
+                              >
+                                <p>Quantity: {product.quantity}</p>
+                                <p>{product.description}</p>
+                                <div className="grid ">
+                                  <div>
+                                    <Button
+                                        label="Update"
+                                        className="p-button-success"
+                                        onClick={() => handleUpdateClick(product)}
+                                    />
+                                  </div>
+                                  <div >
+                                    <Button
+                                        label="Delete"
+                                        className="p-button-danger"
+                                        onClick={() => handleDeleteClick(product)}
+                                    />
+                                  </div>
 
 
+                                </div>
+                              </Card>
                             </div>
-                          </Card>
-                        </div>
-                    ))}
-                  </div>
-                </Panel>
-            ))
-        ) : (
-            <Message severity="info" text="No products available." />
-        )}
+                        ))}
+                      </div>
+                    </Panel>
+                ))
+            ) : (
+                <Message severity="info" text="No products available." />
+            )}
 
-        {/* Update Dialog */}
-        <Dialog
-            visible={updateVisible}
-            header="Update Product"
-            onHide={() => setUpdateVisible(false)}
-            style={{ width: "50vw" }}
-        >
-          <div className="p-fluid p-grid p-p-3">
-            <div className="p-field p-col-12">
-              <label htmlFor="name">Name</label>
-              <InputText
-                  id="name"
-                  value={formData.name}
-                  onChange={(event) =>
-                      setFormData({ ...formData, name: event.target.value })
-                  }
-              />
-            </div>
-            <div className="p-field p-col-12 p-md-6">
-              <label htmlFor="originalPrice">Original Price</label>
-              <InputNumber
-                  id="originalPrice"
-                  value={formData.originalPrice}
-                  onValueChange={(e) =>
-                      setFormData({ ...formData, originalPrice: e.value })
-                  }
-              />
-            </div>
-            <div className="p-field p-col-12 p-md-6">
-              <label htmlFor="listingPrice">Listing Price</label>
-              <InputNumber
-                  id="listingPrice"
-                  value={formData.listingPrice}
-                  onValueChange={(e) =>
-                      setFormData({ ...formData, listingPrice: e.value })
-                  }
-              />
-            </div>
-            <div className="p-field p-col-12">
-              <label htmlFor="description">Description</label>
-              <InputText
-                  id="description"
-                  value={formData.description}
-                  onChange={(event) =>
-                      setFormData({ ...formData, description: event.target.value })
-                  }
-              />
-            </div>
-            <div className="p-field p-col-12 p-md-6">
-              <label htmlFor="quantity">Quantity</label>
-              <InputNumber
-                  id="quantity"
-                  value={formData.quantity}
-                  onValueChange={(e) =>
-                      setFormData({ ...formData, quantity: e.value })
-                  }
-              />
-            </div>
-            <div className="p-field p-col-12 p-md-6">
-              <label htmlFor="pincode">Pincode</label>
-              <InputText
-                  id="pincode"
-                  value={formData.pincode}
-                  onChange={(event) =>
-                      setFormData({ ...formData, pincode: event.target.value })
-                  }
-              />
-            </div>
-            <div className="p-col-12 p-d-flex p-jc-end">
-              <Button
-                  label="Cancel"
-                  className="p-button-text"
-                  onClick={() => setUpdateVisible(false)}
-              />
-              <Button
-                  label="Save"
-                  className="p-button-primary"
-                  onClick={handleUpdateSubmit}
-              />
-            </div>
+            {/* Update Dialog */}
+            <Dialog
+                visible={updateVisible}
+                header="Update Product"
+                onHide={() => setUpdateVisible(false)}
+                style={{ width: "50vw" }}
+            >
+              <div className="p-fluid p-grid p-p-3">
+                <div className="p-field p-col-12">
+                  <label htmlFor="name">Name</label>
+                  <InputText
+                      id="name"
+                      value={formData.name}
+                      onChange={(event) =>
+                          setFormData({ ...formData, name: event.target.value })
+                      }
+                  />
+                </div>
+                <div className="p-field p-col-12 p-md-6">
+                  <label htmlFor="originalPrice">Original Price</label>
+                  <InputNumber
+                      id="originalPrice"
+                      value={formData.originalPrice}
+                      onValueChange={(e) =>
+                          setFormData({ ...formData, originalPrice: e.value })
+                      }
+                  />
+                </div>
+                <div className="p-field p-col-12 p-md-6">
+                  <label htmlFor="listingPrice">Listing Price</label>
+                  <InputNumber
+                      id="listingPrice"
+                      value={formData.listingPrice}
+                      onValueChange={(e) =>
+                          setFormData({ ...formData, listingPrice: e.value })
+                      }
+                  />
+                </div>
+                <div className="p-field p-col-12">
+                  <label htmlFor="description">Description</label>
+                  <InputText
+                      id="description"
+                      value={formData.description}
+                      onChange={(event) =>
+                          setFormData({ ...formData, description: event.target.value })
+                      }
+                  />
+                </div>
+                <div className="p-field p-col-12 p-md-6">
+                  <label htmlFor="quantity">Quantity</label>
+                  <InputNumber
+                      id="quantity"
+                      value={formData.quantity}
+                      onValueChange={(e) =>
+                          setFormData({ ...formData, quantity: e.value })
+                      }
+                  />
+                </div>
+                <div className="p-field p-col-12 p-md-6">
+                  <label htmlFor="pincode">Pincode</label>
+                  <InputText
+                      id="pincode"
+                      value={formData.pincode}
+                      onChange={(event) =>
+                          setFormData({ ...formData, pincode: event.target.value })
+                      }
+                  />
+                </div>
+                <div className="p-col-12 p-d-flex p-jc-end">
+                  <Button
+                      label="Cancel"
+                      className="p-button-text"
+                      onClick={() => setUpdateVisible(false)}
+                  />
+                  <Button
+                      label="Save"
+                      className="p-button-primary"
+                      onClick={handleUpdateSubmit}
+                  />
+                </div>
+              </div>
+            </Dialog>
+            <Dialog
+                visible={visible}
+                header="Confirm Deletion"
+                onHide={() => setVisible(false)}
+                style={{ width: "30vw" }}
+            >
+              <p>Are you sure you want to delete {selectedProduct?.name}?</p>
+              <div className="p-d-flex p-jc-end">
+                <Button
+                    label="Cancel"
+                    className="p-button-text"
+                    onClick={() => setVisible(false)}
+                />
+                <Button
+                    label="Delete"
+                    className="p-button-danger"
+                    onClick={handleDeleteSubmit}
+                />
+              </div>
+            </Dialog>
           </div>
-        </Dialog>
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog
-            visible={visible}
-            header="Confirm Deletion"
-            onHide={() => setVisible(false)}
-            style={{ width: "30vw" }}
-        >
-          <p>Are you sure you want to delete {selectedProduct?.name}?</p>
-          <div className="p-d-flex p-jc-end">
-            <Button
-                label="Cancel"
-                className="p-button-text"
-                onClick={() => setVisible(false)}
-            />
-            <Button
-                label="Delete"
-                className="p-button-danger"
-                onClick={handleDeleteSubmit}
-            />
-          </div>
-        </Dialog>
-      </div>
-  );
-
+      );
+    }
+  else{
+      router.push('/merchant/login');
+      return null;
+      }
 };
 
 export default ProductCatalog;

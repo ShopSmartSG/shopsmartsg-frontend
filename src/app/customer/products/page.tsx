@@ -19,7 +19,6 @@ import FilterSearch from "../../../../shared/components/filter/filterSearch";
 import {useRouter} from "next/navigation";
 
 const Page = () => {
-  const toast = useRef<Toast>(null);
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("categoryId");
   const maxPrice = searchParams.get("maxPrice");
@@ -27,8 +26,9 @@ const Page = () => {
   const pincode = searchParams.get("pincode");
   const searchText = searchParams.get("searchText");
   const [merchants, setMerchants] = useState<string[]>([]);
-  const [isValidSession,setValidSession] = useState(false);
-
+    const [isValidSession, setValidSession] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const toast = useRef(null);
   interface Product {
     productId: string;
     productName: string;
@@ -204,30 +204,31 @@ const response = await axios.put(
       coordinates.find((coord) => coord.id === id)?.lng || center.lng
     );
   };
-  const router = useRouter()
-    useEffect(()=>{
-        const validator = async() => {
-            try{
-                const response  = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`,{
-                    withCredentials:true
-                })
-
-                const data = (await response.data);
-                if(data.status.toLowerCase() != 'failure'){
+  const router = useRouter();
+    useEffect(() => {
+        const validator = async () => {
+            try {
+                const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+                    withCredentials: true
+                });
+                const data = response.data;
+                console.log('API Response:', data); // Debug the response
+                if (data.status && data.status.toLowerCase() !== 'failure') {
                     setValidSession(true);
-                }
-                else{
+                } else {
                     setValidSession(false);
-                    toast.current.show({severity: "error", detail: "You are logged out!! Please Login Again",summary:'Error'});
+                    toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
                 }
-
-            }
-            catch(error){
+            } catch (error) {
+                console.error('Validation Error:', error); // Log the error
                 setValidSession(false);
+            } finally {
+                setIsLoading(false);
             }
-        }
+        };
         validator();
-    },[isValidSession])
+    }, []);
+
   useEffect(() => {
     const getMerchantCoordinates = async () => {
       if (merchants.length > 0) {
@@ -304,7 +305,11 @@ const response = await axios.put(
       </div>
     </div>
   );
-if(isValidSession){
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if(isValidSession){
     return (
         <div>
             <Toast ref={toast} />
@@ -428,8 +433,9 @@ if(isValidSession){
     );
 }
 else{
-    router.push("/customer/login")
-}
+    router.push("/customer/login");
+        return null;
+    }
 
 };
 

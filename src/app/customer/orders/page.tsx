@@ -255,22 +255,22 @@ const Orders = () => {
 
   // Handle session validation
   useEffect(() => {
-    const validator = async() => {
+    const validator = async () => {
       try {
-        const response = await axios.get('https://central-hub.shopsmartsg.com/auth/validate-token', {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
           withCredentials: true
         });
-        
-        const data = await response.data;
-        if(data.status.toLowerCase() !== 'failure') {
+        const data = response.data;
+        console.log('API Response:', data); // Debug the response
+        if (data.status && data.status.toLowerCase() !== 'failure') {
           setValidSession(true);
         } else {
           setValidSession(false);
-          router.push("/customer/login");
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
         }
-      } catch(error) {
+      } catch (error) {
+        console.error('Validation Error:', error); // Log the error
         setValidSession(false);
-        router.push("/customer/login");
       } finally {
         setIsLoading(false);
       }
@@ -372,6 +372,7 @@ if(isValidSession){
 }
  else {
   router.push("/customer/login");
+  return null;
 }
 };
 
