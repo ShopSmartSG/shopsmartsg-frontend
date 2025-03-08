@@ -9,6 +9,7 @@ const Page = () => {
     const router = useRouter();
     const toast = useRef(null);
     const [merchantDetails, setMerchantDetails] = useState(null);
+    const [userType,setUserType] = useState(null);
     useEffect(() => {
         const validator = async () => {
             try {
@@ -16,8 +17,9 @@ const Page = () => {
                     withCredentials: true
                 });
                 const data = response.data;
-                console.log('API Response:', data); // Debug the response
+                // Debug the response
                 if (data.status && data.status.toLowerCase() !== 'failure') {
+                    setUserType(data.profileType);
                     setValidSession(true);
                 } else {
                     setValidSession(false);
@@ -61,6 +63,7 @@ const Page = () => {
             </div>
         );
     }
+
     else {
         router.push('/customer/login');
         return null;

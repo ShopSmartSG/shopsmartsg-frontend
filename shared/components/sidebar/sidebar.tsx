@@ -20,46 +20,41 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const merchantRef = useRef(null);
   const customerRef = useRef(null);
   const deliveryPartnerRef = useRef(null);
-  const {userType} = useAdminContext();
-
+  const [userType, setUserType] = useState("");
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
+  const toast = useRef(null);
+  const [user,setUser] = useState("");
+
 
   useEffect(() => {
-    let userId;
-    try{
-        userId = localStorage.getItem("userId");
-    }
-    catch(error){
-        console.error("Error retrieving userId from localStorage", error);
-        userId = null
-    }
-
-
-    const fetchUsername = async () => {
+    const validator = async () => {
       try {
-        if (!userId) return;
-
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${userId}`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (response.status === 200) {
-          setName(response.data.name);
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+          setUser(data.profileType);
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
         }
       } catch (error) {
-        console.error("Error fetching merchant data:", error);
+        console.log('Validation Error:', error);
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    fetchUsername();
+    validator();
   }, []);
 
   const handleLogout = async() => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout/${userType}`,{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout/${user}`,{
         withCredentials:true
       });
       console.log("Logged Out Successfully", response);
@@ -72,7 +67,6 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
       console.log("User logged out");
     }
   };
-
   return (
     <div>
       <Sidebar
