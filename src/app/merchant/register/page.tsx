@@ -4,6 +4,7 @@ import RegisterForm from "../../../../shared/components/register/page";
 import {useState, useRef, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import axios from "axios";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const EmailOtpForm = () => {
 
