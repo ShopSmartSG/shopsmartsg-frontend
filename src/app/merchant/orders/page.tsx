@@ -12,7 +12,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
     const [isValidSession, setValidSession] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // Loading state
-    const [user,setUser] = useState("");
+    const [user,setUser] = useState(null);
     const toast = useRef(null);
 
   // Fetch Merchant Order Requests
@@ -132,7 +132,7 @@ const Orders = () => {
     if (isLoading) {
         return <div>Loading...</div>;
     }
-    if(user != 'merchant'){
+    if(user&& user != 'merchant'){
        return <ForbiddenPage/>
     }
     if(isValidSession){

@@ -11,7 +11,7 @@ const Page = () => {
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const router = useRouter();
     const toast = useRef(null);
-    const [userType, setUserType] = useState("");
+    const [userType, setUserType] = useState(null);
 
     useEffect(() => {
         const validator = async () => {
