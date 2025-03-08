@@ -13,6 +13,7 @@ import {Checkbox} from "primereact/checkbox";
 import validator from "validator";
 import "./login.css";
 import { Divider } from 'primereact/divider';
+import {useAdminContext} from "@/context/AdminContext";
 
 import axios from "axios";
 
@@ -30,6 +31,7 @@ const Login = ({type}: LoginProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
+    const {setUserTyped} = useAdminContext()
 
     const toast = useRef(null);
 
@@ -163,12 +165,13 @@ const Login = ({type}: LoginProps) => {
                  detail: "Login Successful",
                  life: 3000,
                });
-
+setUserTyped(type);
 
              }
            } catch (error) {
                console.log(error,"Error");
                const location  = error.response.data;
+               setUserTyped(type);
                 window.location.href = location;
              toast.current.show({
                status: "error",

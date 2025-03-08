@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
+import {useAdminContext} from "@/context/AdminContext";
 import Link from "next/link";
 import axios from "axios";
 
@@ -19,6 +20,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const merchantRef = useRef(null);
   const customerRef = useRef(null);
   const deliveryPartnerRef = useRef(null);
+  const {userType} = useAdminContext();
 
   const [name, setName] = useState("");
 
@@ -57,7 +59,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
 
   const handleLogout = async() => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`,{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout/${userType}`,{
         withCredentials:true
       });
       console.log("Logged Out Successfully", response);
