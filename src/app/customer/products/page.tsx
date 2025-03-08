@@ -17,6 +17,7 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import FilterSearch from "../../../../shared/components/filter/filterSearch";
 import {useRouter} from "next/navigation";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -62,6 +63,7 @@ const Page = () => {
   }
 
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
+  const [userType,setUserType] = useState("");
   const [first, setFirst] = useState(0);
   const [rows] = useState(4);
   // const getCurrentPageProducts = () => {
@@ -215,6 +217,7 @@ const response = await axios.put(
                 console.log('API Response:', data); // Debug the response
                 if (data.status && data.status.toLowerCase() !== 'failure') {
                     setValidSession(true);
+                    setUserType(data.profileType);
                 } else {
                     setValidSession(false);
                     toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
@@ -307,6 +310,9 @@ const response = await axios.put(
   );
     if (isLoading) {
         return <div>Loading...</div>;
+    }
+    if(userType != 'customer'){
+        return <ForbiddenPage/>;
     }
 
     if(isValidSession){

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import {Toast} from "primereact/toast";
 import { Card } from "primereact/card";
 import axios from "axios";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const getActiveIndex = (status) => {
   switch (status) {
@@ -251,6 +252,7 @@ const Orders = () => {
   const [isValidSession,setValidSession] = useState(null);
   const toast = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userType,setUserType] = useState(null);
   const router = useRouter();
 
   // Handle session validation
@@ -264,6 +266,7 @@ const Orders = () => {
         console.log('API Response:', data); // Debug the response
         if (data.status && data.status.toLowerCase() !== 'failure') {
           setValidSession(true);
+          setUserType(data.profileType);
         } else {
           setValidSession(false);
           toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
@@ -327,6 +330,11 @@ const Orders = () => {
  if (isLoading) {
   return <div>Loading...</div>;
 }
+
+ if(userType != 'customer'){
+  return <ForbiddenPage/>
+
+ }
 
 if(isValidSession){
   return (

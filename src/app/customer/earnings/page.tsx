@@ -53,6 +53,9 @@ const Page = () => {
     if (isLoading){
         return <div>Loading...</div>;
     }
+    if(userType != 'customer'){
+        return <ForbiddenPage/>
+    }
     if(isValidSession){
         return (
             <div className="text-center">
@@ -64,9 +67,7 @@ const Page = () => {
             </div>
         );
     }
-    if(userType != 'customer'){
-        <ForbiddenPage/>
-    }
+
 
     else {
         router.push('/customer/login');
