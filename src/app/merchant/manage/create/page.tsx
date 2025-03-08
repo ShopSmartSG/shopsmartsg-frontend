@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import axios from "axios";
 import { InputText } from "primereact/inputtext";
+import ForbiddenPage from "../../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 
 
@@ -46,6 +47,7 @@ const Page = () => {
   const [newCategoryDescription, setNewCategoryDescription] = useState("");
   const [isValidSession, setValidSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [userType, setUserType] = useState(null);
 
   const toast = useRef<Toast>(null);
   const accept = () => {
@@ -125,6 +127,7 @@ const Page = () => {
         console.log('API Response:', data); // Debug the response
         if (data.status && data.status.toLowerCase() !== 'failure') {
           setValidSession(true);
+          setUserType(data.profileType);
         } else {
           setValidSession(false);
           toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
@@ -229,6 +232,9 @@ const Page = () => {
   };
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+  if(userType && userType != 'merchant'){
+    return <ForbiddenPage/>
   }
   if(isValidSession){
     return (

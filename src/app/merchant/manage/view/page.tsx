@@ -11,10 +11,9 @@ import { useRouter } from "next/navigation";
 import "./page.css";
 import axios from "axios";
 import { Toast } from "primereact/toast";
-import { getCookie } from "cookies-next";
 import { Message } from "primereact/message";
 import { InputNumber } from "primereact/inputnumber";
-import { useAdminContext } from "@/context/AdminContext";
+import ForbiddenPage from "../../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const ProductCatalog = () => {
   const [products, setProducts] = useState({});
@@ -31,8 +30,8 @@ const ProductCatalog = () => {
   });
   const [selectedProduct, setSelectedProduct] = useState(null);
   const toast = useRef(null);
-  const { adminData, userType } = useAdminContext();
   const [isValidSession, setValidSession] = useState(false);
+  const [userType, setUserType] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const router = useRouter();
 
@@ -143,6 +142,7 @@ const ProductCatalog = () => {
         console.log('API Response:', data); // Debug the response
         if (data.status && data.status.toLowerCase() !== 'failure') {
           setValidSession(true);
+          setUserType(data.profileType);
         } else {
           setValidSession(false);
           toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
@@ -160,6 +160,9 @@ const ProductCatalog = () => {
 
     if (isLoading) {
         return <div>Loading...</div>;
+    }
+    if(userType && userType != 'merchant'){
+      return <ForbiddenPage/>
     }
     if(isValidSession){
       return (
