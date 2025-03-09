@@ -10,10 +10,10 @@ import {Card} from "primereact/card";
 import {Message} from "primereact/message";
 import {InputOtp} from "primereact/inputotp";
 import { Password } from 'primereact/password';
-
+import axios from "axios";
 import "./register.css";
 import {Checkbox} from "primereact/checkbox";
-
+import {useRouter} from "next/navigation";
 interface RegisterFormProps {
     type?: string
 }
@@ -37,6 +37,7 @@ const RegisterForm = ({type}: RegisterFormProps) => {
     const [timer, setTimer] = useState(30); //
     const disabledCondition: boolean = otpCount >= 3;
     const toast = useRef(null);
+    const router = useRouter();
 
     useEffect(() => {
         let interval;
@@ -94,7 +95,45 @@ const RegisterForm = ({type}: RegisterFormProps) => {
         }
     };
 
-    const handleOtpSubmit = () => {
+    const handleOtpSubmit = async() => {
+        const user = type.toLowerCase();
+
+        try{
+            const response = await axios.post(`https://central-hub.shopsmartsg.com/auth/native/signup/${user}`,{
+                email: email,
+                emailAddress: email,
+                password: password,
+                name: name,
+                phoneNumber: phoneNumber,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
+                pinCode: pinCode,
+                otp: otp
+            })
+            if(response.status == 200) {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Registration Successful",
+                    life: 3000,
+                })
+                setTimeout(() => {
+                    router.push("/merchant/login");
+                }, 3000);
+            }
+            else{
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Registration Failed",
+                    life: 3000,
+                })
+                setShowOtpDialog(false);
+            }
+        }
+        catch(error){
+
+        }
         if (parseInt(otp) == 123456) {
             toast.current.show({
                 severity: "success",
@@ -119,7 +158,22 @@ const RegisterForm = ({type}: RegisterFormProps) => {
     };
 
 
-    const handleResendOtp = () => {
+    const handleResendOtp = async() => {
+        const user = type.toLowerCase();
+        try{
+            const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/native/generate-otp/${user}/${email}`);
+            if(response.status == 200){
+                toast.current.show({
+                    severity: "info",
+                    summary: "OTP Resent",
+                    detail: "OTP has been resent to your email.",
+                    life: 3000,
+                })
+            }
+        }
+
+        catch (error){
+        }
         setResendDisabled(true);
         setTimer(30);
         toast.current.show({
@@ -181,9 +235,10 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                         <div className="p-card-footer min-w-4">
                             <Button
                                 label="Next"
-                                type="submit"
+
                                 style={{width: "80px"}}
                                 disabled={emailError != ""}
+                                onClick={handleResendOtp}
                             />
                         </div>
                     </form>

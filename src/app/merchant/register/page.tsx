@@ -34,19 +34,16 @@ const EmailOtpForm = () => {
       }
     };
     validator();
-  }, []); // Empty dependency array
+  }, []);
+
     if (isLoading){
         return <div>Loading...</div>;
     }
-    if(isValidSession){
       return (
           <RegisterForm type={"Merchant"}/>
       );
-    }
-    else{
-        router.push('/merchant/login');
-        return null;
-    }
+
+
 };
 
 export default EmailOtpForm;
