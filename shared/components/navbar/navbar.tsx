@@ -84,12 +84,49 @@ export default function Navbar() {
         if (data.status && data.status.toLowerCase() !== "failure") {
           setValidSession(true);
         } else {
-          setValidSession(false);
-          toast.current.show({
-            severity: "error",
-            detail: "You are logged out!! Please Login Again",
-            summary: "Error",
-          });
+
+            setTotalPrice(totalPrice + discountedPrice);
+        }
+    }, [useRewardPoints])
+
+    const placeOrder = async (customerId: string) => {
+
+
+        setLoading(true);
+        try {
+            const response = await axios.put(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
+
+                {
+                    data: "k",
+                    useDelivery: homeDelivered
+                }
+            );
+            if (response.status == 200) {
+                setTimeout(() => {
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Order Placed",
+                        detail: "Your order has been placed successfully",
+                        life: 3000,
+                    });
+                    setCartVisibility(false);
+                    setCartItems([]);
+                }, 3000);
+                router.push("/customer/orders");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error placing order. Please try again later.",
+                life: 300,
+            });
+        } finally {
+            setLoading(false);
+
         }
       } catch (error) {
         console.error("Validation Error:", error); // Log the error
@@ -98,17 +135,30 @@ export default function Navbar() {
         setIsLoading(false);
       }
     };
-    validator();
-  }, []);
-  useEffect(() => {
-    const getCustomerDetails = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer`,
-        );
-        if (response.status == 200) {
-          setCustomerName(response.data.name);
-          setRewardPoints(response.data.rewardPoints);
+
+
+
+    const fetchProductDetails = async (productId, merchantId) => {
+        try {
+            const response = await axios.get(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`
+
+            );
+
+            return {
+                listingPrice: response.data.listingPrice,
+                productName: response.data.productName,
+                imageUrl: response.data.imageUrl,
+            };
+        } catch (error) {
+            console.error(`Error fetching details for product ${productId}:`, error);
+            return {
+                listingPrice: null,
+                productName: "Not available",
+                imageUrl: null,
+            };
+
         }
       } catch (error) {
         console.error(error);
@@ -142,34 +192,18 @@ export default function Navbar() {
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
 
-        {
-          data: "k",
-          useDelivery: homeDelivered,
-        },
-      );
-      if (response.status == 200) {
-        setTimeout(() => {
-          toast.current.show({
-            severity: "success",
-            summary: "Order Placed",
-            detail: "Your order has been placed successfully",
-            life: 3000,
-          });
-          setCartVisibility(false);
-          setCartItems([]);
-        }, 3000);
-        router.push("/customer/orders");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error placing order. Please try again later.",
-        life: 300,
-      });
-    } finally {
-      setLoading(false);
+
+    const checkoutWithDelivery = async (customerId: string) => {
+        try {
+            const response = await axios.put(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/`
+
+            );
+        } catch (error) {
+            console.error("Error fetching delivery options:", error);
+        }
+
     }
   };
 
@@ -244,19 +278,47 @@ export default function Navbar() {
       }
     };
 
-    fetchData();
-  }, []);
 
-  const getDiscountedPrice = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`,
-      );
-      if (response.status == 200) {
-        setDiscountedPrice(response.data.rewardAmount);
-      }
-    } catch (error) {
-      console.error("Error fetching discount price:", error);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+
+                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`
+
+                );
+
+                setMerchantId(response.data.merchantId);
+
+                const itemsWithDetails = await fetchAllProductDetails(
+                    response.data.cartItems,
+                    response.data.merchantId
+                );
+
+                setCartItems(itemsWithDetails);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
+    const getDiscountedPrice = async () => {
+        try {
+            const response = await axios.get(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
+
+            );
+            if (response.status == 200) {
+                setDiscountedPrice(response.data.rewardAmount)
+            }
+        } catch (error) {
+            console.error("Error fetching discount price:", error);
+        }
+
     }
   };
 
@@ -342,86 +404,138 @@ export default function Navbar() {
           productId: item.productId,
           quantity: item.quantity,
         },
-      );
-      // Update cart items after deletion
-      setCartItems(
-        cartItems.filter((cartItem) => cartItem.productId !== item.productId),
-      );
-    } catch (err) {
-      console.error("Error deleting cart item:", err);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error deleting item from cart",
-        life: 3000,
-      });
-    }
-  };
 
-  const clearCart = async (customerId: string) => {
-    try {
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`,
-      );
-      setCartItems([]);
-      setTotalPrice(0);
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error clearing cart",
-        life: 3000,
-      });
-    }
-  };
+    ];
 
-  const end = (
-    <div className="flex align-items-center gap-2">
-      {userType && userType !== "delivery" && (
-        <i
-          className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
-          style={{ fontSize: "24px" }}
-          onClick={() => setCartVisibility(true)}
-        >
-          <Badge value={cartItems.length} />
-        </i>
-      )}
+    const endItems: MenuItem[] = [];
 
-      <Avatar
-        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-        shape="circle"
-      />
+    const start = (
+        <Link href="/" className="navbar-title">
+            ShopSmart
+        </Link>
+    );
 
-      <Button
-        icon="pi pi-bars"
-        onClick={() => setSidebarVisible(true)}
-        className="p-button-text"
-      />
-      <Dialog
-        visible={cartVisibility}
-        style={{ width: "50vw" }}
-        onHide={() => setCartVisibility(false)}
-        resizable={false}
-        modal={true}
-        draggable={false}
-        header={headerElement}
-        footer={footerContent}
-        maximized={true}
-      >
-        {cartItems.map((item, index) => (
-          <div
-            key={index}
-            className="grid align-items-center gap-3 mb-3"
-            style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}
-          >
-            <div className="col-4">
-              <Image
-                src={`${item.imageUrl}`}
-                alt="Product Image"
-                height="200"
-                width="180"
-              />
-            </div>
+    const deleteCartItem = async (item) => {
+        try {
+            const response = await axios.put(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/deleteFromCart/${'userId'}`,
+
+                {
+                    productId: item.productId,
+                    quantity: item.quantity,
+                }
+            );
+            // Update cart items after deletion
+            setCartItems(
+                cartItems.filter((cartItem) => cartItem.productId !== item.productId)
+            );
+        } catch (err) {
+            console.error("Error deleting cart item:", err);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error deleting item from cart",
+                life: 3000,
+            });
+        }
+    };
+
+    const clearCart = async (customerId: string) => {
+        try {
+            const response = await axios.delete(
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`
+
+            );
+            setCartItems([]);
+            setTotalPrice(0);
+        } catch (error) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error clearing cart",
+                life: 3000,
+            });
+        }
+    };
+
+    const end = (
+        <div className="flex align-items-center gap-2">
+            <i
+                className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
+                style={{fontSize: "24px"}}
+                onClick={() => setCartVisibility(true)}
+            >
+                <Badge value={cartItems.length}/>
+            </i>
+            <Avatar
+                image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                shape="circle"
+            />
+
+            <Button
+                icon="pi pi-bars"
+                onClick={() => setSidebarVisible(true)}
+                className="p-button-text"
+            />
+            <Dialog
+                visible={cartVisibility}
+                style={{width: "50vw"}}
+                onHide={() => setCartVisibility(false)}
+                resizable={false}
+                modal={true}
+                draggable={false}
+                header={headerElement}
+                footer={footerContent}
+                maximized={true}
+            >
+                {cartItems.map((item, index) => (
+                    <div
+                        key={index}
+                        className="grid align-items-center gap-3 mb-3"
+                        style={{padding: "10px", borderBottom: "1px solid #e0e0e0"}}
+                    >
+                        <div className="col-4">
+                            <Image
+                                src={`${item.imageUrl}`}
+                                alt="Product Image"
+                                height="200"
+                                width="180"
+                            />
+                        </div>
+
+                        <div className="col-7 product-details p-1">
+                            <div className="grid">
+                                <div className="col-4 text-left font-bold">
+                                    <p>Product Name</p>
+                                    <p>Quantity</p>
+                                    <p>Price</p>
+                                    <p>Subtotal</p>
+                                </div>
+                                <div className="col-7 text-right">
+                                    <p>{item.productName}</p>
+                                    <p>{item.quantity}</p>
+                                    <p>${item.listingPrice}</p>
+                                    <p>${(item.listingPrice * item.quantity).toFixed(2)}</p>
+                                    <i
+                                        className="pi pi-trash cursor-pointer"
+                                        style={{color: "red"}}
+                                        onClick={() => deleteCartItem(item)}
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </Dialog>
+
+            <HeadlessDemo
+                visible={sidebarVisible}
+                onHide={() => setSidebarVisible(false)}
+            />
+        </div>
+    );
 
             <div className="col-7 product-details p-1">
               <div className="grid">
