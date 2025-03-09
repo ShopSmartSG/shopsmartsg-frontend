@@ -126,17 +126,28 @@ const ProductCatalog = () => {
   };
 
   useEffect(() => {
-    // Simulate fetching data with dummy data
-    const dummyProducts = {
-      // Electronics: [
-      //
-      // ],
-      // Clothing: [
-      //
-      // ],
-    };
-    setProducts(dummyProducts);
+     const fetchProducts = async() => {
+       try{
+         const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProductCatalog`,{
+              withCredentials: true
+         })
+         const data = await response.data;
+         setProducts(data);
+       }
+       catch(error){
+         console.log(error,"Error Fetching Data");
+         toast.current.show({
+              severity: "error",
+              summary: "Error Fetching Data",
+              detail: "Please Try Again!!",
+         })
+
+       }
+     }
+    fetchProducts();
+
   }, []);
+
   useEffect(() => {
     const validator = async () => {
       try {

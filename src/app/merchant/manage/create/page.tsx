@@ -211,8 +211,7 @@ const Page = () => {
     try {
       const response = await axios.post(
 
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCategories`,
-
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/postCategory`,
         {
           categoryName: newCategory,
           categoryDescription: newCategoryDescription,
