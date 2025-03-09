@@ -20,7 +20,6 @@ const Page = () => {
                     withCredentials: true
                 });
                 const data = response.data;
-                console.log('API Response:', data); // Debug the response
                 if (data.status && data.status.toLowerCase() !== 'failure') {
                     setValidSession(true);
                     setUserType(data.profileType);
