@@ -107,7 +107,7 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                 phoneNumber: phoneNumber,
                 addressLine1: addressLine1,
                 addressLine2: addressLine2,
-                pinCode: pinCode,
+                pincode: pinCode,
                 otp: otp
             })
             if(response.status == 200) {
