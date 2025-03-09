@@ -258,7 +258,7 @@ setUserTyped(type);
                     </div>
                     <Divider/>
                     <div className="col-12 mt-4 text-center">
-                        <Link href={`/${userType}/register`}>Click here to register.</Link>
+                        {userType != 'delivery' && (<Link href={`/${userType}/register`}>Click here to register.</Link>)}
                     </div>
 
                 </div>
