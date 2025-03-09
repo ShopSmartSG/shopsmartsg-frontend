@@ -9,6 +9,8 @@ import { Toast } from "primereact/toast";
 import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { InputOtp } from "primereact/inputotp";
+import axios from "axios";
+import {useRouter} from "next/navigation";
 
 const EmailOtpForm = () => {
   const [email, setEmail] = useState("");
@@ -26,6 +28,9 @@ const EmailOtpForm = () => {
   const [timer, setTimer] = useState(30);
   const disabledCondition: boolean = otpCount >= 3;
   const toast = useRef(null);
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     let interval;
@@ -45,6 +50,29 @@ const EmailOtpForm = () => {
 
     return () => clearInterval(interval);
   }, [resendDisabled]);
+  useEffect(() => {
+    const validator = async () => {
+      try {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        console.log('API Response:', data); // Debug the response
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
+        }
+      } catch (error) {
+        console.error('Validation Error:', error);
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    validator();
+  }, []);
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();
@@ -101,7 +129,10 @@ const EmailOtpForm = () => {
       life: 3000,
     });
   };
-
+if(isLoading){
+    return <div>Loading...</div>;
+}
+if(isValidSession){
   return (
       <div className="flex justify-content-center align-items-center min-h-screen p-3">
         <Card className="w-full max-w-md">
@@ -233,6 +264,11 @@ const EmailOtpForm = () => {
         <Toast ref={toast} />
       </div>
   );
+}
+ else{
+   router.push('/merchant/login');
+   return null;
+}
 };
 
 export default EmailOtpForm;

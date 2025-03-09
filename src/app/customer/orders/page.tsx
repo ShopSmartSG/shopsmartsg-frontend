@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import {Toast} from "primereact/toast";
 import { Card } from "primereact/card";
 import axios from "axios";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const getActiveIndex = (status) => {
   switch (status) {
@@ -251,26 +252,28 @@ const Orders = () => {
   const [isValidSession,setValidSession] = useState(null);
   const toast = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userType,setUserType] = useState(null);
   const router = useRouter();
 
   // Handle session validation
   useEffect(() => {
-    const validator = async() => {
+    const validator = async () => {
       try {
-        const response = await axios.get('https://central-hub.shopsmartsg.com/auth/validate-token', {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
           withCredentials: true
         });
-        
-        const data = await response.data;
-        if(data.status.toLowerCase() !== 'failure') {
+        const data = response.data;
+        console.log('API Response:', data); // Debug the response
+        if (data.status && data.status.toLowerCase() !== 'failure') {
           setValidSession(true);
+          setUserType(data.profileType);
         } else {
           setValidSession(false);
-          router.push("/customer/login");
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
         }
-      } catch(error) {
+      } catch (error) {
+        console.error('Validation Error:', error); // Log the error
         setValidSession(false);
-        router.push("/customer/login");
       } finally {
         setIsLoading(false);
       }
@@ -328,6 +331,11 @@ const Orders = () => {
   return <div>Loading...</div>;
 }
 
+ if(userType&& userType != 'customer'){
+  return <ForbiddenPage/>
+
+ }
+
 if(isValidSession){
   return (
       <div className="p-4">
@@ -372,6 +380,7 @@ if(isValidSession){
 }
  else {
   router.push("/customer/login");
+  return null;
 }
 };
 

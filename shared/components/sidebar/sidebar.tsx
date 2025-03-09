@@ -19,45 +19,59 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
   const merchantRef = useRef(null);
   const customerRef = useRef(null);
   const deliveryPartnerRef = useRef(null);
-
+  const [userType, setUserType] = useState("");
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
+  const toast = useRef(null);
+  const [user,setUser] = useState("");
+  const [isMerchant, setIsMerchant] = useState(true);
+  const [isCustomer, setIsCustomer] = useState(true);
+  const [isDeliveryPartner, setIsDeliveryPartner] = useState(true);
+
 
   useEffect(() => {
-    let userId;
-    try{
-        userId = localStorage.getItem("userId");
-    }
-    catch(error){
-        console.error("Error retrieving userId from localStorage", error);
-        userId = null
-    }
-
-
-    const fetchUsername = async () => {
+    const validator = async () => {
       try {
-        if (!userId) return;
-
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${userId}`,
-          {
-            withCredentials: true,
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+          setUser(data.profileType);
+          if(user == 'customer'){
+            setIsCustomer(true);
+            setIsMerchant(false);
+            setIsDeliveryPartner(false);
           }
-        );
-
-        if (response.status === 200) {
-          setName(response.data.name);
+            else if(user == 'merchant'){
+                setIsMerchant(true);
+                setIsCustomer(false);
+                setIsDeliveryPartner(false);
+            }
+            else if(user == 'delivery'){
+                setIsDeliveryPartner(true);
+                setIsCustomer(false);
+                setIsMerchant(false);
+            }
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
         }
       } catch (error) {
-        console.error("Error fetching merchant data:", error);
+        console.log('Validation Error:', error);
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    fetchUsername();
+    validator();
   }, []);
 
   const handleLogout = async() => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout`,{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/logout/${user}`,{
         withCredentials:true
       });
       console.log("Logged Out Successfully", response);
@@ -70,7 +84,6 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
       console.log("User logged out");
     }
   };
-
   return (
     <div>
       <Sidebar
@@ -140,18 +153,18 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                         </li>
 
                         {/* Merchant Section */}
-                        <li>
+                        {isMerchant && ( <li>
                           <StyleClass
-                            nodeRef={merchantRef}
-                            selector="@next"
-                            enterClassName="hidden"
-                            enterActiveClassName="slidedown"
-                            leaveToClassName="hidden"
-                            leaveActiveClassName="slideup"
+                              nodeRef={merchantRef}
+                              selector="@next"
+                              enterClassName="hidden"
+                              enterActiveClassName="slidedown"
+                              leaveToClassName="hidden"
+                              leaveActiveClassName="slideup"
                           >
                             <button
-                              ref={merchantRef}
-                              className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                ref={merchantRef}
+                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             >
                               <i className="pi pi-shopping-cart mr-2"></i>
                               <span className="font-medium">Merchant</span>
@@ -163,8 +176,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden">
                             <li>
                               <Link
-                                href="/merchant/manage/create"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/merchant/manage/create"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-plus mr-2"></i>
                                 <span className="font-medium">Add Product</span>
@@ -173,8 +186,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                             <li>
                               <Link
-                                href="/merchant/manage/view"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/merchant/manage/view"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-list mr-2"></i>
                                 <span className="font-medium">
@@ -185,8 +198,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                             <li>
                               <Link
-                                href="/merchant/orders"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/merchant/orders"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-shopping-bag mr-2"></i>
                                 <span className="font-medium">Orders</span>
@@ -195,8 +208,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                             <li>
                               <Link
-                                href="/merchant/earnings"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/merchant/earnings"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-wallet mr-2"></i>
                                 <span className="font-medium">Earnings</span>
@@ -214,22 +227,23 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               </Link>
                             </li>
                           </ul>
-                        </li>
+                        </li>)}
+
 
 
                         {/* Customer Section */}
-                        <li className={"mt-2"}>
+                        {isCustomer && ( <li className={"mt-2"}>
                           <StyleClass
-                            nodeRef={customerRef}
-                            selector="@next"
-                            enterClassName="hidden"
-                            enterActiveClassName="slidedown"
-                            leaveToClassName="hidden"
-                            leaveActiveClassName="slideup"
+                              nodeRef={customerRef}
+                              selector="@next"
+                              enterClassName="hidden"
+                              enterActiveClassName="slidedown"
+                              leaveToClassName="hidden"
+                              leaveActiveClassName="slideup"
                           >
                             <button
-                              ref={customerRef}
-                              className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                ref={customerRef}
+                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             >
                               <i className="pi pi-users mr-2"></i>
                               <span className="font-medium">Customer</span>
@@ -241,8 +255,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden">
                             <li>
                               <Link
-                                href="/customer/orders"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/customer/orders"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-shopping-bag mr-2"></i>
                                 <span className="font-medium">View Orders</span>
@@ -251,8 +265,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                             </li>
                             <li>
                               <Link
-                                href="/customer/earnings"
-                                className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                  href="/customer/earnings"
+                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
                                 <i className="pi pi-shopping-bag mr-2"></i>
                                 <span className="font-medium">Rewards</span>
@@ -271,10 +285,11 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               </Link>
                             </li>
                           </ul>
-                        </li>
+                        </li>)}
+
 
                         {/* Delivery Partner section */}
-                        <li className={"mt-2"}>
+                        {isDeliveryPartner && <li className={"mt-2"}>
                           <StyleClass
                               nodeRef={deliveryPartnerRef}
                               selector="@next"
@@ -327,7 +342,8 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                               </Link>
                             </li>
                           </ul>
-                        </li>
+                        </li>}
+
                       </ul>
                     </li>
                   </ul>

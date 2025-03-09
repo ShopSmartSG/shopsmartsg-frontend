@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import axios from "axios";
 import { InputText } from "primereact/inputtext";
+import ForbiddenPage from "../../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 
 
@@ -44,6 +45,9 @@ const Page = () => {
   const [category, setCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newCategoryDescription, setNewCategoryDescription] = useState("");
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [userType, setUserType] = useState(null);
 
   const toast = useRef<Toast>(null);
   const accept = () => {
@@ -65,13 +69,7 @@ const Page = () => {
   };
 
 
- let userId, userType;
-  try {
-    userId = localStorage.getItem("userId");
-    userType = localStorage.getItem("userType");
-  } catch (error) {
-    console.error("Error accessing localStorage", error);
-  }
+
   const onUpload = async (event) => {
     try {
       const file = event.files[0];
@@ -119,12 +117,36 @@ const Page = () => {
     };
     fetchCategories();
   }, []);
+  useEffect(() => {
+    const validator = async () => {
+      try {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        console.log('API Response:', data); // Debug the response
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+          setUserType(data.profileType);
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
+        }
+      } catch (error) {
+        console.error('Validation Error:', error); // Log the error
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    validator();
+  }, []); // Empty dependency array
 
   useEffect(() => {
     const getMerchantDetails = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${userId}`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant`
         );
         setMerchantDetails(response.data);
       } catch (error) {
@@ -208,160 +230,163 @@ const Page = () => {
       console.log("error", error); // error
     }
   };
-
-
-  if (userType === 'MERCHANT' && (userId != null || userId != '')) {
-     return (
-       <fieldset className="h-screen">
-         <legend>Create Product</legend>
-         <div className="p-2">
-           <div className="field">
-             <label htmlFor="firstname1">Product Name</label>
-             <input
-               id="firstname1"
-               type="text"
-               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-               value={productName}
-               onChange={(e) => setProductName(e.target.value)}
-             />
-           </div>
-           <div className="field">
-             <label htmlFor="lastname1">Product Description</label>
-             <InputTextarea
-               id="lastname1"
-               className="w-full"
-               value={productDescription}
-               onChange={(e) => setProductDescription(e.target.value)}
-             />
-           </div>
-           <div className="formgrid grid">
-             <div className="field col-6">
-               <label htmlFor="productPrice">Product Price</label>
-               <InputNumber
-                 id="productPrice"
-                 className="w-full"
-                 mode="currency"
-                 currency="SGD"
-                 locale="en-SG"
-                 value={productPrice}
-                 onValueChange={(e) => setProductPrice(e.value)}
-               />
-             </div>
-             <div className="field col-6">
-               <label htmlFor="productPrice">Listing Price</label>
-               <InputNumber
-                 id="productPrice"
-                 className="w-full"
-                 mode="currency"
-                 currency="SGD"
-                 locale="en-SG"
-                 value={listingPrice}
-                 onValueChange={(e) => setListingPrice(e.value)}
-               />
-             </div>
-             <div className="field col-6">
-               <label htmlFor="category" className="block">
-                 Category
-               </label>
-               <Dropdown
-                 optionLabel="categoryName"
-                 optionValue="categoryId" // Assuming each category has an 'id' field
-                 className="w-full"
-                 id="category"
-                 options={categories}
-                 placeholder="Select a Category"
-                 value={category} // Bind selected value to 'category' state
-                 onChange={(event) => {
-                   setCategory(event.value); // Update category state with selected value
-                   setMerchantDetails((prev) => ({
-                     ...prev,
-                     category:
-                       categories.find((cat) => cat.id === event.value) || {}, // Set full category details
-                   }));
-                 }}
-               />
-             </div>
-             {category == "others" ? (
-               <div className="inline">
-                 <div className="field col-6">
-                   <label htmlFor="categoryName">Category Name</label>
-                   <InputText
-                     className="w-100"
-                     onChange={(e) => setNewCategory(e.target.value)}
-                   />
-                 </div>
-                 <div className="field col-6">
-                   <label htmlFor="categoryDescription">
-                     Category Description
-                   </label>
-                   <InputTextarea
-                     className="w-100"
-                     onChange={(e) => setNewCategoryDescription(e.target.value)}
-                   />
-                   <Button label="Add Category" onClick={categoryHandler} />
-                 </div>
-               </div>
-             ) : (
-               <></>
-             )}
-             <div className="field col-6">
-               <label htmlFor="productPrice">Quantity</label>
-               <InputNumber
-                 id="productPrice"
-                 className="w-full"
-                 value={quantity}
-                 locale="en-SG"
-                 onValueChange={(e) => setQuantity(e.value)}
-               />
-             </div>
-             <div className="col-6 ">
-               <div className="field">
-                 <label htmlFor="">Upload Product Image</label>
-                 <Toast ref={toast}></Toast>
-                 <FileUpload
-                   mode="advanced"
-                   name="file"
-                   url={`${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/images/upload`}
-                   accept="image/*"
-                   maxFileSize={1000000}
-                   onUpload={onUpload}
-                   auto={true}
-                   chooseLabel="Browse"
-                 />
-               </div>
-             </div>
-             <div className="col-12 mt-2">
-               <Toast ref={toast} />
-               <ConfirmDialog
-                 group="declarative"
-                 visible={visible}
-                 onHide={() => setVisible(false)}
-                 message="Are you sure you want to proceed?"
-                 header="Confirmation"
-                 icon="pi pi-exclamation-triangle"
-                 accept={accept}
-                 reject={reject}
-                 style={{ width: "50vw" }}
-                 breakpoints={{ "1100px": "75vw", "960px": "100vw" }}
-               />
-               <div className="card">
-                 <Button
-                   onClick={() => createProduct()}
-                   icon="pi pi-check"
-                   label="Create Product"
-                 />
-               </div>
-             </div>
-           </div>
-         </div>
-       </fieldset>
-     );
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
-  else {
-    router.push('/merchant/login')
+  if(userType && userType != 'merchant'){
+    return <ForbiddenPage/>
   }
-
- 
+  if(isValidSession){
+    return (
+        <fieldset className="h-screen">
+          <legend>Create Product</legend>
+          <div className="p-2">
+            <div className="field">
+              <label htmlFor="firstname1">Product Name</label>
+              <input
+                  id="firstname1"
+                  type="text"
+                  className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="lastname1">Product Description</label>
+              <InputTextarea
+                  id="lastname1"
+                  className="w-full"
+                  value={productDescription}
+                  onChange={(e) => setProductDescription(e.target.value)}
+              />
+            </div>
+            <div className="formgrid grid">
+              <div className="field col-6">
+                <label htmlFor="productPrice">Product Price</label>
+                <InputNumber
+                    id="productPrice"
+                    className="w-full"
+                    mode="currency"
+                    currency="SGD"
+                    locale="en-SG"
+                    value={productPrice}
+                    onValueChange={(e) => setProductPrice(e.value)}
+                />
+              </div>
+              <div className="field col-6">
+                <label htmlFor="productPrice">Listing Price</label>
+                <InputNumber
+                    id="productPrice"
+                    className="w-full"
+                    mode="currency"
+                    currency="SGD"
+                    locale="en-SG"
+                    value={listingPrice}
+                    onValueChange={(e) => setListingPrice(e.value)}
+                />
+              </div>
+              <div className="field col-6">
+                <label htmlFor="category" className="block">
+                  Category
+                </label>
+                <Dropdown
+                    optionLabel="categoryName"
+                    optionValue="categoryId" // Assuming each category has an 'id' field
+                    className="w-full"
+                    id="category"
+                    options={categories}
+                    placeholder="Select a Category"
+                    value={category} // Bind selected value to 'category' state
+                    onChange={(event) => {
+                      setCategory(event.value); // Update category state with selected value
+                      setMerchantDetails((prev) => ({
+                        ...prev,
+                        category:
+                            categories.find((cat) => cat.id === event.value) || {}, // Set full category details
+                      }));
+                    }}
+                />
+              </div>
+              {category == "others" ? (
+                  <div className="inline">
+                    <div className="field col-6">
+                      <label htmlFor="categoryName">Category Name</label>
+                      <InputText
+                          className="w-100"
+                          onChange={(e) => setNewCategory(e.target.value)}
+                      />
+                    </div>
+                    <div className="field col-6">
+                      <label htmlFor="categoryDescription">
+                        Category Description
+                      </label>
+                      <InputTextarea
+                          className="w-100"
+                          onChange={(e) => setNewCategoryDescription(e.target.value)}
+                      />
+                      <Button label="Add Category" onClick={categoryHandler} />
+                    </div>
+                  </div>
+              ) : (
+                  <></>
+              )}
+              <div className="field col-6">
+                <label htmlFor="productPrice">Quantity</label>
+                <InputNumber
+                    id="productPrice"
+                    className="w-full"
+                    value={quantity}
+                    locale="en-SG"
+                    onValueChange={(e) => setQuantity(e.value)}
+                />
+              </div>
+              <div className="col-6 ">
+                <div className="field">
+                  <label htmlFor="">Upload Product Image</label>
+                  <Toast ref={toast}></Toast>
+                  <FileUpload
+                      mode="advanced"
+                      name="file"
+                      url={`${process.env.NEXT_PUBLIC_PRODUCTMGMT_API_URL}/merchants/images/upload`}
+                      accept="image/*"
+                      maxFileSize={1000000}
+                      onUpload={onUpload}
+                      auto={true}
+                      chooseLabel="Browse"
+                  />
+                </div>
+              </div>
+              <div className="col-12 mt-2">
+                <Toast ref={toast} />
+                <ConfirmDialog
+                    group="declarative"
+                    visible={visible}
+                    onHide={() => setVisible(false)}
+                    message="Are you sure you want to proceed?"
+                    header="Confirmation"
+                    icon="pi pi-exclamation-triangle"
+                    accept={accept}
+                    reject={reject}
+                    style={{ width: "50vw" }}
+                    breakpoints={{ "1100px": "75vw", "960px": "100vw" }}
+                />
+                <div className="card">
+                  <Button
+                      onClick={() => createProduct()}
+                      icon="pi pi-check"
+                      label="Create Product"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+    );
+  }
+  else{
+    router.push('/merchant/login');
+    return null;
+  }
 };
 
 export default Page;

@@ -1,20 +1,26 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import {Toast} from "primereact/toast";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+    const [isValidSession, setValidSession] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [user,setUser] = useState(null);
+    const toast = useRef(null);
 
   // Fetch Merchant Order Requests
   useEffect(() => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/merchant/id/${userId}`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/merchant/id`
         );
         setOrders(response.data);
       } catch (error) {
@@ -23,14 +29,34 @@ const Orders = () => {
     };
     fetchMerchantOrderRequests();
   }, []);
- let userType, userId;
-  try {
-    userType = localStorage.getItem("userType");
-    userId = localStorage.getItem("userId");
-  } catch (error) {
-    console.error("Error accessing localStorage:", error);
-  }
-  const router = useRouter();
+
+    useEffect(() => {
+        const validator = async () => {
+            try {
+                const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+                    withCredentials: true
+                });
+                const data = response.data;
+                console.log('API Response:', data); // Debug the response
+                if (data.status && data.status.toLowerCase() !== 'failure') {
+                    setValidSession(true);
+                    setUser(data.profileType);
+                } else {
+                    setValidSession(false);
+                    toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
+                }
+            } catch (error) {
+                console.error('Validation Error:', error); // Log the error
+                setValidSession(false);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        validator();
+    }, []); // Empty dependency array
+
+
+    const router = useRouter();
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
@@ -103,85 +129,93 @@ const Orders = () => {
         return null;
     }
   };
-
-  if (userType === "MERCHANT" && (userId != null || userId != "")) {
-    return (
-      <div>
-        <h2>Ongoing Orders</h2>
-        <div className="p-grid">
-          {ongoingOrders.map((order) => (
-            <div key={order.orderId} className="col-12 md:col-4">
-              <Card title={`Order ID: ${order.orderId}`}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <p>Status: {order.status}</p>
-                    <p>Total Price: ${order.totalPrice}</p>
-                    <p>
-                      Date: {new Date(order.createdDate).toLocaleDateString()}
-                    </p>
-                    <p>Customer: {order.customerId}</p>
-                    <Link href={`/merchant/orders/${order.orderId}`}>
-                      View Order Details
-                    </Link>
-                    <p>
-                      Delivery :{" "}
-                      {order.useDelivery ? "Partner Assisted" : "Self - Pickup"}{" "}
-                    </p>
-                  </div>
-                  {renderButtons(
-                    order.orderId,
-                    order.status,
-                    order.useDelivery
-                  )}
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+    if(user&& user != 'merchant'){
+       return <ForbiddenPage/>
+    }
+    if(isValidSession){
+        return (
+            <div>
+                <h2>Ongoing Orders</h2>
+                <div className="p-grid">
+                    {ongoingOrders.map((order) => (
+                        <div key={order.orderId} className="col-12 md:col-4">
+                            <Card title={`Order ID: ${order.orderId}`}>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <div>
+                                        <p>Status: {order.status}</p>
+                                        <p>Total Price: ${order.totalPrice}</p>
+                                        <p>
+                                            Date: {new Date(order.createdDate).toLocaleDateString()}
+                                        </p>
+                                        <p>Customer: {order.customerId}</p>
+                                        <Link href={`/merchant/orders/${order.orderId}`}>
+                                            View Order Details
+                                        </Link>
+                                        <p>
+                                            Delivery :{" "}
+                                            {order.useDelivery ? "Partner Assisted" : "Self - Pickup"}{" "}
+                                        </p>
+                                    </div>
+                                    {renderButtons(
+                                        order.orderId,
+                                        order.status,
+                                        order.useDelivery
+                                    )}
+                                </div>
+                            </Card>
+                        </div>
+                    ))}
                 </div>
-              </Card>
-            </div>
-          ))}
-        </div>
 
-        <h2>Past Orders</h2>
-        <div className="p-grid">
-          {pastOrders.map((order) => (
-            <div key={order.orderId} className="col-12 md:col-4">
-              <Card title={`Order ID: ${order.orderId}`}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <p>Status: {order.status}</p>
-                    <p>Total Price: ${order.totalPrice}</p>
-                    <p>
-                      Date: {new Date(order.createdDate).toLocaleDateString()}
-                    </p>
-                    <p>Customer: {order.customerId}</p>
-                    <Link href={`/merchant/orders/${order.orderId}`}>
-                      View Order Details
-                    </Link>
-                  </div>
-                  {renderButtons(
-                    order.orderId,
-                    order.status,
-                    order.useDelivery
-                  )}
+                <h2>Past Orders</h2>
+                <div className="p-grid">
+                    {pastOrders.map((order) => (
+                        <div key={order.orderId} className="col-12 md:col-4">
+                            <Card title={`Order ID: ${order.orderId}`}>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <div>
+                                        <p>Status: {order.status}</p>
+                                        <p>Total Price: ${order.totalPrice}</p>
+                                        <p>
+                                            Date: {new Date(order.createdDate).toLocaleDateString()}
+                                        </p>
+                                        <p>Customer: {order.customerId}</p>
+                                        <Link href={`/merchant/orders/${order.orderId}`}>
+                                            View Order Details
+                                        </Link>
+                                    </div>
+                                    {renderButtons(
+                                        order.orderId,
+                                        order.status,
+                                        order.useDelivery
+                                    )}
+                                </div>
+                            </Card>
+                        </div>
+                    ))}
                 </div>
-              </Card>
+                <Toast ref={toast} position="top-right" />
             </div>
-          ))}
-        </div>
-      </div>
-    );
-  } else {
+        );
+    }
+  else {
     router.push("/merchant/login");
+    return null;
   }
 };
 
