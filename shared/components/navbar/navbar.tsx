@@ -110,7 +110,7 @@ export default function Navbar() {
         setLoading(true);
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
                 {
                     data: "k",
                     useDelivery: homeDelivered
@@ -146,7 +146,7 @@ export default function Navbar() {
     const fetchProductDetails = async (productId, merchantId) => {
         try {
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getProduct/${merchantId}/products/${productId}`
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}getProduct/${merchantId}/products/${productId}`
             );
 
             return {
@@ -168,7 +168,7 @@ export default function Navbar() {
     const checkoutWithDelivery = async (customerId: string) => {
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/createOrder/`
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}createOrder/`
             );
         } catch (error) {
             console.error("Error fetching delivery options:", error);
@@ -199,7 +199,7 @@ export default function Navbar() {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCartItems/`
+                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}getCartItems/`
                 );
 
                 setMerchantId(response.data.merchantId);
@@ -222,7 +222,7 @@ export default function Navbar() {
     const getDiscountedPrice = async () => {
         try {
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/rewards`
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}getCustomerByUUID/rewards`
             );
             if (response.status == 200) {
                 setDiscountedPrice(response.data.rewardAmount)
@@ -312,7 +312,7 @@ export default function Navbar() {
     const deleteCartItem = async (item) => {
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/deleteFromCart/${'userId'}`,
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}deleteFromCart/${'userId'}`,
                 {
                     productId: item.productId,
                     quantity: item.quantity,
@@ -336,7 +336,7 @@ export default function Navbar() {
     const clearCart = async (customerId: string) => {
         try {
             const response = await axios.delete(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}/emptyCartItems/${customerId}`
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}emptyCartItems/${customerId}`
             );
             setCartItems([]);
             setTotalPrice(0);
