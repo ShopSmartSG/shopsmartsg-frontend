@@ -357,13 +357,13 @@ export default function Navbar() {
 
   const end = (
     <div className="flex align-items-center gap-2">
-      {userType == 'customer' && ( <i
+       <i
           className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
           style={{ fontSize: "24px" }}
           onClick={() => setCartVisibility(true)}
       >
         <Badge value={cartItems.length} />
-      </i>)}
+      </i>
 
       <Avatar
         image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
