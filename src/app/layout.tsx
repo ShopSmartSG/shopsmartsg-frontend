@@ -5,7 +5,6 @@ import "./globals.css";
 import { PrimeReactProvider } from "primereact/api";
 import Navbar from '../../shared/components/navbar/navbar';
 import { AdminProvider } from "@/context/AdminContext";
-import { getSession } from "@/lib";
 import { SessionProvider as CustomSessionProvider } from "@/context/SessionContext";
 import ServiceWorkerRegistration from '../../shared/components/ServiceWorkerRegistration';
 export const metadata: Metadata = {
@@ -20,20 +19,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
- 
+
 
   return (
     <html lang="en">
       <body>
         <AdminProvider>
           <PrimeReactProvider>
-            <CustomSessionProvider session={session}>
               <Navbar />
               <ServiceWorkerRegistration />
               
               <div className="p-2 surface-ground">{children}</div>
-            </CustomSessionProvider>
           </PrimeReactProvider>
         </AdminProvider>
       </body>

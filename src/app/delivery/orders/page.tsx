@@ -1,32 +1,53 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 // import Link from "next/link";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import axios from "axios";
 import { Message } from "primereact/message";
 import { Tooltip } from "primereact/tooltip";
+import {useRouter} from "next/navigation";
+import {Toast} from "primereact/toast";
+import ForbiddenPage from "../../../../shared/components/ForbiddenPage/ForbiddenPage";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [isValidSession, setValidSession] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [userType, setUserType] = useState(null);
+  const router = useRouter();
+  const toast= useRef(null);
 
-  let userId, userType;
-  try {
-    userId = localStorage.getItem("userId");
-    userType = localStorage.getItem("userType");
-  } catch (error) {
-    console.error("Error accessing localStorage:", error);
-    userId = null;
-    userType = null;
-  }
-
+  useEffect(() => {
+    const validator = async () => {
+      try {
+        const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+          withCredentials: true
+        });
+        const data = response.data;
+        if (data.status && data.status.toLowerCase() !== 'failure') {
+          setValidSession(true);
+          setUserType(data.profileType);
+        } else {
+          setValidSession(false);
+          toast.current.show({ severity: "error", detail: "You are logged out!! Please Login Again", summary: 'Error' });
+        }
+      } catch (error) {
+        console.error('Validation Error:', error); // Log the error
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    validator();
+  }, []);
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         // Fetch orders from both endpoints independently
         const [profileResponse, activeResponse] = await Promise.allSettled([
           axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/${userId}`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/`
           ),
           axios.get(
             `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
@@ -105,7 +126,7 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, [userId]); // Added userId to dependency array
+  }, [/*userId*/]); // Added userId to dependency array
 
   const handleDirections = (lat, long) => {
     window.open(
@@ -120,7 +141,7 @@ const Orders = () => {
       await axios.put(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}/updateOrderStatus/${orderId}/${status}`,
         {
-          deliveryPartnerId: userId,
+          deliveryPartnerId: 'userId',
         }
       );
 
@@ -246,7 +267,13 @@ const Orders = () => {
     </div>
   );
 
-  if (userType === "DELIVERY") {
+  if(isLoading){
+    return <div>Loading...</div>;
+  }
+    if(userType && userType != 'delivery'){
+        return <ForbiddenPage/>
+    }
+  if (isValidSession) {
     return (
       <div>
         <h2>Ongoing Orders</h2>
@@ -304,9 +331,11 @@ const Orders = () => {
             </div>
           ))}
         </div>
+        <Toast ref = {toast} position={"top-right"}/>
       </div>
     );
   } else {
+    router.push('/delivery/login');
     return null;
   }
 };
