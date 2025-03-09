@@ -126,24 +126,49 @@ const ProductCatalog = () => {
   };
 
   useEffect(() => {
-     const fetchProducts = async() => {
-       try{
-         const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProductCatalog`,{
-              withCredentials: true
-         })
-         const data = await response.data;
-         setProducts(data);
-       }
-       catch(error){
-         console.log(error,"Error Fetching Data");
-         toast.current.show({
-              severity: "error",
-              summary: "Error Fetching Data",
-              detail: "Please Try Again!!",
-         })
+    const fetchProducts = async() => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProductCatalog`, {
+          withCredentials: true
+        });
+        const data = response.data;
 
-       }
-     }
+        // Transform the flat product array into categories
+        const categorizedProducts = {};
+
+        data.forEach(product => {
+          const categoryName = product.category.categoryName;
+
+          // Initialize category array if it doesn't exist
+          if (!categorizedProducts[categoryName]) {
+            categorizedProducts[categoryName] = [];
+          }
+
+          // Add the product to its category, with structure matching your component
+          categorizedProducts[categoryName].push({
+            id: product.productId,
+            name: product.productName,
+            price: product.listingPrice,
+            originalPrice: product.originalPrice,
+            description: product.productDescription,
+            image: product.imageUrl,
+            quantity: product.availableStock,
+            categoryId: product.category.categoryId,
+            merchantId: product.merchantId,
+            pincode: product.pincode
+          });
+        });
+
+        setProducts(categorizedProducts);
+      } catch(error) {
+        console.log(error, "Error Fetching Data");
+        toast.current.show({
+          severity: "error",
+          summary: "Error Fetching Data",
+          detail: "Please Try Again!!"
+        });
+      }
+    }
     fetchProducts();
 
   }, []);
