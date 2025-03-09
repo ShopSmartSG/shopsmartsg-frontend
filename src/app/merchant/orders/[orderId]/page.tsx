@@ -30,7 +30,8 @@ const Order = ({ params }) => {
       try {
         const response = await axios.get(
 
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrderById/${params.orderId}`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrderById/${params.orderId}`,
+          { withCredentials: true }
         );
 
         if (response.status === 200) {
@@ -82,7 +83,8 @@ const Order = ({ params }) => {
         for (const item of items) {
           try {
             const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${orderDetails.merchantId}/products/${item.productId}`
+              `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${orderDetails.merchantId}/products/${item.productId}`,
+              { withCredentials: true }
             );
 
             if (response.status === 200) {

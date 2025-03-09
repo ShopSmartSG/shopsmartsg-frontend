@@ -39,7 +39,8 @@ const Page = () => {
         const getMerchantDetails = async () => {
             try {   
 
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer`);
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer`,
+                    { withCredentials: true });
 
                 if(response.status === 200){
                     setMerchantDetails(response.data);

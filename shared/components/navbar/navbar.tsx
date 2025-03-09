@@ -62,7 +62,8 @@ export default function Navbar() {
   const fetchProductDetails = async (productId, merchantId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`,
+        { withCredentials: true }
       );
 
       return {
@@ -103,7 +104,8 @@ export default function Navbar() {
   const getCustomerDetails = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setRewardPoints(response.data.rewardPoints);
@@ -117,7 +119,8 @@ export default function Navbar() {
   const getDiscountedPrice = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`,
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setDiscountedPrice(response.data.rewardAmount);
@@ -136,7 +139,8 @@ export default function Navbar() {
         {
           productId: item.productId,
           quantity: item.quantity,
-        }
+        },
+        { withCredentials: true }
       );
       // Update cart items after deletion
       setCartItems(
@@ -156,7 +160,8 @@ export default function Navbar() {
   const clearCart = async (customerId) => {
     try {
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`,
+        { withCredentials: true }
       );
       setCartItems([]);
       setTotalPrice(0);
@@ -178,7 +183,8 @@ export default function Navbar() {
         {
           data: "k",
           useDelivery: homeDelivered,
-        }
+        },
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setTimeout(() => {
@@ -243,7 +249,8 @@ export default function Navbar() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`,
+          { withCredentials: true }
         );
 
         setMerchantId(response.data.merchantId);

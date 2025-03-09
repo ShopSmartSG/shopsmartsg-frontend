@@ -21,7 +21,8 @@ const Orders = () => {
       try {
         const response = await axios.get(
 
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/merchant/id`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/merchant/id`,
+          { withCredentials: true }
         );
         setOrders(response.data);
       } catch (error) {
@@ -65,7 +66,8 @@ const Orders = () => {
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/updateOrderStatus/${orderId}/${status}`,
         {
           k: "",
-        }
+        },
+        { withCredentials: true }
       );
       // Update the local state to reflect the status change
       setOrders((prevOrders) =>
