@@ -1,7 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Menubar } from "primereact/menubar";
-import { useRef } from "react";
 import { MenuItem } from "primereact/menuitem";
 import { Badge } from "primereact/badge";
 import { Avatar } from "primereact/avatar";
@@ -9,17 +8,13 @@ import "./navbar.css";
 import Link from "next/link";
 import HeadlessDemo from "../sidebar/sidebar";
 import { Button } from "primereact/button";
-
 import { ProgressSpinner } from "primereact/progressspinner";
-
 import { Checkbox } from "primereact/checkbox";
-
 import { useRouter } from "next/navigation";
 import { Dialog } from "primereact/dialog";
 import { Image } from "primereact/image";
 import axios from "axios";
 import { Toast } from "primereact/toast";
-import { boolean } from "yup";
 
 export default function Navbar() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -29,15 +24,15 @@ export default function Navbar() {
   const [customerName, setCustomerName] = useState("");
   const [rewardPoints, setRewardPoints] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [homeDelivered, setHomeDelivered] = useState<boolean>(false);
+  const [homeDelivered, setHomeDelivered] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [useRewardPoints, setUseRewardPoints] = useState(false);
   const [discountedPrice, setDiscountedPrice] = useState(0);
-  const router = useRouter();
-
   const [validSession, setValidSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState(null);
+  const router = useRouter();
+  const toast = useRef(null);
 
   const itemRenderer = (item) => (
     <Link className="flex align-items-center p-menuitem-link" href={item.url}>
@@ -51,13 +46,7 @@ export default function Navbar() {
       )}
     </Link>
   );
-  // let userId, userType;
-  // try {
-  //     userId = localStorage.getItem("userId");
-  //     userType = localStorage.getItem("userType");
-  // } catch (error) {
-  //     console.error("Error accessing localStorage:", error);
-  // }
+
   const headerElement = (
     <div className="inline-flex align-items-center justify-content-center gap-2">
       <Avatar
@@ -70,147 +59,10 @@ export default function Navbar() {
     </div>
   );
 
-  useEffect(() => {
-    const validator = async () => {
-      try {
-        const response = await axios.get(
-          `https://central-hub.shopsmartsg.com/auth/validate-token`,
-          {
-            withCredentials: true,
-          },
-        );
-        const data = response.data;
-        console.log("API Response:", data); // Debug the response
-        if (data.status && data.status.toLowerCase() !== "failure") {
-          setValidSession(true);
-        } else {
-
-            setTotalPrice(totalPrice + discountedPrice);
-        }
-    }, [useRewardPoints])
-
-    const placeOrder = async (customerId: string) => {
-
-
-        setLoading(true);
-        try {
-            const response = await axios.put(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
-
-                {
-                    data: "k",
-                    useDelivery: homeDelivered
-                }
-            );
-            if (response.status == 200) {
-                setTimeout(() => {
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Order Placed",
-                        detail: "Your order has been placed successfully",
-                        life: 3000,
-                    });
-                    setCartVisibility(false);
-                    setCartItems([]);
-                }, 3000);
-                router.push("/customer/orders");
-            }
-        } catch (error) {
-            console.log(error);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Error placing order. Please try again later.",
-                life: 300,
-            });
-        } finally {
-            setLoading(false);
-
-        }
-      } catch (error) {
-        console.error("Validation Error:", error); // Log the error
-        setValidSession(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-
-
-    const fetchProductDetails = async (productId, merchantId) => {
-        try {
-            const response = await axios.get(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`
-
-            );
-
-            return {
-                listingPrice: response.data.listingPrice,
-                productName: response.data.productName,
-                imageUrl: response.data.imageUrl,
-            };
-        } catch (error) {
-            console.error(`Error fetching details for product ${productId}:`, error);
-            return {
-                listingPrice: null,
-                productName: "Not available",
-                imageUrl: null,
-            };
-
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getCustomerDetails();
-  });
-  const toast = useRef(null);
-
-  // Calculate total price whenever cart items change
-  useEffect(() => {
-    const total = cartItems.reduce((sum, item) => {
-      return sum + item.listingPrice * item.quantity;
-    }, 0);
-    setTotalPrice(total);
-  }, [cartItems]);
-
-  useEffect(() => {
-    getDiscountedPrice();
-    if (useRewardPoints) {
-      const disPrice = totalPrice - discountedPrice;
-      setTotalPrice(disPrice);
-    } else {
-      setTotalPrice(totalPrice + discountedPrice);
-    }
-  }, [useRewardPoints]);
-
-  const placeOrder = async (customerId: string) => {
-    setLoading(true);
-    try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
-
-
-    const checkoutWithDelivery = async (customerId: string) => {
-        try {
-            const response = await axios.put(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/`
-
-            );
-        } catch (error) {
-            console.error("Error fetching delivery options:", error);
-        }
-
-    }
-  };
-
   const fetchProductDetails = async (productId, merchantId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`
       );
 
       return {
@@ -228,29 +80,19 @@ export default function Navbar() {
     }
   };
 
-  const checkoutWithDelivery = async (customerId: string) => {
-    try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/`,
-      );
-    } catch (error) {
-      console.error("Error fetching delivery options:", error);
-    }
-  };
-
   const fetchAllProductDetails = async (items, merchantId) => {
     try {
       const updatedItems = await Promise.all(
         items.map(async (item) => {
           const productDetails = await fetchProductDetails(
             item.productId,
-            merchantId,
+            merchantId
           );
           return {
             ...item,
             ...productDetails,
           };
-        }),
+        })
       );
       return updatedItems;
     } catch (error) {
@@ -258,18 +100,157 @@ export default function Navbar() {
     }
   };
 
+  const getCustomerDetails = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
+      );
+      if (response.status === 200) {
+        setRewardPoints(response.data.rewardPoints);
+        setCustomerName(response.data.customerName);
+      }
+    } catch (error) {
+      console.error("Error fetching customer details:", error);
+    }
+  };
+
+  const getDiscountedPrice = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
+      );
+      if (response.status === 200) {
+        setDiscountedPrice(response.data.rewardAmount);
+      }
+    } catch (error) {
+      console.error("Error fetching discount price:", error);
+    }
+  };
+
+  const deleteCartItem = async (item) => {
+    try {
+      const response = await axios.put(
+        `${
+          process.env.NEXT_PUBLIC_CentralService_API_URL
+        }api/deleteFromCart/${"userId"}`,
+        {
+          productId: item.productId,
+          quantity: item.quantity,
+        }
+      );
+      // Update cart items after deletion
+      setCartItems(
+        cartItems.filter((cartItem) => cartItem.productId !== item.productId)
+      );
+    } catch (err) {
+      console.error("Error deleting cart item:", err);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error deleting item from cart",
+        life: 3000,
+      });
+    }
+  };
+
+  const clearCart = async (customerId) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`
+      );
+      setCartItems([]);
+      setTotalPrice(0);
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error clearing cart",
+        life: 3000,
+      });
+    }
+  };
+
+  const placeOrder = async (customerId) => {
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
+        {
+          data: "k",
+          useDelivery: homeDelivered,
+        }
+      );
+      if (response.status === 200) {
+        setTimeout(() => {
+          toast.current.show({
+            severity: "success",
+            summary: "Order Placed",
+            detail: "Your order has been placed successfully",
+            life: 3000,
+          });
+          setCartVisibility(false);
+          setCartItems([]);
+        }, 3000);
+        router.push("/customer/orders");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error placing order. Please try again later.",
+        life: 300,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Validate session on component mount
+  useEffect(() => {
+    const validator = async () => {
+      try {
+        const response = await axios.get(
+          `https://central-hub.shopsmartsg.com/auth/validate-token`,
+          {
+            withCredentials: true,
+          }
+        );
+        const data = response.data;
+        console.log("API Response:", data);
+        if (data.status && data.status.toLowerCase() !== "failure") {
+
+          const userLowerCase = await data.userType.toLowerCase();
+            setUserType(userLowerCase);
+
+        } else {
+          setValidSession(false);
+        }
+      } catch (error) {
+        console.error("Validation Error:", error);
+        setValidSession(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validator();
+    getCustomerDetails();
+  }, []);
+
+  // Fetch cart items
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`
         );
 
         setMerchantId(response.data.merchantId);
 
         const itemsWithDetails = await fetchAllProductDetails(
           response.data.cartItems,
-          response.data.merchantId,
+          response.data.merchantId
         );
 
         setCartItems(itemsWithDetails);
@@ -278,49 +259,27 @@ export default function Navbar() {
       }
     };
 
+    fetchData();
+  }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(
+  // Calculate total price whenever cart items change
+  useEffect(() => {
+    const total = cartItems.reduce((sum, item) => {
+      return sum + item.listingPrice * item.quantity;
+    }, 0);
+    setTotalPrice(total);
+  }, [cartItems]);
 
-                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`
-
-                );
-
-                setMerchantId(response.data.merchantId);
-
-                const itemsWithDetails = await fetchAllProductDetails(
-                    response.data.cartItems,
-                    response.data.merchantId
-                );
-
-                setCartItems(itemsWithDetails);
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-
-    const getDiscountedPrice = async () => {
-        try {
-            const response = await axios.get(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`
-
-            );
-            if (response.status == 200) {
-                setDiscountedPrice(response.data.rewardAmount)
-            }
-        } catch (error) {
-            console.error("Error fetching discount price:", error);
-        }
-
+  // Handle reward points
+  useEffect(() => {
+    getDiscountedPrice();
+    if (useRewardPoints) {
+      const disPrice = totalPrice - discountedPrice;
+      setTotalPrice(disPrice);
+    } else {
+      setTotalPrice(totalPrice + discountedPrice);
     }
-  };
+  }, [useRewardPoints, discountedPrice, totalPrice]);
 
   const footerContent = (
     <div className="p-2 flex justify-content-between align-items-center">
@@ -369,14 +328,13 @@ export default function Navbar() {
     </div>
   );
 
-  const items: MenuItem[] = [
+  const items = [
     {
       label: "Merchant",
       icon: "pi pi-users",
       url: "/merchant",
       template: itemRenderer,
     },
-
     {
       label: "Orders",
       icon: "pi pi-gift",
@@ -391,151 +349,57 @@ export default function Navbar() {
     },
   ];
 
-  const endItems: MenuItem[] = [];
+  const start = (
+    <Link href="/" className="navbar-title">
+      ShopSmart
+    </Link>
+  );
 
-  const start = <Link href="/" className="navbar-title"></Link>;
+  const end = (
+    <div className="flex align-items-center gap-2">
+      {userType == 'customer' && ( <i
+          className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
+          style={{ fontSize: "24px" }}
+          onClick={() => setCartVisibility(true)}
+      >
+        <Badge value={cartItems.length} />
+      </i>)}
 
-  const deleteCartItem = async (item) => {
-    try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/deleteFromCart/${"userId"}`,
+      <Avatar
+        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+        shape="circle"
+      />
 
-        {
-          productId: item.productId,
-          quantity: item.quantity,
-        },
-
-    ];
-
-    const endItems: MenuItem[] = [];
-
-    const start = (
-        <Link href="/" className="navbar-title">
-            ShopSmart
-        </Link>
-    );
-
-    const deleteCartItem = async (item) => {
-        try {
-            const response = await axios.put(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/deleteFromCart/${'userId'}`,
-
-                {
-                    productId: item.productId,
-                    quantity: item.quantity,
-                }
-            );
-            // Update cart items after deletion
-            setCartItems(
-                cartItems.filter((cartItem) => cartItem.productId !== item.productId)
-            );
-        } catch (err) {
-            console.error("Error deleting cart item:", err);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Error deleting item from cart",
-                life: 3000,
-            });
-        }
-    };
-
-    const clearCart = async (customerId: string) => {
-        try {
-            const response = await axios.delete(
-
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`
-
-            );
-            setCartItems([]);
-            setTotalPrice(0);
-        } catch (error) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Error clearing cart",
-                life: 3000,
-            });
-        }
-    };
-
-    const end = (
-        <div className="flex align-items-center gap-2">
-            <i
-                className="pi pi-shopping-cart p-overlay-badge mr-3 cursor-pointer"
-                style={{fontSize: "24px"}}
-                onClick={() => setCartVisibility(true)}
-            >
-                <Badge value={cartItems.length}/>
-            </i>
-            <Avatar
-                image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                shape="circle"
-            />
-
-            <Button
-                icon="pi pi-bars"
-                onClick={() => setSidebarVisible(true)}
-                className="p-button-text"
-            />
-            <Dialog
-                visible={cartVisibility}
-                style={{width: "50vw"}}
-                onHide={() => setCartVisibility(false)}
-                resizable={false}
-                modal={true}
-                draggable={false}
-                header={headerElement}
-                footer={footerContent}
-                maximized={true}
-            >
-                {cartItems.map((item, index) => (
-                    <div
-                        key={index}
-                        className="grid align-items-center gap-3 mb-3"
-                        style={{padding: "10px", borderBottom: "1px solid #e0e0e0"}}
-                    >
-                        <div className="col-4">
-                            <Image
-                                src={`${item.imageUrl}`}
-                                alt="Product Image"
-                                height="200"
-                                width="180"
-                            />
-                        </div>
-
-                        <div className="col-7 product-details p-1">
-                            <div className="grid">
-                                <div className="col-4 text-left font-bold">
-                                    <p>Product Name</p>
-                                    <p>Quantity</p>
-                                    <p>Price</p>
-                                    <p>Subtotal</p>
-                                </div>
-                                <div className="col-7 text-right">
-                                    <p>{item.productName}</p>
-                                    <p>{item.quantity}</p>
-                                    <p>${item.listingPrice}</p>
-                                    <p>${(item.listingPrice * item.quantity).toFixed(2)}</p>
-                                    <i
-                                        className="pi pi-trash cursor-pointer"
-                                        style={{color: "red"}}
-                                        onClick={() => deleteCartItem(item)}
-                                    ></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </Dialog>
-
-            <HeadlessDemo
-                visible={sidebarVisible}
-                onHide={() => setSidebarVisible(false)}
-            />
-        </div>
-    );
+      <Button
+        icon="pi pi-bars"
+        onClick={() => setSidebarVisible(true)}
+        className="p-button-text"
+      />
+      <Dialog
+        visible={cartVisibility}
+        style={{ width: "50vw" }}
+        onHide={() => setCartVisibility(false)}
+        resizable={false}
+        modal={true}
+        draggable={false}
+        header={headerElement}
+        footer={footerContent}
+        maximized={true}
+      >
+        {cartItems.map((item, index) => (
+          <div
+            key={index}
+            className="grid align-items-center gap-3 mb-3"
+            style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}
+          >
+            <div className="col-4">
+              <Image
+                src={`${item.imageUrl}`}
+                alt="Product Image"
+                height="200"
+                width="180"
+              />
+            </div>
 
             <div className="col-7 product-details p-1">
               <div className="grid">
