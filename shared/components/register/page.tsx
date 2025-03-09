@@ -18,6 +18,13 @@ interface RegisterFormProps {
     type?: string
 }
 
+
+interface  RegistrationResponse {
+    status ?: string,
+    redirect_uri ?: string
+    message?: string
+}
+
 const RegisterForm = ({type}: RegisterFormProps) => {
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
@@ -117,8 +124,9 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                     detail: "Registration Successful",
                     life: 3000,
                 })
+                const response_uri:RegistrationResponse = await response.data;
                 setTimeout(() => {
-                    router.push("/merchant/login");
+                    router.push(response_uri.redirect_uri);
                 }, 3000);
             }
             else{

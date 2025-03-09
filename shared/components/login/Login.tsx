@@ -16,6 +16,7 @@ import { Divider } from 'primereact/divider';
 import {useAdminContext} from "@/context/AdminContext";
 
 import axios from "axios";
+import Link from "next/link";
 
 interface LoginProps {
     type?: string
@@ -32,7 +33,7 @@ const Login = ({type}: LoginProps) => {
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
     const {setUserTyped} = useAdminContext()
-
+    const userType = type.toLowerCase();
     const toast = useRef(null);
 
     const isValidEmail = (email) => {
@@ -253,8 +254,12 @@ setUserTyped(type);
                             className="w-full p-button-outlined p-button-secondary"
                             onClick={handleGoogleSignIn}
                         />
-                    </div>
 
+                    </div>
+                    <Divider/>
+                    <div className="col-12 mt-4 text-center">
+                        <Link href={`/${userType}/register`}>Click here to register.</Link>
+                    </div>
 
                 </div>
 

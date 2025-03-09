@@ -20,6 +20,7 @@ const Orders = () => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
+
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/merchant/id`
         );
         setOrders(response.data);
@@ -60,6 +61,7 @@ const Orders = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
+
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/updateOrderStatus/${orderId}/${status}`,
         {
           k: "",

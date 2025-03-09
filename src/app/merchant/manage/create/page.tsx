@@ -105,6 +105,7 @@ const Page = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
+
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCategories`
         );
         setCategories([
@@ -146,6 +147,7 @@ const Page = () => {
     const getMerchantDetails = async () => {
       try {
         const response = await axios.get(
+
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant`
         );
         setMerchantDetails(response.data);
@@ -205,7 +207,9 @@ const Page = () => {
   const categoryHandler = async () => {
     try {
       const response = await axios.post(
+
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCategories`,
+
         {
           categoryName: newCategory,
           categoryDescription: newCategoryDescription,

@@ -29,6 +29,7 @@ const Order = ({ params }) => {
     const getOrderDetails = async () => {
       try {
         const response = await axios.get(
+
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrderById/${params.orderId}`
         );
 

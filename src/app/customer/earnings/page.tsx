@@ -38,7 +38,9 @@ const Page = () => {
     useEffect(() => {
         const getMerchantDetails = async () => {
             try {   
+
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer`);
+
                 if(response.status === 200){
                     setMerchantDetails(response.data);
                 }

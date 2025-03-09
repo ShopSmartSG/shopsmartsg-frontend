@@ -23,7 +23,9 @@ const FilterSearch = () => {
     useEffect(() => {
       const fetchCategories = async () => {
         try {
+
           const response = await axios.get(`${apiUrlProduct}api/getCategories`);
+
           const data = response.data;
           const formattedCategories = data.map((category) => ({
             label: category.categoryName,
