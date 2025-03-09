@@ -75,10 +75,12 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
         withCredentials:true
       });
       console.log("Logged Out Successfully", response);
+      toast.current.show({ severity: "success", detail: "Logged Out Successfully", summary: 'Success' });
 
     }
     catch(error){
       console.error("Error logging out", error);
+        toast.current.show({ severity: "error", detail: "Error Logging Out", summary: 'Error' });
     }
     finally {
       console.log("User logged out");
@@ -157,7 +159,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           <StyleClass
                               nodeRef={merchantRef}
                               selector="@next"
-                              enterClassName="hidden"
+                              enterFromClassName="hidden"
                               enterActiveClassName="slidedown"
                               leaveToClassName="hidden"
                               leaveActiveClassName="slideup"
@@ -236,7 +238,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           <StyleClass
                               nodeRef={customerRef}
                               selector="@next"
-                              enterClassName="hidden"
+                              enterFromClassName="hidden"
                               enterActiveClassName="slidedown"
                               leaveToClassName="hidden"
                               leaveActiveClassName="slideup"
@@ -293,7 +295,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                           <StyleClass
                               nodeRef={deliveryPartnerRef}
                               selector="@next"
-                              enterClassName="hidden"
+                              enterFromClassName="hidden"
                               enterActiveClassName="slidedown"
                               leaveToClassName="hidden"
                               leaveActiveClassName="slideup"
