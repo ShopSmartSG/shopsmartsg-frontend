@@ -106,7 +106,8 @@ const Page = () => {
       try {
         const response = await axios.get(
 
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCategories`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCategories`,
+          { withCredentials: true }
         );
         setCategories([
           ...response.data,
@@ -148,7 +149,8 @@ const Page = () => {
       try {
         const response = await axios.get(
 
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant`,
+          { withCredentials: true }
         );
         setMerchantDetails(response.data);
       } catch (error) {
@@ -187,7 +189,8 @@ const Page = () => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantProducts`,
-        dataObj
+        dataObj,
+        { withCredentials: true }
       );
       toast.current.show({
         severity: "success",
@@ -213,7 +216,8 @@ const Page = () => {
         {
           categoryName: newCategory,
           categoryDescription: newCategoryDescription,
-        }
+        },
+        { withCredentials: true }
       );
       if (response.status == 200) {
         toast.current.show({

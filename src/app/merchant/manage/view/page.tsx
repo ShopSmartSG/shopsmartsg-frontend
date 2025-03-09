@@ -67,7 +67,8 @@ const ProductCatalog = () => {
       await axios.put(
 
           `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByProductId/${updatedProductData.merchantId}/products/${updatedProductData.productId}`,
-          updatedProductData
+          updatedProductData,
+          { withCredentials: true }
       );
       setProducts((prevProducts) => {
         const updatedProducts = { ...prevProducts };
@@ -100,7 +101,8 @@ const ProductCatalog = () => {
     try {
       const response = await axios.delete(
 
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByProductId/${selectedProduct.merchantId}/products/${selectedProduct.id}`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByProductId/${selectedProduct.merchantId}/products/${selectedProduct.id}`,
+          { withCredentials: true }
 
       );
       if (response.status === 200) {

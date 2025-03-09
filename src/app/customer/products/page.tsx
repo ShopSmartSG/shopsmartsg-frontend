@@ -86,7 +86,8 @@ const ProductsContent = () => {
                         minPrice: minPrice ? parseFloat(minPrice) : undefined,
                         pincode,
                         searchText,
-                    }
+                    },
+                    { withCredentials: true }
                 );
 
                 const merchantIds = response.data.map(
@@ -140,7 +141,8 @@ const ProductsContent = () => {
                     productId: product.productId,
                     quantity,
                     price: product.listingPrice,
-                }
+                },
+                { withCredentials: true }
             );
             if (response.status == 200) {
                 toast.current?.show({
@@ -221,7 +223,8 @@ const ProductsContent = () => {
                         try {
                             const response = await axios.get(
 
-                                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${merchant}`
+                                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${merchant}`,
+                                { withCredentials: true }
 
                             );
                             const data = response.data;

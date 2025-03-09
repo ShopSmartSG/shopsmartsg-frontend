@@ -48,10 +48,12 @@ const Orders = () => {
         const [profileResponse, activeResponse] = await Promise.allSettled([
           axios.get(
 
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/`,
+            { withCredentials: true }
           ),
           axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getActiveOrdersForDeliveries`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getActiveOrdersForDeliveries`,
+            { withCredentials: true }
 
           ),
         ]);
@@ -146,7 +148,8 @@ const Orders = () => {
 
         {
           deliveryPartnerId: 'userId',
-        }
+        },
+        { withCredentials: true }
       );
 
       setOrders((prevOrders) =>
@@ -170,7 +173,8 @@ const Orders = () => {
   const getMerchantDetails = async (merchantId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${merchantId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${merchantId}`,
+        { withCredentials: true }
 
       );
       return response.data;
@@ -183,7 +187,8 @@ const Orders = () => {
     try {
       const response = await axios.get(
 
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/${customerId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/${customerId}`,
+        { withCredentials: true }
 
       );
       return response.data;

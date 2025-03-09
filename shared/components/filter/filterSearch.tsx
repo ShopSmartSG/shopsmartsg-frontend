@@ -24,7 +24,8 @@ const FilterSearch = () => {
       const fetchCategories = async () => {
         try {
 
-          const response = await axios.get(`${apiUrlProduct}api/getCategories`);
+          const response = await axios.get(`${apiUrlProduct}api/getCategories`,
+            { withCredentials: true });
 
           const data = response.data;
           const formattedCategories = data.map((category) => ({
