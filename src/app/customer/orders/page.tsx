@@ -55,7 +55,9 @@ const OrderCard = ({ order, isDelivery }) => {
     const fetchMerchantDetails = async () => {
       try {
         const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}getMerchantByUUID/${order.merchantId}`
+
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${order.merchantId}`
+
         );
         if (response.status === 200) {
           setMerchantDetails(response.data);
@@ -288,7 +290,9 @@ const Orders = () => {
         try {
           setIsLoading(true);
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}getOrdersListForProfile/ALL/profiles/customer/id`
+
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/customer/id`
+
           );
           if (response.status === 200) {
             setOrders(response.data);

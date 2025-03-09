@@ -77,7 +77,9 @@ const ProductsContent = () => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.post(
-                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}searchProducts`,
+
+                    `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/searchProducts`,
+
                     {
                         categoryId,
                         maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
@@ -131,7 +133,9 @@ const ProductsContent = () => {
 
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}addToCart/${userId}/merchant/${product.merchantId}`,
+
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/addToCart/${userId}/merchant/${product.merchantId}`,
+
                 {
                     productId: product.productId,
                     quantity,
@@ -216,7 +220,9 @@ const ProductsContent = () => {
                     merchants.map(async (merchant) => {
                         try {
                             const response = await axios.get(
-                                `${process.env.NEXT_PUBLIC_CentralService_API_URL}getMerchantByUUID/${merchant}`
+
+                                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchantByUUID/${merchant}`
+
                             );
                             const data = response.data;
                             return {
