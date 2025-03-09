@@ -357,7 +357,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
                     <div className="col-10">
                       <div className="flex align-items-center gap-2">
                         <Avatar
-                          image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                          image="https://storage.googleapis.com/shopsmart-product-images-bucket/Screenshot%202025-03-09%20at%206.53.29%E2%80%AFPM.png"
                           shape="circle"
                         />
                         <span className="font-bold">{name}</span>
