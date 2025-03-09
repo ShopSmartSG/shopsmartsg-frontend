@@ -20,7 +20,7 @@ const Orders = () => {
     const fetchMerchantOrderRequests = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}getOrdersListForProfile/ALL/profiles/merchant/id`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getOrdersListForProfile/ALL/profiles/merchant/id`
         );
         setOrders(response.data);
       } catch (error) {
@@ -60,7 +60,7 @@ const Orders = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}updateOrderStatus/${orderId}/${status}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/updateOrderStatus/${orderId}/${status}`,
         {
           k: "",
         }
