@@ -65,7 +65,7 @@ const ProductCatalog = () => {
     };
     try {
       await axios.put(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchantByProductId/${updatedProductData.merchantId}/products/${updatedProductData.productId}`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}getMerchantByProductId/${updatedProductData.merchantId}/products/${updatedProductData.productId}`,
           updatedProductData
       );
       setProducts((prevProducts) => {
@@ -98,7 +98,7 @@ const ProductCatalog = () => {
   const handleDeleteSubmit = async () => {
     try {
       const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchantByProductId/${selectedProduct.merchantId}/products/${selectedProduct.id}`
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}getMerchantByProductId/${selectedProduct.merchantId}/products/${selectedProduct.id}`
       );
       if (response.status === 200) {
         toast.current.show({

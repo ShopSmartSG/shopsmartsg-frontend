@@ -16,7 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials, req) {
         try {
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}/profile/login/verifyOtp/merchant`,
+            `${process.env.NEXT_PUBLIC_CentralServiceLogin_API_URL}profile/login/verifyOtp/merchant`,
             {
               email: credentials.email,
               emailAddress:credentials.email,

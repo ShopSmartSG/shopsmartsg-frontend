@@ -47,10 +47,10 @@ const Orders = () => {
         // Fetch orders from both endpoints independently
         const [profileResponse, activeResponse] = await Promise.allSettled([
           axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getOrdersListForProfile/ALL/profiles/deliveryPartner/id/`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}getOrdersListForProfile/ALL/profiles/deliveryPartner/id/`
           ),
           axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getActiveOrdersForDeliveries`
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}getActiveOrdersForDeliveries`
           ),
         ]);
 
@@ -139,7 +139,7 @@ const Orders = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/updateOrderStatus/${orderId}/${status}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}updateOrderStatus/${orderId}/${status}`,
         {
           deliveryPartnerId: 'userId',
         }
@@ -166,7 +166,7 @@ const Orders = () => {
   const getMerchantDetails = async (merchantId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getMerchant/${merchantId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}getMerchantByUUID/${merchantId}`
       );
       return response.data;
     } catch (error) {
@@ -177,7 +177,7 @@ const Orders = () => {
   const getCustomerDetails = async (customerId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}/getCustomer/${customerId}`
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}getCustomerByUUID/${customerId}`
       );
       return response.data;
     } catch (error) {
