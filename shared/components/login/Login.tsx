@@ -92,7 +92,7 @@ const Login = ({type}: LoginProps) => {
         }
 
         setIsLoading(true);
-        const userType = type?.toLowerCase() || "customer";
+        const userType = type?.toLowerCase() ;
         
         try {
             const response = await axios.post(
@@ -148,7 +148,7 @@ const Login = ({type}: LoginProps) => {
     };
 
     const handleGoogleSignIn = async () => {
-        const userType = type === "Customer" ? "customer" : "merchant";
+        const userType = type.toLowerCase();
 
            try {
              const response = await axios.get(
