@@ -52,7 +52,7 @@ const Orders = () => {
             { withCredentials: true }
           ),
           axios.get(
-            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getActiveOrdersForDeliveries/activeOrdersForDelivery`,
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getActiveOrdersForDeliveries`,
             { withCredentials: true }
 
           ),
