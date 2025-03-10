@@ -76,7 +76,7 @@ const Order = ({ params }) => {
 
             try {
                 // Extract all product IDs from order items
-                const productIds = orderDetails.orderItems.map(item => item.productId);
+                const productIds = Array.from(new Set(orderDetails.orderItems.map(item => item.productId)));
                 const queryParam = productIds.join(',');
 
                 // Make a single API call with all product IDs
