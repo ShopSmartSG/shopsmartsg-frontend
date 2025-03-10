@@ -142,7 +142,7 @@ export default function Navbar() {
   const getDiscountedPrice = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomerByUUID/rewards`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer/rewards`,
         { withCredentials: true }
       );
       if (response.status === 200) {
