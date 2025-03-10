@@ -17,6 +17,7 @@ const Orders = () => {
   const [userType, setUserType] = useState(null);
   const router = useRouter();
   const toast= useRef(null);
+  const [deliveryPartnerId, setDeliveryPartnerId] = useState(null);
 
   useEffect(() => {
     const validator = async () => {
@@ -39,7 +40,20 @@ const Orders = () => {
         setIsLoading(false);
       }
     };
+    const delivery = async () => {
+      try{
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getDelivery`,{
+          withCredentials:true
+        })
+        const data = await response.data;
+        setDeliveryPartnerId(data?.deliveryPartnerId);
+      }
+      catch (error){
+        console.error('Error:', error);
+      }
+    }
     validator();
+    delivery();
   }, []);
   useEffect(() => {
     const fetchOrders = async () => {
@@ -147,7 +161,7 @@ const Orders = () => {
         `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/updateOrderStatus/${orderId}/${status}`,
 
         {
-          deliveryPartnerId: 'userId',
+          deliveryPartnerId: deliveryPartnerId,
         },
         { withCredentials: true }
       );
