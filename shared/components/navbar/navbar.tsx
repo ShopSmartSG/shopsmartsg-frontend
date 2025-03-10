@@ -202,7 +202,7 @@ export default function Navbar() {
     setLoading(true);
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/${customerId}/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/createOrder/rewards/${useRewardPoints}/delivery/${homeDelivered}`,
         {
           data: "k",
           useDelivery: homeDelivered,
