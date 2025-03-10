@@ -62,7 +62,7 @@ export default function Navbar() {
   const fetchProductDetails = async (productId, merchantId) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${merchantId}/products/${productId}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProducts/${productId}`,
         { withCredentials: true }
       );
 
@@ -83,20 +83,43 @@ export default function Navbar() {
 
   const fetchAllProductDetails = async (items, merchantId) => {
     try {
-      const updatedItems = await Promise.all(
-        items.map(async (item) => {
-          const productDetails = await fetchProductDetails(
-            item.productId,
-            merchantId
-          );
-          return {
-            ...item,
-            ...productDetails,
-          };
-        })
+      // Extract product IDs from cart items
+      const productIds = items.map(item => item.productId);
+
+      // Create query string with array of product IDs
+      const queryString = productIds.join(',');
+
+      // Make a single API call with all product IDs
+      const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProducts?productIds=${queryString}`,
+          { withCredentials: true }
       );
+
+      // Map the response data to cart items
+      const productDetailsMap = {};
+      response.data.forEach(product => {
+        productDetailsMap[product.productId] = {
+          listingPrice: product.listingPrice,
+          productName: product.productName,
+          imageUrl: product.imageUrl
+        };
+      });
+
+      // Merge product details with cart items
+      const updatedItems = items.map(item => {
+        return {
+          ...item,
+          ...(productDetailsMap[item.productId] || {
+            listingPrice: null,
+            productName: "Not available",
+            imageUrl: null
+          })
+        };
+      });
+
       return updatedItems;
     } catch (error) {
+      console.error("Error fetching product details:", error);
       throw new Error("Error fetching product details");
     }
   };
