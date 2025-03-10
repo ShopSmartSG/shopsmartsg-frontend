@@ -1,10 +1,10 @@
 "use client";
-import React, { LegacyRef, useEffect, useRef, useState } from "react";
-import { Sidebar } from "primereact/sidebar";
-import { Button } from "primereact/button";
-import { Avatar } from "primereact/avatar";
-import { Ripple } from "primereact/ripple";
-import { StyleClass } from "primereact/styleclass";
+import React, {LegacyRef, useEffect, useRef, useState} from "react";
+import {Sidebar} from "primereact/sidebar";
+import {Button} from "primereact/button";
+import {Avatar} from "primereact/avatar";
+import {Ripple} from "primereact/ripple";
+import {StyleClass} from "primereact/styleclass";
 import Link from "next/link";
 import axios from "axios";
 
@@ -75,6 +75,7 @@ export default function HeadlessDemo({ visible, onHide }: HeadlessDemoProps) {
         withCredentials:true
       });
       console.log("Logged Out Successfully", response);
+      window.location.href = await response.data.redirect_uri;
       toast.current.show({ severity: "success", detail: "Logged Out Successfully", summary: 'Success' });
 
     }
