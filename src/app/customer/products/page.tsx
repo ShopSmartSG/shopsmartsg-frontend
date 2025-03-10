@@ -135,7 +135,7 @@ const ProductsContent = () => {
         try {
             const response = await axios.put(
 
-                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/addToCart/${userId}/merchant/${product.merchantId}`,
+                `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/addToCart/merchant/${product.merchantId}`,
 
                 {
                     productId: product.productId,

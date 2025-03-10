@@ -249,7 +249,7 @@ export default function Navbar() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems/`,
+          `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCartItems`,
           { withCredentials: true }
         );
 
