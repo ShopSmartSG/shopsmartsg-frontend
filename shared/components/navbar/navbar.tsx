@@ -158,7 +158,7 @@ export default function Navbar() {
       const response = await axios.put(
         `${
           process.env.NEXT_PUBLIC_CentralService_API_URL
-        }api/deleteFromCart/${"userId"}`,
+        }api/deleteFromCart`,
         {
           productId: item.productId,
           quantity: item.quantity,
@@ -183,7 +183,7 @@ export default function Navbar() {
   const clearCart = async (customerId) => {
     try {
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems/${customerId}`,
+        `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/emptyCartItems`,
         { withCredentials: true }
       );
       setCartItems([]);
