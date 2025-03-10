@@ -51,7 +51,7 @@ export default function Navbar() {
     const headerElement = (
         <div className="inline-flex align-items-center justify-content-center gap-2">
             <Avatar
-                image="https://storage.googleapis.com/shopsmart-product-images-bucket/Screenshot%202025-03-09%20at%206.53.29%E2%80%AFPM.png"
+                image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                 shape="circle"
             />
             <span className="font-bold white-space-nowrap">
@@ -447,7 +447,7 @@ export default function Navbar() {
             </i>
 
             <Avatar
-                image="https://storage.googleapis.com/shopsmart-product-images-bucket/Screenshot%202025-03-09%20at%206.53.29%E2%80%AFPM.png"
+                image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                 shape="circle"
             />
 
@@ -476,7 +476,7 @@ export default function Navbar() {
                         >
                             <div className="col-4">
                                 <Image
-                                    src={item.imageUrl || "https://storage.googleapis.com/shopsmart-product-images-bucket/placeholder.png"}
+                                    src={item.imageUrl || "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"}
                                     alt="Product Image"
                                     height="200"
                                     width="180"
