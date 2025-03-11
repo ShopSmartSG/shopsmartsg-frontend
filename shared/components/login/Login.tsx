@@ -40,7 +40,7 @@ const Login = ({type}: LoginProps) => {
         return validator.isEmail(email);
     };
 
-    const handleGenerateOTP = () => {
+    const handleGenerateOTP = async () => {
         if (!isValidEmail(email)) {
             toast.current.show({
                 severity: "error",
@@ -51,6 +51,14 @@ const Login = ({type}: LoginProps) => {
         }
 
         setShowLoader(true);
+        try{
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/native/generate-otp/${type.toLowerCase()}`);
+            const data = await response.data;
+            console.log(data);
+        }
+        catch(error){
+            console.log(error,"Error Generating OTP");
+        }
         setTimeout(() => {
             setShowLoader(false);
             setIsOtpGenerated(true);
