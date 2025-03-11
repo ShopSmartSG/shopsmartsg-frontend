@@ -227,7 +227,7 @@ const ProductCatalog = () => {
                               <Card
                                   header={<Image alt={product.name} src={product.image}  className={"h-20rem w-20rem"} />}
                                   title={product.name}
-                                  subTitle={`Price: $${product.price}`}
+                                  subTitle={`Price: $${product.listingPrice}`}
                                   style={{ padding: "1rem" }}
                               >
                                 <p>Quantity: {product.quantity}</p>
