@@ -39,7 +39,7 @@ const Page = () => {
         const getMerchantDetails = async () => {
             try {   
 
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer`,
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getCustomer/rewards`,
                     { withCredentials: true });
 
                 if(response.status === 200){
@@ -63,7 +63,7 @@ const Page = () => {
         return (
             <div className="text-center">
                 <h4> Rewards</h4>
-                {merchantDetails && <p>Welcome, {merchantDetails.name}</p>}
+                {merchantDetails && <p>Welcome</p>}
                 {merchantDetails && (
                     <p>Total Reward points: {merchantDetails.rewardPoints} points</p>
                 )}

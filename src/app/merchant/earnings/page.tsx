@@ -41,7 +41,7 @@ const Page = () => {
         const getMerchantDetails = async () => {
             try {   
 
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant`,
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant/rewards`,
                     { withCredentials: true });
                 if(response.status === 200){
                     setMerchantDetails(response.data);
@@ -66,7 +66,7 @@ const Page = () => {
         return (
             <div>
                 Merchant Earnings
-                {merchantDetails && <p>Welcome, {merchantDetails.name}</p>}
+                {merchantDetails && <p>Welcome !!!</p>}
                 {merchantDetails && <p>Total Earnings: ${merchantDetails.earnings}</p>}
                 <Toast ref={toast} />
             </div>
