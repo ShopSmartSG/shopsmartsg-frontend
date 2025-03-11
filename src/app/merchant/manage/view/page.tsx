@@ -149,7 +149,7 @@ const ProductCatalog = () => {
           categorizedProducts[categoryName].push({
             id: product.productId,
             name: product.productName,
-            price: product.listingPrice,
+            listingPrice: product.listingPrice,
             originalPrice: product.originalPrice,
             description: product.productDescription,
             image: product.imageUrl,
