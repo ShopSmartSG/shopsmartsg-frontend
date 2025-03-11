@@ -14,6 +14,7 @@ import { Toast } from "primereact/toast";
 import { Message } from "primereact/message";
 import { InputNumber } from "primereact/inputnumber";
 import ForbiddenPage from "../../../../../shared/components/ForbiddenPage/ForbiddenPage";
+import {Image} from "primereact/image";
 
 const ProductCatalog = () => {
   const [products, setProducts] = useState({});
@@ -224,7 +225,7 @@ const ProductCatalog = () => {
                                 className="p-col-12 p-md-6 p-lg-4 p-p-3 mt-2"
                             >
                               <Card
-                                  header={<img alt={product.name} src={product.image} style={{ width: "100%", height: "150px", objectFit: "cover" }} />}
+                                  header={<Image alt={product.name} src={product.image}  className={"h-auto w-auto"} />}
                                   title={product.name}
                                   subTitle={`Price: $${product.price}`}
                                   style={{ padding: "1rem" }}
