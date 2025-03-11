@@ -142,27 +142,8 @@ const RegisterForm = ({type}: RegisterFormProps) => {
         catch(error){
 
         }
-        if (parseInt(otp) == 123456) {
-            toast.current.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Login Succcessful",
-                life: 3000,
-            });
-            setShowOtpDialog(false);
-            setOtp("");
-            setOtpCount(0);
-        } else {
-            setOtpError(true);
-            setOtp("");
-            setOtpCount(otpCount + 1);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Invalid OTP",
-                life: 3000,
-            });
-        }
+
+
     };
 
 
