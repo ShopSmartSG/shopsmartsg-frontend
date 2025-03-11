@@ -15,7 +15,7 @@ const Page = () => {
     useEffect(() => {
         const validator = async () => {
             try {
-                const response = await axios.get(`https://central-hub.shopsmartsg.com/auth/validate-token`, {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_UR}auth/validate-token`, {
                     withCredentials: true
                 });
                 const data = response.data;
@@ -41,7 +41,7 @@ const Page = () => {
         const getMerchantDetails = async () => {
             try {   
 
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant/rewards`,
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getMerchant`,
                     { withCredentials: true });
                 if(response.status === 200){
                     setMerchantDetails(response.data);
