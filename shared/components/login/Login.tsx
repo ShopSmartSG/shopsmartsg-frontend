@@ -52,7 +52,7 @@ const Login = ({type}: LoginProps) => {
 
         setShowLoader(true);
         try{
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}profile/login/generateOtp/${type.toLowerCase()}`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/native/generate-otp/${type.toLowerCase()}/${email}`);
             const data = await response.data;
             console.log(data);
         }
