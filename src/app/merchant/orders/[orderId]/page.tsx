@@ -71,40 +71,38 @@ const Order = ({ params }) => {
   }, []);
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!orderDetails) return;
+      if (!orderDetails || !orderDetails.orderItems || orderDetails.orderItems.length === 0) {
+        return;
+      }
 
       try {
-        const details = {};
-        
-        const items = orderDetails.orderItems || [];
+        // Extract all product IDs from order items
+        const productIds = Array.from(new Set(orderDetails.orderItems.map(item => item.productId)));
+        const queryParam = productIds.join(',');
 
-       
-
-        for (const item of items) {
-          try {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProduct/${orderDetails.merchantId}/products/${item.productId}`,
-              { withCredentials: true }
-            );
-
-            if (response.status === 200) {
-              console.log(
-                `Product details received for ${item.productId}:`,
-                response.data
-              );
-              details[item.productId] = response.data;
+        // Make a single API call with all product IDs
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_CentralService_API_URL}api/getProducts?productIds=${queryParam}`,
+            {
+              params: { productIds: productIds.join(',') },
+              withCredentials: true
             }
-          } catch (productError) {
-            console.error(
-              `Error fetching details for product ${item.productId}:`,
-              productError
-            );
-          }
-        }
+        );
 
-        setProductDetails(details);
+        if (response.status === 200) {
+          console.log("Products details received:", response.data);
+
+          // Convert array of products to an object with productId as keys
+          const productsMap = {};
+          response.data.forEach(product => {
+            productsMap[product.productId] = product;
+          });
+
+          setProductDetails(productsMap);
+        }
       } catch (error) {
-        console.error("Error in fetchProductDetails:", error);
+        console.error("Error fetching product details:", error);
+        // We don't set loading to false here as it might interfere with the order loading state
       }
     };
 
