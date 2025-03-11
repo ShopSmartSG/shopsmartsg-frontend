@@ -15,7 +15,7 @@ const Page = () => {
     useEffect(() => {
         const validator = async () => {
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_UR}auth/validate-token`, {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_CentralService_API_URL}auth/validate-token`, {
                     withCredentials: true
                 });
                 const data = response.data;
