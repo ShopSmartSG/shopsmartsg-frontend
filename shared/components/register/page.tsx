@@ -116,6 +116,8 @@ const RegisterForm = ({type}: RegisterFormProps) => {
                 addressLine2: addressLine2,
                 pincode: pinCode,
                 otp: otp
+            },{
+                withCredentials: true
             })
             if(response.status == 200) {
                 toast.current.show({
