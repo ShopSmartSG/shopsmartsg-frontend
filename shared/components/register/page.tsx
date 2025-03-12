@@ -247,7 +247,8 @@ const RegisterForm = ({type}: RegisterFormProps) => {
             >
                 <div className={"field"}>
                     <label className={"w-full"}>Create Password</label>
-                    <Password className={"w-full"} value={password} onChange={(e) => setPassword(e.target.value)} toggleMask feedback={false}/>
+                    <Password className={"w-full"}  onChange={(e) => setPassword(e.target.value)} toggleMask feedback={false} />
+                    {/*<input  className={"w-full"} value={password}  onChange={(e) => setPassword(e.target.value)}/>*/}
 
                 </div>
                 <div className="field">

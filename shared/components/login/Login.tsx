@@ -285,9 +285,9 @@ setUserTyped(type);
                     <div className="flex flex-column gap-3">
                         <div className="col-12 mt-3">
                             <FloatLabel>
+                                {/*<input onChange={(e) => setPassword(e.target.value)} type={'password'}/>*/}
                                 <Password
                                     inputId="password"
-                                    value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     toggleMask
                                     feedback={false}
